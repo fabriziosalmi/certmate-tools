@@ -1,0 +1,110 @@
+---
+import "~/styles/global.css";
+import Header from "~/components/Header.astro";
+import Footer from "~/components/Footer.astro";
+import {
+  DEFAULT_LOCALE,
+  LOCALES,
+  detectLocale,
+  getMessages,
+  localizedPath,
+  stripLocale,
+  type Locale,
+} from "~/i18n";
+
+interface Props {
+  title: string;
+  description: string;
+  keywords?: string[];
+  /** When true, the page is a tool-style compact layout (sticky header + thin footer). */
+  compact?: boolean;
+}
+
+const { title, description, keywords = [], compact = false } = Astro.props;
+
+const locale: Locale = detectLocale(Astro.url.pathname);
+const m = getMessages(locale);
+const canonicalPath = Astro.url.pathname.endsWith("/")
+  ? Astro.url.pathname
+  : `${Astro.url.pathname}/`;
+const canonicalUrl = new URL(
+  canonicalPath,
+  Astro.site ?? "http://localhost"
+).toString();
+
+const fullTitle =
+  title === "CertMate Tools"
+    ? `CertMate Tools — ${m.brandTagline}`
+    : `${title} — CertMate Tools`;
+
+const cleanPath = stripLocale(Astro.url.pathname);
+const alternates = LOCALES.map((l) => ({
+  locale: l,
+  href: new URL(
+    localizedPath(l, cleanPath),
+    Astro.site ?? "http://localhost"
+  ).toString(),
+}));
+const xDefault = new URL(
+  localizedPath(DEFAULT_LOCALE, cleanPath),
+  Astro.site ?? "http://localhost"
+).toString();
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" href="/certmate-logo.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="canonical" href={canonicalUrl} />
+
+    {
+      alternates.map((alt) => (
+        <link rel="alternate" hreflang={alt.locale} href={alt.href} />
+      ))
+    }
+    <link rel="alternate" hreflang="x-default" href={xDefault} />
+
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    {
+      keywords.length > 0 && (
+        <meta name="keywords" content={keywords.join(", ")} />
+      )
+    }
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:site_name" content="CertMate Tools" />
+    <meta property="og:locale" content={locale} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+
+    <meta name="theme-color" content="#1d4ed8" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#020617" media="(prefers-color-scheme: dark)" />
+    <meta name="robots" content="index, follow" />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+    <meta name="format-detection" content="telephone=no" />
+  </head>
+  <body
+    class:list={[
+      "min-h-screen bg-white text-zinc-900 antialiased font-sans flex flex-col",
+      "dark:bg-zinc-950 dark:text-zinc-100",
+    ]}
+  >
+    <Header locale={locale} />
+    <main class:list={["flex-1", compact && "flex flex-col"]}>
+      <slot />
+    </main>
+    <Footer locale={locale} />
+  </body>
+</html>

@@ -1,0 +1,87 @@
+---
+import { getMessages, type Locale } from "~/i18n";
+
+interface Props {
+  id: string;
+  locale: Locale;
+  titleId?: string;
+}
+
+const { id, locale, titleId = `${id}-title` } = Astro.props;
+const m = getMessages(locale);
+---
+
+<dialog
+  id={id}
+  aria-labelledby={titleId}
+  class:list={[
+    "p-0 rounded-2xl shadow-2xl border w-[min(56rem,calc(100vw-1.5rem))] max-h-[min(48rem,calc(100vh-2rem))] m-auto",
+    "bg-white border-zinc-200 text-zinc-900",
+    "dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-100",
+  ]}
+>
+  <div
+    class:list={[
+      "sticky top-0 flex items-center justify-between gap-3 border-b px-5 py-3 backdrop-blur",
+      "bg-white/95 border-zinc-200",
+      "dark:bg-zinc-900/95 dark:border-zinc-800",
+    ]}
+  >
+    <div class="min-w-0 flex-1">
+      <h2 id={titleId} class="text-base font-semibold truncate">
+        <slot name="title" />
+      </h2>
+      <div class="text-xs text-zinc-500 dark:text-zinc-400 truncate">
+        <slot name="subtitle" />
+      </div>
+    </div>
+    <button
+      type="button"
+      data-modal-close={id}
+      class:list={[
+        "shrink-0 inline-flex items-center justify-center h-8 w-8 rounded-md transition-colors",
+        "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900",
+        "dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100",
+      ]}
+      aria-label={m.closeModal}
+    >
+      <svg
+        viewBox="0 0 20 20"
+        class="h-4 w-4 fill-current"
+        aria-hidden="true"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+          clip-rule="evenodd"
+        ></path>
+      </svg>
+    </button>
+  </div>
+  <div class="overflow-y-auto px-5 py-5 max-h-[calc(min(48rem,100vh-2rem)-3.5rem)]">
+    <slot />
+  </div>
+</dialog>
+
+<script is:inline define:vars={{ id }}>
+  (function () {
+    const dlg = document.getElementById(id);
+    if (!dlg) return;
+    document
+      .querySelectorAll(`[data-modal-close="${id}"]`)
+      .forEach((b) => b.addEventListener("click", () => dlg.close()));
+    // Click backdrop → close. Native <dialog> doesn't fire on backdrop click
+    // unless we detect coordinates outside the panel.
+    dlg.addEventListener("click", (e) => {
+      const t = e.target;
+      if (!(t instanceof Element)) return;
+      const r = dlg.getBoundingClientRect();
+      const inside =
+        e.clientX >= r.left &&
+        e.clientX <= r.right &&
+        e.clientY >= r.top &&
+        e.clientY <= r.bottom;
+      if (!inside) dlg.close();
+    });
+  })();
+</script>

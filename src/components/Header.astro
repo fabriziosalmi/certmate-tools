@@ -1,0 +1,176 @@
+---
+import {
+  LOCALES,
+  LOCALE_LABELS,
+  getMessages,
+  localizedPath,
+  stripLocale,
+  type Locale,
+} from "~/i18n";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const m = getMessages(locale);
+const { pathname } = Astro.url;
+const cleanPath = stripLocale(pathname);
+const isHome = cleanPath === "/";
+const homeHref = localizedPath(locale, "/");
+---
+
+<header
+  class:list={[
+    "border-b bg-white/90 backdrop-blur sticky top-0 z-40",
+    "border-zinc-200",
+    "dark:bg-zinc-950/85 dark:border-zinc-800",
+  ]}
+>
+  <div
+    class="mx-auto max-w-6xl px-5 h-14 flex items-center justify-between gap-3"
+  >
+    <a href={homeHref} class="flex items-center gap-2.5 group shrink-0">
+      <img
+        src="/certmate-logo.png"
+        alt="CertMate"
+        width="28"
+        height="28"
+        class="h-7 w-7 select-none"
+        decoding="async"
+        fetchpriority="high"
+      />
+      <span class="font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+        CertMate <span class="text-zinc-400 font-normal dark:text-zinc-600">/</span>
+        <span class="text-brand-700 dark:text-brand-400">Tools</span>
+      </span>
+    </a>
+
+    <nav class="flex items-center gap-1 text-sm">
+      {
+        !isHome && (
+          <a
+            href={homeHref}
+            class:list={[
+              "hidden sm:inline-flex px-3 py-1.5 rounded-md transition-colors",
+              "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100",
+              "dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-900",
+            ]}
+          >
+            {m.navAllTools}
+          </a>
+        )
+      }
+
+      <a
+        href="https://www.certmate.org"
+        target="_blank"
+        rel="noopener"
+        class:list={[
+          "hidden md:inline-flex px-3 py-1.5 rounded-md transition-colors",
+          "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100",
+          "dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-900",
+        ]}
+        title="The official CertMate site"
+      >
+        {m.navSite}
+      </a>
+
+      <a
+        href="https://github.com/fabriziosalmi/certmate"
+        target="_blank"
+        rel="noopener"
+        class:list={[
+          "px-3 py-1.5 rounded-md transition-colors inline-flex items-center gap-1.5",
+          "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100",
+          "dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-900",
+        ]}
+        aria-label="CertMate on GitHub"
+      >
+        <svg
+          viewBox="0 0 16 16"
+          class="h-4 w-4 fill-current"
+          aria-hidden="true"
+        >
+          <path
+            d="M8 0C3.58 0 0 3.58 0 8a8 8 0 005.47 7.59c.4.07.55-.17.55-.38v-1.36c-2.23.48-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.23 1.88.88 2.34.67.07-.52.28-.88.51-1.08-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.13 0 0 .67-.21 2.2.82A7.65 7.65 0 018 4.04c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.11.16 1.93.08 2.13.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.19c0 .21.15.46.55.38A8 8 0 0016 8c0-4.42-3.58-8-8-8z"
+          ></path>
+        </svg>
+        <span class="hidden sm:inline">{m.navGithub}</span>
+      </a>
+
+      <div class="relative ml-1">
+        <button
+          id="lang-toggle"
+          type="button"
+          class:list={[
+            "inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium uppercase tracking-wider transition-colors",
+            "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100",
+            "dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-900",
+          ]}
+          aria-haspopup="menu"
+          aria-expanded="false"
+        >
+          {locale}
+          <svg viewBox="0 0 12 12" class="h-3 w-3 fill-current" aria-hidden="true"
+            ><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg
+          >
+        </button>
+        <div
+          id="lang-menu"
+          class:list={[
+            "hidden absolute right-0 mt-1 w-36 rounded-md border bg-white shadow-md py-1 z-50",
+            "border-zinc-200",
+            "dark:bg-zinc-900 dark:border-zinc-800",
+          ]}
+          role="menu"
+        >
+          {
+            LOCALES.map((l) => (
+              <a
+                href={localizedPath(l, cleanPath)}
+                role="menuitem"
+                hreflang={l}
+                class:list={[
+                  "block px-3 py-1.5 text-sm transition-colors",
+                  l === locale
+                    ? "font-semibold text-brand-700 dark:text-brand-400 bg-brand-50/40 dark:bg-zinc-800/60"
+                    : "text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800",
+                ]}
+              >
+                <span class="mr-2 text-[10px] uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                  {l}
+                </span>
+                {LOCALE_LABELS[l]}
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const $btn = document.getElementById("lang-toggle");
+  const $menu = document.getElementById("lang-menu");
+  if ($btn && $menu) {
+    const close = () => {
+      $menu.classList.add("hidden");
+      $btn.setAttribute("aria-expanded", "false");
+    };
+    $btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const open = $menu.classList.toggle("hidden");
+      $btn.setAttribute("aria-expanded", String(!open));
+    });
+    document.addEventListener("click", (e) => {
+      if (e.target && !$menu.contains(e.target as Node) && e.target !== $btn) {
+        close();
+      }
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") close();
+    });
+  }
+</script>

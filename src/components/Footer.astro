@@ -1,0 +1,148 @@
+---
+import { getMessages, localizedPath, type Locale } from "~/i18n";
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const m = getMessages(locale);
+const year = new Date().getFullYear();
+const homeHref = localizedPath(locale, "/");
+---
+
+<footer
+  class:list={[
+    "border-t mt-16",
+    "bg-zinc-50 border-zinc-200",
+    "dark:bg-zinc-950 dark:border-zinc-800",
+  ]}
+>
+  <div class="mx-auto max-w-6xl px-5 py-12 grid gap-10 md:grid-cols-3">
+    <div>
+      <a href={homeHref} class="flex items-center gap-2.5 mb-3 group">
+        <img
+          src="/certmate-logo.png"
+          alt=""
+          width="28"
+          height="28"
+          class="h-7 w-7 select-none"
+          decoding="async"
+        />
+        <span
+          class="font-semibold tracking-tight text-zinc-900 dark:text-zinc-50"
+        >
+          CertMate <span class="text-zinc-400 font-normal dark:text-zinc-600">/</span>
+          <span class="text-brand-700 dark:text-brand-400">Tools</span>
+        </span>
+      </a>
+      <p
+        class="text-sm text-zinc-600 leading-relaxed max-w-sm dark:text-zinc-400"
+      >
+        {m.brandTagline} <br />
+        <a
+          href="https://www.certmate.org"
+          class="text-brand-700 hover:underline dark:text-brand-400"
+          target="_blank"
+          rel="noopener">certmate.org</a
+        >
+      </p>
+    </div>
+
+    <div>
+      <h4
+        class="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-3 dark:text-zinc-400"
+      >
+        CertMate
+      </h4>
+      <ul class="space-y-2 text-sm">
+        <li>
+          <a
+            href="https://www.certmate.org"
+            target="_blank"
+            rel="noopener"
+            class="text-zinc-700 hover:text-brand-700 inline-flex items-center gap-1.5 dark:text-zinc-300 dark:hover:text-brand-400"
+          >
+            certmate.org
+          </a>
+        </li>
+        <li>
+          <a
+            href="https://github.com/fabriziosalmi/certmate"
+            target="_blank"
+            rel="noopener"
+            class="text-zinc-700 hover:text-brand-700 inline-flex items-center gap-1.5 dark:text-zinc-300 dark:hover:text-brand-400"
+          >
+            <svg viewBox="0 0 16 16" class="h-3.5 w-3.5 fill-current" aria-hidden="true"
+              ><path
+                d="M8 0C3.58 0 0 3.58 0 8a8 8 0 005.47 7.59c.4.07.55-.17.55-.38v-1.36c-2.23.48-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.23 1.88.88 2.34.67.07-.52.28-.88.51-1.08-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.13 0 0 .67-.21 2.2.82A7.65 7.65 0 018 4.04c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.11.16 1.93.08 2.13.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.19c0 .21.15.46.55.38A8 8 0 0016 8c0-4.42-3.58-8-8-8z"
+              ></path></svg
+            >
+            github.com/fabriziosalmi/certmate
+          </a>
+        </li>
+        <li>
+          <a
+            href="https://github.com/fabriziosalmi/certmate/issues"
+            target="_blank"
+            rel="noopener"
+            class="text-zinc-700 hover:text-brand-700 dark:text-zinc-300 dark:hover:text-brand-400"
+          >
+            {m.reportBug}
+          </a>
+        </li>
+      </ul>
+
+      <a
+        href="https://github.com/fabriziosalmi/certmate"
+        target="_blank"
+        rel="noopener"
+        class:list={[
+          "mt-4 inline-flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors",
+          "bg-zinc-900 text-white hover:bg-zinc-800",
+          "dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white",
+        ]}
+      >
+        {m.starOnGithub}
+      </a>
+    </div>
+
+    <div>
+      <h4
+        class="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-3 dark:text-zinc-400"
+      >
+        {m.footerBuiltWithPrivacy}
+      </h4>
+      <ul
+        class="text-sm text-zinc-600 space-y-2 leading-relaxed dark:text-zinc-400"
+      >
+        <li>{m.footerNoTracking}</li>
+        <li>{m.footerNoUpload}</li>
+        <li>{m.footerOpenSource}</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="border-t border-zinc-200 dark:border-zinc-800">
+    <div
+      class="mx-auto max-w-6xl px-5 py-4 text-xs text-zinc-500 flex flex-wrap justify-between gap-2 dark:text-zinc-500"
+    >
+      <span>
+        © {year} CertMate — {m.footerCopyright} ·
+        <a
+          href="https://www.certmate.org"
+          target="_blank"
+          rel="noopener"
+          class="hover:text-zinc-900 dark:hover:text-zinc-100">certmate.org</a
+        >
+         ·
+        <a
+          href="https://github.com/fabriziosalmi/certmate"
+          target="_blank"
+          rel="noopener"
+          class="hover:text-zinc-900 dark:hover:text-zinc-100">github</a
+        >
+      </span>
+      <span>tools.certmate.org</span>
+    </div>
+  </div>
+</footer>

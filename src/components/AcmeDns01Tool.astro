@@ -1,0 +1,288 @@
+---
+import Layout from "~/layouts/Layout.astro";
+import PrivacyBadge from "~/components/PrivacyBadge.astro";
+import Modal from "~/components/Modal.astro";
+import ToolNav from "~/components/ToolNav.astro";
+import { getMessages, type Locale } from "~/i18n";
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const m = getMessages(locale);
+const desc =
+  locale === "it"
+    ? "Calcola nel browser il valore TXT atteso da un server ACME per la DNS-01 challenge (RFC 8555 §8.4). La tua account key non lascia mai il browser."
+    : locale === "de"
+      ? "Berechnen Sie im Browser den TXT-Wert für die ACME DNS-01-Challenge (RFC 8555 §8.4). Ihr Account-Schlüssel verlässt nie den Browser."
+      : locale === "fr"
+        ? "Calculez dans le navigateur la valeur TXT attendue pour le challenge ACME DNS-01 (RFC 8555 §8.4). Votre clé de compte ne quitte jamais le navigateur."
+        : "Compute the TXT value an ACME server expects for the DNS-01 challenge (RFC 8555 §8.4), client-side. Your account key never leaves the browser.";
+---
+
+<Layout
+  title={m.acmeDns01Title}
+  description={desc}
+  keywords={[
+    "acme dns-01",
+    "letsencrypt dns challenge",
+    "txt record helper",
+    "rfc 8555",
+    "acme txt value",
+    "jwk thumbprint",
+  ]}
+  compact
+>
+  <div
+    class="flex-1 flex flex-col items-stretch justify-start md:justify-center px-4 py-6 md:py-10"
+  >
+    <div class="w-full max-w-3xl mx-auto">
+      <ToolNav locale={locale} currentSlug="acme-dns-01" />
+      <header class="mb-5">
+        <h1
+          class="text-2xl md:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50"
+        >
+          {m.acmeDns01Title}
+        </h1>
+        <p class="mt-1.5 text-zinc-600 dark:text-zinc-400 leading-relaxed">
+          {m.acmeDns01Tagline}
+        </p>
+        <div class="mt-3"><PrivacyBadge locale={locale} variant="block" /></div>
+      </header>
+
+      <div
+        class:list={[
+          "rounded-2xl border shadow-sm overflow-hidden divide-y",
+          "bg-white border-zinc-200 divide-zinc-100",
+          "dark:bg-zinc-900 dark:border-zinc-800 dark:divide-zinc-800",
+        ]}
+      >
+        <div class="p-4 space-y-3">
+          <label class="block">
+            <span class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+              Account key (JWK JSON)
+            </span>
+            <textarea
+              id="jwk-input"
+              rows="6"
+              spellcheck="false"
+              autocomplete="off"
+              autocapitalize="off"
+              autocorrect="off"
+              placeholder={'{"kty":"RSA","n":"...","e":"AQAB"}'}
+              class:list={[
+                "mt-1 mono w-full resize-y rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400/40",
+                "border-zinc-200 bg-white text-zinc-900 placeholder:text-zinc-400",
+                "dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder:text-zinc-600",
+              ]}></textarea>
+          </label>
+          <button
+            type="button"
+            data-action="sample"
+            class="text-xs font-medium text-brand-700 hover:text-brand-800 dark:text-brand-400 dark:hover:text-brand-300"
+          >
+            Generate a sample RSA account key
+          </button>
+        </div>
+        <div class="grid sm:grid-cols-2 gap-3 p-4">
+          <label class="block">
+            <span class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+              Challenge token
+            </span>
+            <input
+              id="token-input"
+              type="text"
+              spellcheck="false"
+              autocomplete="off"
+              autocapitalize="off"
+              autocorrect="off"
+              placeholder="evaGxfADs6pSRb2LAv9IZf17Dt3juxGJ-PCt92wr-oA"
+              class:list={[
+                "mt-1 mono w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400/40",
+                "border-zinc-200 bg-white text-zinc-900 placeholder:text-zinc-400",
+                "dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder:text-zinc-600",
+              ]}
+            />
+          </label>
+          <label class="block">
+            <span class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+              Domain (optional, for record name)
+            </span>
+            <input
+              id="domain-input"
+              type="text"
+              spellcheck="false"
+              autocomplete="off"
+              autocapitalize="off"
+              autocorrect="off"
+              placeholder="example.com"
+              class:list={[
+                "mt-1 mono w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400/40",
+                "border-zinc-200 bg-white text-zinc-900 placeholder:text-zinc-400",
+                "dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder:text-zinc-600",
+              ]}
+            />
+          </label>
+        </div>
+      </div>
+
+      <div class="mt-4 flex items-center gap-3 flex-wrap">
+        <button
+          type="button"
+          data-action="compute"
+          class:list={[
+            "inline-flex items-center gap-2 rounded-md px-5 py-2.5 text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
+            "bg-zinc-900 text-white hover:bg-zinc-800",
+            "dark:bg-brand-500 dark:text-zinc-50 dark:hover:bg-brand-400",
+          ]}>Compute TXT value</button
+        >
+        <button
+          type="button"
+          data-action="clear"
+          class="text-xs font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+          >{m.clear}</button
+        >
+        <p id="status" role="status" aria-live="polite" class="text-sm text-zinc-500 dark:text-zinc-400"></p>
+      </div>
+
+      <div
+        id="error"
+        role="alert"
+        class:list={[
+          "mt-5 hidden rounded-lg border px-4 py-3 text-sm",
+          "bg-red-50 border-red-200 text-red-900",
+          "dark:bg-red-950/40 dark:border-red-900/60 dark:text-red-200",
+        ]}
+      >
+      </div>
+
+    </div>
+  </div>
+
+  <Modal id="result-modal" locale={locale}>
+    <span slot="title">{m.acmeDns01Title}</span>
+    <span slot="subtitle" id="result-modal-subtitle"></span>
+    <div id="result-body"></div>
+  </Modal>
+</Layout>
+
+<script>
+  import { computeDns01, generateSampleAccountKey } from "~/lib/acme-dns01";
+  import { escapeHtml } from "~/lib/util";
+  import { detectLocale, getMessages } from "~/i18n";
+
+  const locale = detectLocale(location.pathname);
+  const m = getMessages(locale);
+
+  const $jwk = document.getElementById("jwk-input") as HTMLTextAreaElement;
+  const $token = document.getElementById("token-input") as HTMLInputElement;
+  const $domain = document.getElementById("domain-input") as HTMLInputElement;
+  const $status = document.getElementById("status") as HTMLElement;
+  const $error = document.getElementById("error") as HTMLElement;
+  const $modal = document.getElementById("result-modal") as HTMLDialogElement;
+  const $subtitle = document.getElementById("result-modal-subtitle") as HTMLElement;
+  const $body = document.getElementById("result-body") as HTMLElement;
+  const $btn = document.querySelector('[data-action="compute"]') as HTMLButtonElement;
+
+  let busy = false;
+  function setBusy(v: boolean) {
+    busy = v;
+    $btn.disabled = v;
+    $btn.textContent = v ? "Working…" : "Compute TXT value";
+  }
+  function showError(msg: string) {
+    $error.textContent = msg;
+    $error.classList.remove("hidden");
+    $status.textContent = "";
+  }
+
+  async function compute() {
+    if (busy) return;
+    $error.classList.add("hidden");
+    if (!$jwk.value.trim() || !$token.value.trim()) {
+      $status.textContent = "Paste a JWK and a token.";
+      return;
+    }
+    setBusy(true);
+    $status.textContent = "Working…";
+    try {
+      const r = await computeDns01({
+        jwk: $jwk.value,
+        token: $token.value,
+        domain: $domain.value,
+      });
+      if (!r.ok) {
+        showError(r.error);
+        return;
+      }
+      const out = r.result;
+      const copy = (id: string, value: string) =>
+        `<div class="flex items-start gap-2"><code id="${id}" class="mono text-xs break-all flex-1">${escapeHtml(value)}</code><button type="button" class="shrink-0 text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100" data-copy="#${id}">${m.copy}</button></div>`;
+      $subtitle.textContent = "Add this TXT record at the displayed name.";
+      $body.innerHTML = `<article class="space-y-4">
+        <div class="rounded-lg border border-emerald-200 bg-emerald-50/60 p-5 dark:bg-emerald-950/30 dark:border-emerald-900/60">
+          <div class="text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-300 mb-1">DNS record</div>
+          <div class="mono text-sm break-all">
+            ${escapeHtml(out.recordName)} <span class="text-zinc-400 dark:text-zinc-500">IN</span> <span class="text-zinc-400 dark:text-zinc-500">TXT</span> "${escapeHtml(out.txtValue)}"
+          </div>
+        </div>
+        <div class="rounded-lg border border-zinc-200 bg-white p-5 dark:bg-zinc-900/40 dark:border-zinc-800 space-y-3">
+          <div><dt class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">TXT value</dt><dd class="mt-1">${copy("txt", out.txtValue)}</dd></div>
+          <div><dt class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Key authorization</dt><dd class="mt-1">${copy("ka", out.keyAuthorization)}</dd></div>
+          <div><dt class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">JWK thumbprint (RFC 7638)</dt><dd class="mt-1">${copy("tp", out.thumbprintB64Url)}</dd></div>
+        </div>
+        <details class="rounded-lg border border-zinc-200 bg-white p-5 dark:bg-zinc-900/40 dark:border-zinc-800">
+          <summary class="cursor-pointer font-semibold text-zinc-900 dark:text-zinc-100">How is this computed?</summary>
+          <pre class="mono mt-3 text-xs leading-relaxed text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap">key_authorization = token + "." + base64url(SHA-256(canonical_JWK(account_pub)))
+TXT value         = base64url(SHA-256(key_authorization))</pre>
+          <p class="mt-3 text-xs text-zinc-500 dark:text-zinc-400">References: <a class="underline" target="_blank" rel="noopener" href="https://www.rfc-editor.org/rfc/rfc8555">RFC 8555 §8.4</a>, <a class="underline" target="_blank" rel="noopener" href="https://www.rfc-editor.org/rfc/rfc7638">RFC 7638</a>.</p>
+        </details>
+      </article>`;
+      $body.querySelectorAll<HTMLButtonElement>("button[data-copy]").forEach((b) => {
+        b.addEventListener("click", async () => {
+          const sel = b.getAttribute("data-copy");
+          const t = sel ? $body.querySelector(sel) : null;
+          if (!t) return;
+          try {
+            await navigator.clipboard.writeText(t.textContent ?? "");
+            const old = b.textContent;
+            b.textContent = m.copied;
+            setTimeout(() => (b.textContent = old), 1500);
+          } catch {}
+        });
+      });
+      $status.textContent = $subtitle.textContent;
+      if (!$modal.open) $modal.showModal();
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  $btn.addEventListener("click", () => void compute());
+  document.querySelector('[data-action="clear"]')?.addEventListener("click", () => {
+    $jwk.value = "";
+    $token.value = "";
+    $domain.value = "";
+    $error.classList.add("hidden");
+    $status.textContent = "";
+    $jwk.focus();
+  });
+  document
+    .querySelector('[data-action="sample"]')
+    ?.addEventListener("click", async () => {
+      const { jwk } = await generateSampleAccountKey();
+      $jwk.value = JSON.stringify(jwk, null, 2);
+      if (!$token.value) {
+        $token.value = "evaGxfADs6pSRb2LAv9IZf17Dt3juxGJ-PCt92wr-oA";
+      }
+      if (!$domain.value) {
+        $domain.value = "example.com";
+      }
+    });
+  $token.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      void compute();
+    }
+  });
+</script>

@@ -1,0 +1,337 @@
+---
+import Layout from "~/layouts/Layout.astro";
+import PrivacyBadge from "~/components/PrivacyBadge.astro";
+import Modal from "~/components/Modal.astro";
+import ToolNav from "~/components/ToolNav.astro";
+import { getMessages, type Locale } from "~/i18n";
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const m = getMessages(locale);
+const desc =
+  locale === "it"
+    ? "Decodifica online qualsiasi CSR PKCS#10 nel browser. Vedi CN, SAN, parametri chiave, attributi richiesti — niente upload."
+    : locale === "de"
+      ? "Beliebige PKCS#10-CSRs online im Browser dekodieren. CN, SAN, Schlüsselparameter und Attribute — kein Upload."
+      : locale === "fr"
+        ? "Décodez n'importe quel CSR PKCS#10 dans le navigateur. CN, SAN, paramètres de clé et attributs — aucun upload."
+        : "Decode any PKCS#10 Certificate Signing Request in your browser. See CN, SAN, key parameters and challenge attributes — no upload.";
+---
+
+<Layout
+  title={m.csrDecoderTitle}
+  description={desc}
+  keywords={[
+    "csr decoder",
+    "pkcs10 decoder",
+    "csr parser",
+    "decoder csr",
+    "certificate signing request",
+  ]}
+  compact
+>
+  <div
+    class="flex-1 flex flex-col items-stretch justify-start md:justify-center px-4 py-6 md:py-10"
+  >
+    <div class="w-full max-w-3xl mx-auto">
+      <ToolNav locale={locale} currentSlug="csr-decoder" />
+      <header class="mb-5">
+        <h1
+          class="text-2xl md:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50"
+        >
+          {m.csrDecoderTitle}
+        </h1>
+        <p class="mt-1.5 text-zinc-600 dark:text-zinc-400 leading-relaxed">
+          {m.csrDecoderTagline}
+        </p>
+        <div class="mt-3"><PrivacyBadge locale={locale} variant="inline" /></div>
+      </header>
+
+      <div
+        id="card"
+        class:list={[
+          "rounded-2xl border shadow-sm overflow-hidden",
+          "bg-white border-zinc-200",
+          "dark:bg-zinc-900 dark:border-zinc-800",
+        ]}
+      >
+        <div
+          class:list={[
+            "flex items-center justify-between gap-3 border-b px-4 py-2.5",
+            "bg-zinc-50/60 border-zinc-100",
+            "dark:bg-zinc-900/80 dark:border-zinc-800",
+          ]}
+        >
+          <div class="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+            {m.pasteHint}
+          </div>
+          <div class="flex items-center gap-2 text-xs">
+            <button
+              type="button"
+              data-action="sample"
+              class="font-medium text-brand-700 hover:text-brand-800 dark:text-brand-400 dark:hover:text-brand-300"
+              >{m.tryWithSample}</button
+            >
+            <span class="text-zinc-300 dark:text-zinc-700">·</span>
+            <button
+              type="button"
+              data-action="clear"
+              class="font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+              >{m.clear}</button
+            >
+          </div>
+        </div>
+        <textarea
+          id="csr-input"
+          rows="10"
+          spellcheck="false"
+          autocomplete="off"
+          autocapitalize="off"
+          autocorrect="off"
+          maxlength="2097152"
+          placeholder={m.csrDecoderPlaceholder}
+          class:list={[
+            "mono w-full resize-y border-0 px-4 py-4 focus:outline-none focus:ring-0",
+            "bg-white text-zinc-900 placeholder:text-zinc-400",
+            "dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder:text-zinc-600",
+          ]}></textarea>
+      </div>
+
+      <div class="mt-4 flex items-center gap-3 flex-wrap">
+        <button
+          type="button"
+          data-action="decode"
+          class:list={[
+            "inline-flex items-center gap-2 rounded-md px-5 py-2.5 text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
+            "bg-zinc-900 text-white hover:bg-zinc-800",
+            "dark:bg-brand-500 dark:text-zinc-50 dark:hover:bg-brand-400",
+          ]}>{m.decodeButton}</button
+        >
+        <p id="status" role="status" aria-live="polite" class="text-sm text-zinc-500 dark:text-zinc-400"></p>
+      </div>
+
+      <div
+        id="error"
+        role="alert"
+        class:list={[
+          "mt-5 hidden rounded-lg border px-4 py-3 text-sm",
+          "bg-red-50 border-red-200 text-red-900",
+          "dark:bg-red-950/40 dark:border-red-900/60 dark:text-red-200",
+        ]}
+      >
+      </div>
+
+    </div>
+  </div>
+
+  <Modal id="result-modal" locale={locale}>
+    <span slot="title">{m.resultsHeader}</span>
+    <span slot="subtitle" id="result-modal-subtitle"></span>
+    <div id="result-body"></div>
+  </Modal>
+</Layout>
+
+<script>
+  import {
+    decodeCSRInput,
+    SAMPLE_CSR,
+    type DecodedCSR,
+  } from "~/lib/csr-decoder";
+  import { escapeHtml, MAX_INPUT_BYTES } from "~/lib/util";
+  import { detectLocale, getMessages } from "~/i18n";
+
+  const locale = detectLocale(location.pathname);
+  const m = getMessages(locale);
+
+  const $input = document.getElementById("csr-input") as HTMLTextAreaElement;
+  const $status = document.getElementById("status") as HTMLElement;
+  const $error = document.getElementById("error") as HTMLElement;
+  const $modal = document.getElementById("result-modal") as HTMLDialogElement;
+  const $subtitle = document.getElementById("result-modal-subtitle") as HTMLElement;
+  const $body = document.getElementById("result-body") as HTMLElement;
+  const $btn = document.querySelector(
+    '[data-action="decode"]'
+  ) as HTMLButtonElement;
+
+  let busy = false;
+  function setBusy(v: boolean) {
+    busy = v;
+    $btn.disabled = v;
+    $btn.textContent = v ? m.decodingButton : m.decodeButton;
+  }
+  function showError(msg: string) {
+    $error.textContent = msg;
+    $error.classList.remove("hidden");
+    $status.textContent = "";
+  }
+
+  function chips(items: string[]): string {
+    if (items.length === 0)
+      return `<p class="text-sm text-zinc-500 italic dark:text-zinc-500">none</p>`;
+    return `<div class="flex flex-wrap gap-1.5">${items.map((i) => `<span class="inline-flex rounded-md bg-zinc-100 text-zinc-800 px-2 py-1 text-xs font-medium mono dark:bg-zinc-800 dark:text-zinc-200">${escapeHtml(i)}</span>`).join("")}</div>`;
+  }
+
+  function copyableHex(value: string, label: string): string {
+    const id = `c-${Math.random().toString(36).slice(2, 8)}`;
+    return `<div class="flex items-start gap-2">
+      <code id="${id}" class="mono text-xs break-all flex-1">${escapeHtml(value)}</code>
+      <button type="button" class="shrink-0 text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100" data-copy="#${id}" aria-label="Copy ${escapeHtml(label)}">${m.copy}</button>
+    </div>`;
+  }
+
+  function field(label: string, value: string, mono = false): string {
+    return `<div>
+      <dt class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">${escapeHtml(label)}</dt>
+      <dd class="${mono ? "mono " : ""}mt-1 text-sm text-zinc-900 break-all dark:text-zinc-100">${value}</dd>
+    </div>`;
+  }
+
+  function section(title: string, body: string): string {
+    return `<div class="rounded-lg border border-zinc-200 bg-white p-5 dark:bg-zinc-900/40 dark:border-zinc-800"><h3 class="text-sm font-semibold uppercase tracking-wider text-brand-700 dark:text-brand-400 mb-3">${escapeHtml(title)}</h3>${body}</div>`;
+  }
+
+  function sigBadge(csr: DecodedCSR): string {
+    if (csr.signatureValid === true) {
+      return `<span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 text-emerald-800 px-2.5 py-1 text-xs font-semibold ring-1 ring-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-200 dark:ring-emerald-900/60"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>${escapeHtml(m.validSignature)}</span>`;
+    }
+    if (csr.signatureValid === false) {
+      return `<span class="inline-flex items-center gap-1.5 rounded-full bg-red-100 text-red-800 px-2.5 py-1 text-xs font-semibold ring-1 ring-red-200 dark:bg-red-950/50 dark:text-red-200 dark:ring-red-900/60"><span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>${escapeHtml(m.invalidSignature)}</span>`;
+    }
+    return `<span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-100 text-zinc-700 px-2.5 py-1 text-xs font-medium dark:bg-zinc-800 dark:text-zinc-300">Signature not checked</span>`;
+  }
+
+  function renderCSR(csr: DecodedCSR): string {
+    const cn = csr.subjectDN["CN"]?.[0] ?? csr.subject ?? "CSR";
+    const subjBody = `<dl class="grid grid-cols-[7rem_1fr] gap-x-4 gap-y-1.5 text-sm">
+      ${Object.entries(csr.subjectDN)
+        .map(
+          ([k, vs]) =>
+            `<dt class="text-zinc-500 font-medium dark:text-zinc-400">${escapeHtml(k)}</dt><dd class="text-zinc-900 mono break-all dark:text-zinc-100">${vs.map(escapeHtml).join("<br>")}</dd>`
+        )
+        .join("")}
+    </dl>`;
+    const keyBody = `<dl class="grid sm:grid-cols-2 gap-4">
+      ${field("Algorithm", escapeHtml(csr.publicKey.algorithm))}
+      ${csr.publicKey.keySize ? field("Key size", `${csr.publicKey.keySize} bits`) : ""}
+      ${csr.publicKey.namedCurve ? field("Curve", escapeHtml(csr.publicKey.namedCurve)) : ""}
+      ${field("Signature", escapeHtml(csr.signatureAlgorithm))}
+    </dl>`;
+    const sanBody =
+      csr.san.length > 0
+        ? `<div class="flex flex-wrap gap-1.5">${csr.san
+            .map(
+              (e) =>
+                `<span class="inline-flex items-center rounded-md bg-zinc-100 text-zinc-800 pl-1.5 pr-2 py-0.5 text-xs font-medium dark:bg-zinc-800 dark:text-zinc-200"><span class="mr-1.5 rounded-sm bg-brand-100 text-brand-800 px-1 text-[10px] uppercase tracking-wider dark:bg-brand-900/40 dark:text-brand-200">${escapeHtml(e.type)}</span><span class="mono">${escapeHtml(e.value)}</span></span>`
+            )
+            .join("")}</div>`
+        : `<p class="text-sm text-zinc-500 italic dark:text-zinc-500">No SAN requested.</p>`;
+    const usageBody = `<div class="space-y-3">
+      <div><div class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">Key Usage</div>${chips(csr.keyUsage)}</div>
+      <div><div class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">Extended Key Usage</div>${chips(csr.extendedKeyUsage)}</div>
+      <div class="text-sm text-zinc-700 dark:text-zinc-300">CA requested: <span class="font-semibold">${csr.isCA ? "yes" : "no"}</span>${csr.pathLenConstraint != null ? `, pathlen ${csr.pathLenConstraint}` : ""}</div>
+    </div>`;
+    const idBody = `<dl class="space-y-3">
+      ${field("Public key SHA-256", copyableHex(csr.spkiFingerprintSha256, "spki"), true)}
+      ${csr.challengePassword ? field("Challenge password", `<code class="mono">${escapeHtml(csr.challengePassword)}</code>`, true) : ""}
+      ${csr.unhandledOidAttrs.length ? field("Other attribute OIDs", chips(csr.unhandledOidAttrs)) : ""}
+    </dl>`;
+    return `<article class="space-y-4">
+      <header class="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h2 class="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50">${escapeHtml(cn)}</h2>
+          <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">PKCS#10 Certificate Signing Request</p>
+        </div>
+        ${sigBadge(csr)}
+      </header>
+      <div class="grid lg:grid-cols-2 gap-4">
+        ${section("Subject", subjBody)}
+        ${section("Public Key", keyBody)}
+      </div>
+      ${section("Requested SAN", sanBody)}
+      <div class="grid lg:grid-cols-2 gap-4">
+        ${section("Requested Usage", usageBody)}
+        ${section("Identifiers", idBody)}
+      </div>
+    </article>`;
+  }
+
+  function bindCopy(root: HTMLElement) {
+    root.querySelectorAll<HTMLButtonElement>("button[data-copy]").forEach((b) => {
+      b.addEventListener("click", async () => {
+        const sel = b.getAttribute("data-copy");
+        const target = sel ? root.querySelector(sel) : null;
+        if (!target) return;
+        try {
+          await navigator.clipboard.writeText(target.textContent ?? "");
+          const old = b.textContent;
+          b.textContent = m.copied;
+          setTimeout(() => (b.textContent = old), 1500);
+        } catch {}
+      });
+    });
+  }
+
+  async function decode() {
+    if (busy) return;
+    const text = $input.value.trim();
+    $error.classList.add("hidden");
+    if (!text) {
+      $status.textContent = m.inputEmpty;
+      return;
+    }
+    if (text.length > MAX_INPUT_BYTES) {
+      showError(m.inputTooLarge);
+      return;
+    }
+    setBusy(true);
+    $status.textContent = m.decodingButton;
+    try {
+      const r = await decodeCSRInput(text);
+      if (!r.ok) {
+        showError(r.error);
+        return;
+      }
+      $subtitle.textContent = m.decodedSuccess(r.csrs.length);
+      $body.innerHTML = r.csrs
+        .map(renderCSR)
+        .join('<hr class="my-6 border-zinc-100 dark:border-zinc-800">');
+      bindCopy($body);
+      $status.textContent = m.decodedSuccess(r.csrs.length);
+      if (!$modal.open) $modal.showModal();
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  $btn.addEventListener("click", () => void decode());
+  document
+    .querySelector('[data-action="sample"]')
+    ?.addEventListener("click", () => {
+      $input.value = SAMPLE_CSR;
+      void decode();
+    });
+  document
+    .querySelector('[data-action="clear"]')
+    ?.addEventListener("click", () => {
+      $input.value = "";
+      $error.classList.add("hidden");
+      $status.textContent = "";
+      $input.focus();
+    });
+  $input.addEventListener("keydown", (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+      e.preventDefault();
+      void decode();
+    }
+  });
+  $input.addEventListener("paste", () => {
+    setTimeout(() => {
+      const v = $input.value.trim();
+      if (v.includes("-----BEGIN") || (v.length > 80 && /^[A-Za-z0-9+/=\s]+$/.test(v))) {
+        void decode();
+      }
+    }, 0);
+  });
+</script>

@@ -1,0 +1,98 @@
+---
+import {
+  getMessages,
+  localizedPath,
+  toolLabels,
+  type Locale,
+} from "~/i18n";
+import type { InternalTool, ExternalTool } from "~/data/tools";
+
+interface Props {
+  tool: InternalTool | ExternalTool;
+  locale: Locale;
+}
+
+const { tool, locale } = Astro.props;
+const m = getMessages(locale);
+const isInternal = "slug" in tool;
+
+let title = "";
+let blurb = "";
+if (isInternal) {
+  const labels = toolLabels(m, tool.slug);
+  title = labels.title;
+  blurb = labels.tagline;
+} else {
+  title = tool.name;
+  blurb = tool.why;
+}
+
+const href = isInternal ? localizedPath(locale, `/${tool.slug}/`) : tool.url;
+const isExternal = !isInternal;
+const isSoon = isInternal && tool.status === "soon";
+---
+
+<a
+  href={isSoon ? undefined : href}
+  target={isExternal ? "_blank" : undefined}
+  rel={isExternal ? "noopener" : undefined}
+  class:list={[
+    "group relative block rounded-xl border p-5 transition-colors",
+    isSoon
+      ? "opacity-70 cursor-not-allowed border-zinc-200 bg-white dark:bg-zinc-900/40 dark:border-zinc-800"
+      : "border-zinc-200 bg-white hover:border-brand-400 hover:bg-zinc-50/40 dark:bg-zinc-900/30 dark:border-zinc-800 dark:hover:border-brand-600 dark:hover:bg-zinc-900/60",
+  ]}
+  aria-disabled={isSoon}
+>
+  <div class="flex items-start justify-between gap-3">
+    <h3
+      class="font-semibold leading-snug text-zinc-900 dark:text-zinc-50"
+    >
+      {title}
+    </h3>
+    {
+      isExternal && (
+        <span
+          class:list={[
+            "inline-flex items-center gap-1 shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider",
+            "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400",
+          ]}
+          title="External tool — curated, opens in a new tab"
+        >
+          {m.externalBadge}
+        </span>
+      )
+    }
+    {
+      isSoon && (
+        <span
+          class:list={[
+            "inline-flex items-center shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider",
+            "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200",
+          ]}
+        >
+          {m.soonBadge}
+        </span>
+      )
+    }
+  </div>
+
+  <p
+    class="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400"
+  >
+    {blurb}
+  </p>
+
+  {
+    isExternal && tool.openSource && (
+      <div
+        class="mt-3 text-xs inline-flex items-center gap-1.5 text-zinc-500 dark:text-zinc-500"
+      >
+        <svg viewBox="0 0 16 16" class="h-3.5 w-3.5 fill-current" aria-hidden="true">
+          <path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 005.47 7.59c.4.07.55-.17.55-.38v-1.36c-2.23.48-2.7-1.07-2.7-1.07-.36-.92-.89-1.17-.89-1.17-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.23 1.88.88 2.34.67.07-.52.28-.88.51-1.08-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.13 0 0 .67-.21 2.2.82A7.65 7.65 0 018 4.04c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.11.16 1.93.08 2.13.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48v2.19c0 .21.15.46.55.38A8 8 0 0016 8c0-4.42-3.58-8-8-8z" />
+        </svg>
+        {m.openSourceBadge}
+      </div>
+    )
+  }
+</a>

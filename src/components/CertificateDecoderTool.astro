@@ -1,0 +1,606 @@
+---
+import Layout from "~/layouts/Layout.astro";
+import PrivacyBadge from "~/components/PrivacyBadge.astro";
+import Modal from "~/components/Modal.astro";
+import ToolNav from "~/components/ToolNav.astro";
+import { getMessages, type Locale } from "~/i18n";
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const m = getMessages(locale);
+
+const seoDescription =
+  locale === "it"
+    ? "Decodifica online qualsiasi certificato SSL/TLS X.509 nel browser. Incolla PEM o DER e vedi Subject, SAN, validità, chiave, firma, fingerprint — niente upload, niente tracking."
+    : locale === "de"
+      ? "Beliebige SSL/TLS-X.509-Zertifikate online im Browser dekodieren. PEM oder DER einfügen und Subject, SAN, Gültigkeit, Schlüssel, Signatur und Fingerprints sehen — kein Upload, kein Tracking."
+      : locale === "fr"
+        ? "Décoder n'importe quel certificat SSL/TLS X.509 dans le navigateur. Collez un PEM ou DER et consultez Subject, SAN, validité, clé, signature, empreintes — aucun upload, aucun tracker."
+        : "Decode any SSL/TLS X.509 certificate in your browser. Paste a PEM or DER and see Subject, SAN, validity, key, signature, fingerprints — no upload, no tracking.";
+---
+
+<Layout
+  title={m.certDecoderTitle}
+  description={seoDescription}
+  keywords={[
+    m.certDecoderTitle.toLowerCase(),
+    "certificate decoder",
+    "pem decoder",
+    "x509 decoder",
+    "ssl certificate decoder",
+    "decoder certificato",
+    "tls certificate parser",
+  ]}
+  compact
+>
+  <div
+    class="flex-1 flex flex-col items-stretch justify-start md:justify-center px-4 py-6 md:py-10"
+  >
+    <div class="w-full max-w-3xl mx-auto">
+      <ToolNav locale={locale} currentSlug="certificate-decoder" />
+      <header class="mb-5">
+        <h1
+          class="text-2xl md:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50"
+        >
+          {m.certDecoderTitle}
+        </h1>
+        <p class="mt-1.5 text-zinc-600 dark:text-zinc-400 leading-relaxed">
+          {m.certDecoderTagline}
+        </p>
+        <div class="mt-3">
+          <PrivacyBadge locale={locale} variant="inline" />
+        </div>
+      </header>
+
+      <div
+        id="card"
+        class:list={[
+          "rounded-2xl border shadow-sm overflow-hidden transition-shadow",
+          "bg-white border-zinc-200",
+          "dark:bg-zinc-900 dark:border-zinc-800",
+        ]}
+      >
+        <div
+          class:list={[
+            "flex items-center justify-between gap-3 border-b px-4 py-2.5",
+            "bg-zinc-50/60 border-zinc-100",
+            "dark:bg-zinc-900/80 dark:border-zinc-800",
+          ]}
+        >
+          <div
+            class="flex items-center gap-2 text-xs font-medium text-zinc-500 dark:text-zinc-400"
+          >
+            <span class="inline-flex h-2 w-2 rounded-full bg-red-400"></span>
+            <span class="inline-flex h-2 w-2 rounded-full bg-amber-400"></span>
+            <span class="inline-flex h-2 w-2 rounded-full bg-emerald-400"></span>
+            <span class="ml-2">{m.pasteHint}</span>
+          </div>
+          <div class="flex items-center gap-2 text-xs">
+            <button
+              type="button"
+              data-action="sample"
+              class="font-medium text-brand-700 hover:text-brand-800 dark:text-brand-400 dark:hover:text-brand-300"
+            >
+              {m.tryWithSample}
+            </button>
+            <span class="text-zinc-300 dark:text-zinc-700">·</span>
+            <button
+              type="button"
+              data-action="clear"
+              class="font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+            >
+              {m.clear}
+            </button>
+          </div>
+        </div>
+
+        <label class="block">
+          <span class="sr-only">{m.certDecoderTagline}</span>
+          <textarea
+            id="cert-input"
+            rows="10"
+            spellcheck="false"
+            autocomplete="off"
+            autocapitalize="off"
+            autocorrect="off"
+            maxlength="2097152"
+            placeholder={m.certDecoderPlaceholder}
+            class:list={[
+              "mono w-full resize-y border-0 px-4 py-4 focus:outline-none focus:ring-0",
+              "bg-white text-zinc-900 placeholder:text-zinc-400",
+              "dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder:text-zinc-600",
+            ]}></textarea>
+        </label>
+
+        <div
+          id="drop-zone"
+          class:list={[
+            "border-t border-dashed px-4 py-3 text-center text-xs cursor-pointer",
+            "border-zinc-200 bg-zinc-50/50 text-zinc-500",
+            "dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-400",
+          ]}
+        >
+          {m.dropHint}
+          <input
+            id="file-input"
+            type="file"
+            class="hidden"
+            accept=".pem,.crt,.cer,.der,application/x-x509-ca-cert,application/x-x509-user-cert,application/pkix-cert"
+          />
+        </div>
+      </div>
+
+      <div class="mt-4 flex items-center gap-3 flex-wrap">
+        <button
+          type="button"
+          data-action="decode"
+          class:list={[
+            "inline-flex items-center gap-2 rounded-md px-5 py-2.5 text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
+            "bg-zinc-900 text-white hover:bg-zinc-800",
+            "dark:bg-brand-500 dark:text-zinc-50 dark:hover:bg-brand-400",
+          ]}
+        >
+          {m.decodeButton}
+        </button>
+        <p
+          id="status"
+          role="status"
+          aria-live="polite"
+          class="text-sm text-zinc-500 dark:text-zinc-400"
+        >
+        </p>
+      </div>
+
+      <div
+        id="error"
+        role="alert"
+        class:list={[
+          "mt-5 hidden rounded-lg border px-4 py-3 text-sm",
+          "bg-red-50 border-red-200 text-red-900",
+          "dark:bg-red-950/40 dark:border-red-900/60 dark:text-red-200",
+        ]}
+      >
+      </div>
+
+    </div>
+  </div>
+
+  <Modal id="result-modal" locale={locale}>
+    <span slot="title" id="result-modal-title">{m.resultsHeader}</span>
+    <span slot="subtitle" id="result-modal-subtitle"></span>
+    <div id="result-body"></div>
+  </Modal>
+</Layout>
+
+<script>
+  import {
+    decodeCertificateInput,
+    SAMPLE_CERT_ISRG_X1,
+    type DecodedCertificate,
+    type SanEntry,
+  } from "~/lib/cert-decoder";
+  import { escapeHtml, formatDate, MAX_INPUT_BYTES } from "~/lib/util";
+  import { detectLocale, getMessages } from "~/i18n";
+
+  const locale = detectLocale(location.pathname);
+  const m = getMessages(locale);
+
+  const $input = document.getElementById("cert-input") as HTMLTextAreaElement;
+  const $status = document.getElementById("status") as HTMLElement;
+  const $error = document.getElementById("error") as HTMLElement;
+  const $file = document.getElementById("file-input") as HTMLInputElement;
+  const $drop = document.getElementById("drop-zone") as HTMLElement;
+  const $card = document.getElementById("card") as HTMLElement;
+  const $decodeBtn = document.querySelector(
+    '[data-action="decode"]'
+  ) as HTMLButtonElement;
+  const $modal = document.getElementById("result-modal") as HTMLDialogElement;
+  const $modalSubtitle = document.getElementById(
+    "result-modal-subtitle"
+  ) as HTMLElement;
+  const $body = document.getElementById("result-body") as HTMLElement;
+
+  let busy = false;
+
+  function setBusy(value: boolean): void {
+    busy = value;
+    $decodeBtn.disabled = value;
+    $decodeBtn.textContent = value ? m.decodingButton : m.decodeButton;
+  }
+
+  function showError(msg: string): void {
+    $error.textContent = msg;
+    $error.classList.remove("hidden");
+    $status.textContent = "";
+  }
+
+  function clearError(): void {
+    $error.classList.add("hidden");
+    $error.textContent = "";
+  }
+
+  function statusBadge(cert: DecodedCertificate): string {
+    if (cert.expired) {
+      const days = Math.abs(cert.daysUntilExpiry);
+      return `<span class="inline-flex items-center gap-1.5 rounded-full bg-red-100 text-red-800 px-2.5 py-1 text-xs font-semibold ring-1 ring-red-200 dark:bg-red-950/50 dark:text-red-200 dark:ring-red-900/60">
+        <span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>
+        Expired ${days} day${days === 1 ? "" : "s"} ago
+      </span>`;
+    }
+    if (cert.notYetValid) {
+      return `<span class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 text-amber-800 px-2.5 py-1 text-xs font-semibold ring-1 ring-amber-200 dark:bg-amber-950/40 dark:text-amber-200 dark:ring-amber-900/60">
+        <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+        Not yet valid
+      </span>`;
+    }
+    if (cert.daysUntilExpiry <= 14) {
+      return `<span class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 text-amber-800 px-2.5 py-1 text-xs font-semibold ring-1 ring-amber-200 dark:bg-amber-950/40 dark:text-amber-200 dark:ring-amber-900/60">
+        <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+        Expires in ${cert.daysUntilExpiry} day${cert.daysUntilExpiry === 1 ? "" : "s"}
+      </span>`;
+    }
+    return `<span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 text-emerald-800 px-2.5 py-1 text-xs font-semibold ring-1 ring-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-200 dark:ring-emerald-900/60">
+      <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+      Valid · ${cert.daysUntilExpiry} day${cert.daysUntilExpiry === 1 ? "" : "s"} left
+    </span>`;
+  }
+
+  function renderDN(dn: Record<string, string[]>): string {
+    const entries = Object.entries(dn);
+    if (entries.length === 0)
+      return `<p class="text-sm text-zinc-500 italic dark:text-zinc-500">empty</p>`;
+    return `<dl class="grid grid-cols-[7rem_1fr] gap-x-4 gap-y-1.5 text-sm">
+      ${entries
+        .map(
+          ([k, vs]) =>
+            `<dt class="text-zinc-500 font-medium dark:text-zinc-400">${escapeHtml(k)}</dt>
+             <dd class="text-zinc-900 mono break-all dark:text-zinc-100">${vs
+               .map((v) => escapeHtml(v))
+               .join("<br>")}</dd>`
+        )
+        .join("")}
+    </dl>`;
+  }
+
+  function chips(items: string[]): string {
+    if (items.length === 0)
+      return `<p class="text-sm text-zinc-500 italic dark:text-zinc-500">none</p>`;
+    return `<div class="flex flex-wrap gap-1.5">
+      ${items
+        .map(
+          (i) =>
+            `<span class="inline-flex items-center rounded-md bg-zinc-100 text-zinc-800 px-2 py-1 text-xs font-medium mono dark:bg-zinc-800 dark:text-zinc-200">${escapeHtml(i)}</span>`
+        )
+        .join("")}
+    </div>`;
+  }
+
+  function sanChips(items: SanEntry[]): string {
+    if (items.length === 0)
+      return `<p class="text-sm text-zinc-500 italic dark:text-zinc-500">none</p>`;
+    return `<div class="flex flex-wrap gap-1.5">
+      ${items
+        .map(
+          (e) =>
+            `<span class="inline-flex items-center rounded-md bg-zinc-100 text-zinc-800 pl-1.5 pr-2 py-0.5 text-xs font-medium dark:bg-zinc-800 dark:text-zinc-200">
+              <span class="mr-1.5 rounded-sm bg-brand-100 text-brand-800 px-1 text-[10px] uppercase tracking-wider dark:bg-brand-900/40 dark:text-brand-200">${escapeHtml(e.type)}</span>
+              <span class="mono">${escapeHtml(e.value)}</span>
+            </span>`
+        )
+        .join("")}
+    </div>`;
+  }
+
+  function copyableHex(value: string, label: string): string {
+    const id = `copy-${label.toLowerCase().replace(/[^a-z0-9]/g, "")}-${Math.random().toString(36).slice(2, 8)}`;
+    return `<div class="flex items-start gap-2">
+      <code id="${id}" class="mono text-xs break-all flex-1">${escapeHtml(value)}</code>
+      <button type="button" class="shrink-0 text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100" data-copy="#${id}" aria-label="Copy ${escapeHtml(label)}">${m.copy}</button>
+    </div>`;
+  }
+
+  function field(label: string, value: string, mono = false): string {
+    return `<div>
+      <dt class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">${escapeHtml(label)}</dt>
+      <dd class="${mono ? "mono " : ""}mt-1 text-sm text-zinc-900 break-all dark:text-zinc-100">${value}</dd>
+    </div>`;
+  }
+
+  function section(title: string, body: string): string {
+    return `<div class="rounded-lg border border-zinc-200 bg-white p-5 dark:bg-zinc-900/40 dark:border-zinc-800">
+      <h3 class="text-sm font-semibold uppercase tracking-wider text-brand-700 dark:text-brand-400 mb-3">${escapeHtml(title)}</h3>
+      ${body}
+    </div>`;
+  }
+
+  function renderCert(
+    cert: DecodedCertificate,
+    idx: number,
+    total: number
+  ): string {
+    const cn = cert.subjectDN["CN"]?.[0] ?? cert.subject ?? "Certificate";
+    const chainLabel =
+      total > 1
+        ? ` <span class="ml-2 text-xs font-medium text-zinc-500 dark:text-zinc-400">${idx + 1} of ${total}</span>`
+        : "";
+
+    const validityBody = `<dl class="grid sm:grid-cols-2 gap-4">
+      ${field("Not Before", escapeHtml(formatDate(cert.notBefore)), true)}
+      ${field("Not After", escapeHtml(formatDate(cert.notAfter)), true)}
+      ${field("Total validity", `${cert.validityDays} days`)}
+      ${field("Status", statusBadge(cert))}
+    </dl>
+    ${
+      !cert.isCA && cert.validityDays > 100
+        ? `<div class="mt-4 rounded-md bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-900 leading-relaxed dark:bg-amber-950/30 dark:border-amber-900/40 dark:text-amber-200">
+            <strong>SC-081v3</strong> — public TLS validity drops to 200 d (15 Mar 2026), 100 d (2027), 47 d (2029). This certificate's ${cert.validityDays}-day lifetime${
+              cert.validityDays > 200
+                ? " already exceeds the March 2026 cap."
+                : " will exceed the March 2027 cap."
+            }
+            <a href="https://cabforum.org/2025/04/11/ballot-sc081v3-introduce-schedule-of-reducing-validity-and-data-reuse-periods/" target="_blank" rel="noopener" class="underline ml-1">source ↗</a>
+          </div>`
+        : ""
+    }`;
+
+    const keyBody = `<dl class="grid sm:grid-cols-2 gap-4">
+      ${field("Algorithm", escapeHtml(cert.publicKey.algorithm))}
+      ${cert.publicKey.keySize ? field("Key size", `${cert.publicKey.keySize} bits`) : ""}
+      ${cert.publicKey.namedCurve ? field("Curve", escapeHtml(cert.publicKey.namedCurve)) : ""}
+      ${field("Signature", escapeHtml(cert.signatureAlgorithm))}
+    </dl>`;
+
+    const idBody = `<dl class="space-y-3">
+      ${field("Serial (hex)", copyableHex(cert.serial, "serial-hex"), true)}
+      ${field("Serial (decimal)", escapeHtml(cert.serialDec), true)}
+      ${field("SHA-1", copyableHex(cert.fingerprintSha1, "sha1"), true)}
+      ${field("SHA-256", copyableHex(cert.fingerprintSha256, "sha256"), true)}
+      ${field("SHA-512", copyableHex(cert.fingerprintSha512, "sha512"), true)}
+      ${cert.subjectKeyId ? field("Subject Key Identifier", copyableHex(cert.subjectKeyId, "ski"), true) : ""}
+      ${cert.authorityKeyId ? field("Authority Key Identifier", copyableHex(cert.authorityKeyId, "aki"), true) : ""}
+    </dl>`;
+
+    const usageBody = `<div class="space-y-4">
+      <div>
+        <div class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2">Basic Constraints</div>
+        <div class="text-sm">
+          ${
+            cert.isCA
+              ? `<span class="font-semibold text-zinc-900 dark:text-zinc-100">CA: TRUE</span>${cert.pathLenConstraint != null ? ` <span class="text-zinc-500 dark:text-zinc-400">· pathlen ${cert.pathLenConstraint}</span>` : ""}`
+              : `<span class="text-zinc-700 dark:text-zinc-300">CA: false</span>`
+          }
+          ${cert.selfSigned ? `<span class="ml-2 inline-flex items-center rounded-md bg-zinc-100 text-zinc-700 px-1.5 py-0.5 text-[10px] uppercase tracking-wider dark:bg-zinc-800 dark:text-zinc-300">self-signed</span>` : ""}
+        </div>
+      </div>
+      <div>
+        <div class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2">Key Usage</div>
+        ${chips(cert.keyUsage)}
+      </div>
+      <div>
+        <div class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2">Extended Key Usage</div>
+        ${chips(cert.extendedKeyUsage)}
+      </div>
+    </div>`;
+
+    const aiaIssuersBlock = cert.aiaIssuers.length
+      ? `<div><div class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">CA Issuers (AIA)</div>${cert.aiaIssuers
+          .map(
+            (u) =>
+              `<a class="block mono text-brand-700 hover:underline break-all dark:text-brand-400" href="${escapeHtml(u)}" target="_blank" rel="noopener">${escapeHtml(u)}</a>`
+          )
+          .join("")}</div>`
+      : "";
+    const aiaOcspBlock = cert.aiaOcsp.length
+      ? `<div><div class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">OCSP</div>${cert.aiaOcsp
+          .map(
+            (u) =>
+              `<a class="block mono text-brand-700 hover:underline break-all dark:text-brand-400" href="${escapeHtml(u)}" target="_blank" rel="noopener">${escapeHtml(u)}</a>`
+          )
+          .join("")}</div>`
+      : "";
+    const crlBlock = cert.crlUrls.length
+      ? `<div><div class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">CRL Distribution</div>${cert.crlUrls
+          .map(
+            (u) =>
+              `<a class="block mono text-brand-700 hover:underline break-all dark:text-brand-400" href="${escapeHtml(u)}" target="_blank" rel="noopener">${escapeHtml(u)}</a>`
+          )
+          .join("")}</div>`
+      : "";
+    const policiesBlock = cert.policies.length
+      ? `<div><div class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">Certificate Policies</div>${chips(cert.policies)}</div>`
+      : "";
+    const linksBody = `<div class="space-y-4 text-sm">
+      ${aiaIssuersBlock}${aiaOcspBlock}${crlBlock}${policiesBlock}
+      ${
+        !cert.aiaIssuers.length &&
+        !cert.aiaOcsp.length &&
+        !cert.crlUrls.length &&
+        !cert.policies.length
+          ? `<p class="text-zinc-500 italic dark:text-zinc-500">No AIA / CRL / Policy extensions.</p>`
+          : ""
+      }
+    </div>`;
+
+    return `<article class="space-y-4">
+      <header class="flex items-start justify-between gap-3 flex-wrap">
+        <div>
+          <h2 class="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+            ${escapeHtml(cn)}${chainLabel}
+          </h2>
+          <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+            issued by ${escapeHtml(cert.issuerDN["CN"]?.[0] ?? cert.issuer)}
+          </p>
+        </div>
+        ${statusBadge(cert)}
+      </header>
+
+      <div class="grid lg:grid-cols-2 gap-4">
+        ${section("Subject", renderDN(cert.subjectDN))}
+        ${section("Issuer", renderDN(cert.issuerDN))}
+      </div>
+
+      ${section("Subject Alternative Names", sanChips(cert.san))}
+      ${section("Validity", validityBody)}
+
+      <div class="grid lg:grid-cols-2 gap-4">
+        ${section("Public Key & Signature", keyBody)}
+        ${section("Key Usage", usageBody)}
+      </div>
+
+      ${section("Identifiers & Fingerprints", idBody)}
+      ${section("Distribution & Policies", linksBody)}
+    </article>`;
+  }
+
+  function bindCopyButtons(root: HTMLElement): void {
+    root
+      .querySelectorAll<HTMLButtonElement>("button[data-copy]")
+      .forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const sel = btn.getAttribute("data-copy");
+          if (!sel) return;
+          const target = root.querySelector(sel);
+          if (!target) return;
+          try {
+            await navigator.clipboard.writeText(target.textContent ?? "");
+            const old = btn.textContent;
+            btn.textContent = m.copied;
+            setTimeout(() => {
+              btn.textContent = old;
+            }, 1500);
+          } catch {
+            /* clipboard denied — silent */
+          }
+        });
+      });
+  }
+
+  async function decode(): Promise<void> {
+    if (busy) return;
+    const text = $input.value.trim();
+    clearError();
+
+    if (!text) {
+      $status.textContent = m.inputEmpty;
+      return;
+    }
+    if (text.length > MAX_INPUT_BYTES) {
+      showError(m.inputTooLarge);
+      return;
+    }
+
+    setBusy(true);
+    $status.textContent = m.decodingButton;
+    try {
+      const result = await decodeCertificateInput(text);
+      if (!result.ok) {
+        showError(result.error);
+        return;
+      }
+      $modalSubtitle.textContent = m.decodedSuccess(result.certs.length);
+      $body.innerHTML = result.certs
+        .map((c, i) => renderCert(c, i, result.certs.length))
+        .join('<hr class="my-6 border-zinc-100 dark:border-zinc-800">');
+      bindCopyButtons($body);
+      $status.textContent = m.decodedSuccess(result.certs.length);
+      if (!$modal.open) $modal.showModal();
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  $decodeBtn.addEventListener("click", () => void decode());
+
+  document
+    .querySelector('[data-action="sample"]')
+    ?.addEventListener("click", () => {
+      $input.value = SAMPLE_CERT_ISRG_X1;
+      void decode();
+    });
+
+  document
+    .querySelector('[data-action="clear"]')
+    ?.addEventListener("click", () => {
+      $input.value = "";
+      clearError();
+      $status.textContent = "";
+      $input.focus();
+    });
+
+  $input.addEventListener("keydown", (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+      e.preventDefault();
+      void decode();
+    }
+  });
+
+  // Auto-decode on paste.
+  $input.addEventListener("paste", () => {
+    setTimeout(() => {
+      const v = $input.value.trim();
+      if (
+        v.includes("-----BEGIN CERTIFICATE-----") ||
+        (/^[A-Za-z0-9+/=\s]+$/.test(v) && v.length > 80)
+      ) {
+        void decode();
+      }
+    }, 0);
+  });
+
+  async function readFile(file: File): Promise<void> {
+    if (file.size > MAX_INPUT_BYTES) {
+      showError(
+        `File is too large (${(file.size / 1024 / 1024).toFixed(1)} MB, max 2 MB).`
+      );
+      return;
+    }
+    setBusy(true);
+    try {
+      const buf = await file.arrayBuffer();
+      const text = new TextDecoder().decode(buf).trim();
+      const result = text.includes("-----BEGIN CERTIFICATE-----")
+        ? await decodeCertificateInput(text)
+        : await decodeCertificateInput(buf);
+      if (!result.ok) {
+        showError(result.error);
+        return;
+      }
+      $input.value = result.certs.map((c) => c.pem).join("\n");
+      $modalSubtitle.textContent = m.decodedSuccess(result.certs.length);
+      $body.innerHTML = result.certs
+        .map((c, i) => renderCert(c, i, result.certs.length))
+        .join('<hr class="my-6 border-zinc-100 dark:border-zinc-800">');
+      bindCopyButtons($body);
+      clearError();
+      $status.textContent = m.decodedSuccess(result.certs.length);
+      if (!$modal.open) $modal.showModal();
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  $drop.addEventListener("click", () => $file.click());
+  $file.addEventListener("change", () => {
+    const f = $file.files?.[0];
+    if (f) void readFile(f);
+  });
+
+  (["dragenter", "dragover"] as const).forEach((evt) =>
+    $card.addEventListener(evt, (e) => {
+      e.preventDefault();
+      $card.classList.add("ring-2", "ring-brand-300", "dark:ring-brand-600");
+    })
+  );
+  (["dragleave", "drop"] as const).forEach((evt) =>
+    $card.addEventListener(evt, (e) => {
+      e.preventDefault();
+      $card.classList.remove("ring-2", "ring-brand-300", "dark:ring-brand-600");
+    })
+  );
+  $card.addEventListener("drop", (e) => {
+    const f = (e as DragEvent).dataTransfer?.files?.[0];
+    if (f) void readFile(f);
+  });
+</script>

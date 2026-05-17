@@ -1,0 +1,348 @@
+---
+import Layout from "~/layouts/Layout.astro";
+import ToolNav from "~/components/ToolNav.astro";
+import { getMessages, type Locale } from "~/i18n";
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const m = getMessages(locale);
+
+const sections =
+  locale === "it"
+    ? [
+        {
+          ref: "Art. 21(2)(h) NIS2 — Crittografia",
+          items: [
+            "Tutti i servizi pubblici espongono solo TLS 1.2+ con TLS 1.3 abilitato preferito.",
+            "TLS 1.0/1.1 disabilitati su ogni endpoint esposto in internet.",
+            "Cipher suite legacy (RC4, 3DES, NULL, EXPORT) disabilitate.",
+            "Catena di certificati completa servita (no AIA chasing client-side).",
+            "HSTS abilitato su tutti i siti, con max-age ≥ 31536000.",
+          ],
+        },
+        {
+          ref: "Det. ACN 379907/2025 — Inventario e ciclo di vita",
+          items: [
+            "Inventario centralizzato dei certificati pubblici con scadenze monitorate.",
+            "Alert automatici su scadenza certificato (T-30 e T-7).",
+            "Procedura documentata di rinnovo (chi, come, con quale CA).",
+            "Procedura di revoca rapida documentata, testata negli ultimi 12 mesi.",
+          ],
+        },
+        {
+          ref: "Art. 23 NIS2 — Notifica incidenti",
+          items: [
+            "Runbook di notifica ACN per incidente PKI (24h early warning, 72h notifica, 1 mese report finale).",
+            "Contatti di emergenza CA/registrar documentati e raggiungibili 24×7.",
+            "Procedura di rotazione chiave privata in caso di compromissione testata.",
+          ],
+        },
+        {
+          ref: "DORA / eIDAS — Resilienza e qualified",
+          items: [
+            "Policy di cifratura documentata (data at rest / in transit / in use), allineata a RTS 2024/1774 art. 6.",
+            "Per servizi PSD2 / eIDAS Art. 45a: certificato QWAC presso TSP qualificato.",
+            "Almeno un fornitore secondario di emergenza per i certificati pubblici (multi-CA).",
+          ],
+        },
+      ]
+    : [
+        {
+          ref: "NIS2 Art. 21(2)(h) — Cryptography",
+          items: [
+            "All public-facing services accept TLS 1.2+ only, with TLS 1.3 enabled and preferred.",
+            "TLS 1.0 and 1.1 disabled on every internet-exposed endpoint.",
+            "Legacy cipher suites (RC4, 3DES, NULL, EXPORT) disabled.",
+            "Full certificate chain served (no client-side AIA chasing required).",
+            "HSTS enabled on all sites, with max-age ≥ 31536000.",
+          ],
+        },
+        {
+          ref: "Italian ACN det. 379907/2025 — Inventory & lifecycle",
+          items: [
+            "Centralized inventory of public certificates with expiry tracking.",
+            "Automatic expiry alerts at T-30 and T-7 days.",
+            "Documented renewal procedure (who, how, which CA).",
+            "Documented fast-revocation procedure, tested in the last 12 months.",
+          ],
+        },
+        {
+          ref: "NIS2 Art. 23 — Incident reporting",
+          items: [
+            "PKI incident runbook for ACN notification (24h early warning, 72h notification, 1-month final report).",
+            "Emergency contacts for CA / registrar documented and reachable 24×7.",
+            "Private-key rotation procedure tested for compromise scenarios.",
+          ],
+        },
+        {
+          ref: "DORA / eIDAS — Resilience & qualified",
+          items: [
+            "Documented encryption policy (data at rest / in transit / in use) aligned to RTS 2024/1774 art. 6.",
+            "For PSD2 / eIDAS Art. 45a-targeted services: QWAC from a qualified TSP.",
+            "At least one secondary CA fallback for public certificates (multi-CA).",
+          ],
+        },
+      ];
+
+const desc =
+  locale === "it"
+    ? "Checklist interattiva client-side che mappa la tua postura TLS / certificati a NIS2 Art. 21(2)(h), Det. ACN 379907/2025, DORA. Esporta un evidence pack."
+    : locale === "de"
+      ? "Interaktive Client-Side-Checkliste, die Ihre TLS- und Zertifikatslage auf NIS2 Art. 21(2)(h), DORA und eIDAS 2.0 abbildet."
+      : locale === "fr"
+        ? "Liste de contrôle interactive côté client qui cartographie votre posture TLS et certificats vis-à-vis de la NIS2 Art. 21(2)(h), DORA et eIDAS 2.0."
+        : "Client-side interactive checklist that maps your TLS / certificate posture to NIS2 Art. 21(2)(h), Italian D.Lgs. 138/2024 and DORA.";
+---
+
+<Layout
+  title={m.nis2ReadinessTitle}
+  description={desc}
+  keywords={[
+    "nis2 tls",
+    "nis2 checklist",
+    "nis2 readiness",
+    "audit certificati nis2",
+    "dora encryption",
+    "dlgs 138 2024",
+  ]}
+>
+  <div class="mx-auto max-w-3xl px-5 py-10">
+    <ToolNav locale={locale} currentSlug="nis2-tls-readiness" />
+    <header class="mb-8">
+      <h1
+        class="text-3xl md:text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50"
+      >
+        {m.nis2ReadinessTitle}
+      </h1>
+      <p class="mt-3 text-zinc-600 leading-relaxed max-w-2xl dark:text-zinc-400">
+        {m.nis2ReadinessTagline}
+      </p>
+    </header>
+
+    <div
+      class:list={[
+        "sticky top-14 z-30 mb-6 rounded-xl border p-4 backdrop-blur",
+        "bg-white/90 border-zinc-200",
+        "dark:bg-zinc-900/90 dark:border-zinc-800",
+      ]}
+    >
+      <div class="flex items-center gap-4">
+        <div class="flex-1">
+          <div class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+            Score
+          </div>
+          <div class="mt-1.5 h-2 rounded-full bg-zinc-100 overflow-hidden dark:bg-zinc-800">
+            <div
+              id="bar"
+              class="h-full bg-brand-500 transition-all duration-200"
+              style="width:0%"
+            >
+            </div>
+          </div>
+        </div>
+        <div class="text-right">
+          <div id="score" class="text-2xl font-bold text-zinc-900 dark:text-zinc-50">0%</div>
+          <button
+            type="button"
+            data-action="download"
+            class="text-xs font-medium text-brand-700 hover:text-brand-800 dark:text-brand-400 dark:hover:text-brand-300"
+            >Download evidence pack</button
+          >
+        </div>
+      </div>
+    </div>
+
+    <form id="nis2-form" class="space-y-8">
+      {
+        sections.map((s, si) => (
+          <section
+            class:list={[
+              "rounded-xl border p-5",
+              "bg-white border-zinc-200",
+              "dark:bg-zinc-900/40 dark:border-zinc-800",
+            ]}
+          >
+            <h2 class="text-sm font-semibold uppercase tracking-wider text-brand-700 dark:text-brand-400 mb-4">
+              {s.ref}
+            </h2>
+            <ul class="space-y-3">
+              {s.items.map((q, qi) => (
+                <li class="flex items-start gap-3">
+                  <span class="text-zinc-400 mt-1 dark:text-zinc-600 text-xs select-none">
+                    {si + 1}.{qi + 1}
+                  </span>
+                  <div class="flex-1">
+                    <p class="text-sm text-zinc-800 dark:text-zinc-200">{q}</p>
+                    <div class="mt-2 flex gap-2 text-xs">
+                      <label class="inline-flex items-center gap-1.5">
+                        <input
+                          type="radio"
+                          name={`q-${si}-${qi}`}
+                          value="yes"
+                          class="accent-brand-600"
+                        />
+                        <span class="text-zinc-700 dark:text-zinc-300">yes</span>
+                      </label>
+                      <label class="inline-flex items-center gap-1.5">
+                        <input
+                          type="radio"
+                          name={`q-${si}-${qi}`}
+                          value="no"
+                          class="accent-red-600"
+                        />
+                        <span class="text-zinc-700 dark:text-zinc-300">no</span>
+                      </label>
+                      <label class="inline-flex items-center gap-1.5">
+                        <input
+                          type="radio"
+                          name={`q-${si}-${qi}`}
+                          value="na"
+                          class="accent-zinc-500"
+                        />
+                        <span class="text-zinc-700 dark:text-zinc-300">N/A</span>
+                      </label>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))
+      }
+    </form>
+
+    <div
+      class:list={[
+        "mt-10 rounded-xl border p-5",
+        "bg-zinc-50/60 border-zinc-200",
+        "dark:bg-zinc-950/40 dark:border-zinc-800",
+      ]}
+    >
+      <h3 class="text-sm font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-300 mb-2">
+        References
+      </h3>
+      <ul class="text-sm space-y-1 list-disc pl-5 text-zinc-700 dark:text-zinc-300">
+        <li>
+          <a
+            href="https://eur-lex.europa.eu/eli/dir/2022/2555/oj/eng"
+            target="_blank"
+            rel="noopener"
+            class="text-brand-700 hover:underline dark:text-brand-400">Directive (EU) 2022/2555 — NIS2</a
+          >
+        </li>
+        <li>
+          <a
+            href="https://www.acn.gov.it/portale/web/guest/normativa"
+            target="_blank"
+            rel="noopener"
+            class="text-brand-700 hover:underline dark:text-brand-400">ACN — D.Lgs. 138/2024 e Determinazione 379907/2025</a
+          >
+        </li>
+        <li>
+          <a
+            href="https://eur-lex.europa.eu/eli/reg/2022/2554/oj"
+            target="_blank"
+            rel="noopener"
+            class="text-brand-700 hover:underline dark:text-brand-400">Regulation (EU) 2022/2554 — DORA</a
+          >
+        </li>
+        <li>
+          <a
+            href="https://www.enisa.europa.eu/publications/implementation-guidance-on-nis-2-security-measures"
+            target="_blank"
+            rel="noopener"
+            class="text-brand-700 hover:underline dark:text-brand-400">ENISA NIS2 Technical Implementation Guidance</a
+          >
+        </li>
+      </ul>
+    </div>
+
+  </div>
+</Layout>
+
+<script>
+  const form = document.getElementById("nis2-form") as HTMLFormElement;
+  const bar = document.getElementById("bar") as HTMLElement;
+  const scoreEl = document.getElementById("score") as HTMLElement;
+
+  function recompute(): void {
+    const radios = form.querySelectorAll<HTMLInputElement>(
+      "input[type=radio]"
+    );
+    const groups = new Map<string, string | null>();
+    radios.forEach((r) => {
+      if (!groups.has(r.name)) groups.set(r.name, null);
+      if (r.checked) groups.set(r.name, r.value);
+    });
+
+    let total = 0;
+    let yes = 0;
+    groups.forEach((v) => {
+      if (v === "yes" || v === "no") total += 1;
+      if (v === "yes") yes += 1;
+    });
+
+    const score = total === 0 ? 0 : Math.round((yes / total) * 100);
+    scoreEl.textContent = `${score}%`;
+    bar.style.width = `${score}%`;
+
+    // Tint the bar from amber to emerald as the score rises.
+    if (score >= 80) bar.className = "h-full bg-emerald-500 transition-all duration-200";
+    else if (score >= 50) bar.className = "h-full bg-brand-500 transition-all duration-200";
+    else bar.className = "h-full bg-amber-500 transition-all duration-200";
+  }
+
+  form.addEventListener("change", recompute);
+
+  document
+    .querySelector('[data-action="download"]')
+    ?.addEventListener("click", () => {
+      const radios = form.querySelectorAll<HTMLInputElement>(
+        "input[type=radio]"
+      );
+      const groups = new Map<string, string | null>();
+      radios.forEach((r) => {
+        if (!groups.has(r.name)) groups.set(r.name, null);
+        if (r.checked) groups.set(r.name, r.value);
+      });
+
+      const sections = Array.from(
+        form.querySelectorAll<HTMLElement>("section")
+      );
+      const lines: string[] = [];
+      lines.push("# NIS2 TLS Readiness — evidence pack");
+      lines.push(`Generated: ${new Date().toISOString()}`);
+      lines.push("");
+
+      sections.forEach((sec, si) => {
+        const h2 = sec.querySelector("h2")?.textContent?.trim() ?? "";
+        lines.push(`## ${h2}`);
+        const items = Array.from(sec.querySelectorAll<HTMLElement>("li"));
+        items.forEach((li, qi) => {
+          const q = li.querySelector("p")?.textContent?.trim() ?? "";
+          const ans = groups.get(`q-${si}-${qi}`) ?? "—";
+          const marker = ans === "yes" ? "[x]" : ans === "no" ? "[ ]" : "[?]";
+          lines.push(`- ${marker} ${q} _(${ans})_`);
+        });
+        lines.push("");
+      });
+
+      lines.push("## References");
+      lines.push("- Directive (EU) 2022/2555 — NIS2");
+      lines.push("- D.Lgs. 138/2024 (IT) and ACN Determinazione 379907/2025");
+      lines.push("- Regulation (EU) 2022/2554 — DORA");
+      lines.push("");
+      lines.push("---");
+      lines.push("Built with https://tools.certmate.org");
+
+      const blob = new Blob([lines.join("\n")], { type: "text/markdown" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `nis2-tls-readiness-${new Date().toISOString().slice(0, 10)}.md`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+</script>

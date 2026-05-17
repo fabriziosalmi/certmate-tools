@@ -1,0 +1,50 @@
+---
+import { getMessages, type Locale } from "~/i18n";
+
+interface Props {
+  locale: Locale;
+  variant?: "inline" | "block";
+}
+const { locale, variant = "inline" } = Astro.props;
+const m = getMessages(locale);
+---
+
+{variant === "inline" ? (
+  <span
+    class:list={[
+      "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ring-1",
+      "bg-brand-50 text-brand-800 ring-brand-200/60",
+      "dark:bg-brand-900/30 dark:text-brand-200 dark:ring-brand-700/40",
+    ]}
+    title={m.privacyBadgeBodyBlock}
+  >
+    <svg viewBox="0 0 20 20" class="h-3.5 w-3.5 fill-current" aria-hidden="true">
+      <path
+        fill-rule="evenodd"
+        d="M10 1a4.5 4.5 0 00-4.5 4.5V8H5a2 2 0 00-2 2v7a2 2 0 002 2h10a2 2 0 002-2v-7a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm2.5 7V5.5a2.5 2.5 0 10-5 0V8h5z"
+        clip-rule="evenodd"></path>
+    </svg>
+    {m.privacyBadgeInline}
+  </span>
+) : (
+  <div
+    class:list={[
+      "rounded-lg border px-4 py-3 text-sm flex items-start gap-3",
+      "border-brand-200 bg-brand-50/60 text-brand-900",
+      "dark:bg-brand-900/20 dark:border-brand-800/60 dark:text-brand-100",
+    ]}
+  >
+    <svg viewBox="0 0 20 20" class="h-5 w-5 fill-current mt-0.5" aria-hidden="true">
+      <path
+        fill-rule="evenodd"
+        d="M10 1a4.5 4.5 0 00-4.5 4.5V8H5a2 2 0 00-2 2v7a2 2 0 002 2h10a2 2 0 002-2v-7a2 2 0 00-2-2h-.5V5.5A4.5 4.5 0 0010 1zm2.5 7V5.5a2.5 2.5 0 10-5 0V8h5z"
+        clip-rule="evenodd"></path>
+    </svg>
+    <div>
+      <div class="font-semibold">{m.privacyBadgeTitleBlock}</div>
+      <div class="opacity-90 mt-0.5">
+        {m.privacyBadgeBodyBlock}
+      </div>
+    </div>
+  </div>
+)}
