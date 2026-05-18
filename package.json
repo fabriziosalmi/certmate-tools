@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.10.5",
-    "happy-dom": "^15.11.7",
+    "happy-dom": "^20.9.0",
     "vitest": "^2.1.8"
   }
 }
