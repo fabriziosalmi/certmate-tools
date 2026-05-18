@@ -4,6 +4,10 @@ Free online tools for TLS, SSL certificates, ACME, domain & DNS — privacy-firs
 
 Companion to [CertMate](https://github.com/fabriziosalmi/certmate) — open-source SSL certificate management.
 
+## Security
+
+See the full policy and operational hardening checklist in [SECURITY.md](./SECURITY.md).
+
 ## Local development
 
 ```bash

@@ -20,7 +20,14 @@ const catLabels: Record<Category, { label: string; blurb: string }> = {
 };
 
 const liveCount = internalTools.filter((t) => t.status === "live").length;
-const categoryOrder: Category[] = [
+const internalCategoryOrder: Category[] = [
+  "decode",
+  "validate",
+  "inspect",
+  "acme",
+  "compliance",
+];
+const externalCategoryOrder: Category[] = [
   "decode",
   "validate",
   "inspect",
@@ -29,14 +36,14 @@ const categoryOrder: Category[] = [
   "compliance",
 ];
 
-const groupedInternal = categoryOrder
+const groupedInternal = internalCategoryOrder
   .map((cat) => ({
     cat,
     tools: internalTools.filter((t) => t.category === cat),
   }))
   .filter((g) => g.tools.length > 0);
 
-const groupedExternal = categoryOrder
+const groupedExternal = externalCategoryOrder
   .map((cat) => ({
     cat,
     tools: externalTools.filter((t) => t.category === cat),
@@ -75,7 +82,7 @@ const seoDescription =
       "dark:border-zinc-800 dark:from-brand-900/20 dark:to-zinc-950",
     ]}
   >
-    <div class="mx-auto max-w-6xl px-5 py-16 md:py-24">
+    <div class="mx-auto max-w-6xl px-4 sm:px-5 py-12 md:py-24">
       <div class="max-w-3xl">
         <span
           class:list={[
@@ -88,16 +95,14 @@ const seoDescription =
           {m.homeBadge(liveCount)}
         </span>
         <h1
-          class="mt-5 text-4xl md:text-5xl font-bold tracking-tight leading-[1.05] text-zinc-900 dark:text-zinc-50"
+          class="mt-5 text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-[1.1] md:leading-[1.05] text-zinc-900 dark:text-zinc-50"
         >
           {m.homeHeadlineL1}
           <br class="hidden md:block" />
           {m.homeHeadlineL2a}
           <span class="text-brand-700 dark:text-brand-400">{m.homeHeadlineL2b}</span>.
         </h1>
-        <p
-          class="mt-5 text-lg leading-relaxed max-w-2xl text-zinc-600 dark:text-zinc-300"
-        >
+        <p class="mt-5 text-base sm:text-lg leading-relaxed max-w-2xl text-zinc-600 dark:text-zinc-300">
           {m.homeIntro}
         </p>
 
@@ -127,7 +132,7 @@ const seoDescription =
     </div>
   </section>
 
-  <section id="tools" class="mx-auto max-w-6xl px-5 py-16">
+  <section id="tools" class="mx-auto max-w-6xl px-4 sm:px-5 py-14 sm:py-16">
     <div class="flex items-baseline justify-between flex-wrap gap-3 mb-2">
       <h2 class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
         {m.homeOurTools}
@@ -144,7 +149,7 @@ const seoDescription =
       {
         groupedInternal.map(({ cat, tools }) => (
           <div>
-            <div class="mb-4 flex items-baseline gap-3">
+            <div class="mb-4 flex flex-col sm:flex-row sm:items-baseline gap-1.5 sm:gap-3">
               <h3 class="text-sm font-semibold uppercase tracking-wider text-brand-700 dark:text-brand-400">
                 {catLabels[cat].label}
               </h3>
@@ -204,10 +209,10 @@ const seoDescription =
     </div>
   </section>
 
-  <section class="mx-auto max-w-6xl px-5 py-20">
+  <section class="mx-auto max-w-6xl px-4 sm:px-5 py-16 sm:py-20">
     <div
       class:list={[
-        "rounded-2xl p-10 md:p-14 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 text-white",
+        "rounded-2xl p-6 sm:p-10 md:p-14 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 text-white",
         "bg-zinc-900",
         "dark:bg-gradient-to-br dark:from-zinc-900 dark:to-zinc-800",
       ]}

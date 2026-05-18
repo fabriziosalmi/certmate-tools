@@ -71,7 +71,7 @@ const desc =
               autocorrect="off"
               placeholder={'{"kty":"RSA","n":"...","e":"AQAB"}'}
               class:list={[
-                "mt-1 mono w-full resize-y rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400/40",
+                "mt-1 mono w-full resize-y rounded-md border px-3 py-2.5 text-base sm:text-sm leading-relaxed min-h-36 focus:outline-none focus:ring-2 focus:ring-brand-400/40",
                 "border-zinc-200 bg-white text-zinc-900 placeholder:text-zinc-400",
                 "dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder:text-zinc-600",
               ]}></textarea>
@@ -98,7 +98,7 @@ const desc =
               autocorrect="off"
               placeholder="evaGxfADs6pSRb2LAv9IZf17Dt3juxGJ-PCt92wr-oA"
               class:list={[
-                "mt-1 mono w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400/40",
+                "mt-1 mono w-full rounded-md border px-3 py-2.5 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-400/40",
                 "border-zinc-200 bg-white text-zinc-900 placeholder:text-zinc-400",
                 "dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder:text-zinc-600",
               ]}
@@ -117,7 +117,7 @@ const desc =
               autocorrect="off"
               placeholder="example.com"
               class:list={[
-                "mt-1 mono w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400/40",
+                "mt-1 mono w-full rounded-md border px-3 py-2.5 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-400/40",
                 "border-zinc-200 bg-white text-zinc-900 placeholder:text-zinc-400",
                 "dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder:text-zinc-600",
               ]}
@@ -131,7 +131,7 @@ const desc =
           type="button"
           data-action="compute"
           class:list={[
-            "inline-flex items-center gap-2 rounded-md px-5 py-2.5 text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
+            "inline-flex w-full sm:w-auto justify-center items-center gap-2 rounded-md px-5 py-3 text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
             "bg-zinc-900 text-white hover:bg-zinc-800",
             "dark:bg-brand-500 dark:text-zinc-50 dark:hover:bg-brand-400",
           ]}>Compute TXT value</button
@@ -142,7 +142,7 @@ const desc =
           class="text-xs font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
           >{m.clear}</button
         >
-        <p id="status" role="status" aria-live="polite" class="text-sm text-zinc-500 dark:text-zinc-400"></p>
+        <p id="status" role="status" aria-live="polite" class="w-full sm:w-auto text-xs sm:text-sm leading-relaxed text-zinc-500 dark:text-zinc-400"></p>
       </div>
 
       <div
@@ -168,7 +168,7 @@ const desc =
 
 <script>
   import { computeDns01, generateSampleAccountKey } from "~/lib/acme-dns01";
-  import { escapeHtml } from "~/lib/util";
+  import { escapeHtml, MAX_INPUT_BYTES } from "~/lib/util";
   import { detectLocale, getMessages } from "~/i18n";
 
   const locale = detectLocale(location.pathname);
@@ -201,6 +201,14 @@ const desc =
     $error.classList.add("hidden");
     if (!$jwk.value.trim() || !$token.value.trim()) {
       $status.textContent = "Paste a JWK and a token.";
+      return;
+    }
+    if (
+      $jwk.value.length > MAX_INPUT_BYTES ||
+      $token.value.length > 4096 ||
+      $domain.value.length > 1024
+    ) {
+      showError("Input is too large.");
       return;
     }
     setBusy(true);

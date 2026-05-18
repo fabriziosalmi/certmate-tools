@@ -28,7 +28,7 @@ const homeHref = localizedPath(locale, "/");
   ]}
 >
   <div
-    class="mx-auto max-w-6xl px-5 h-14 flex items-center justify-between gap-3"
+    class="mx-auto max-w-6xl px-4 sm:px-5 min-h-14 py-2 flex flex-wrap items-center justify-between gap-2 sm:gap-3"
   >
     <a href={homeHref} class="flex items-center gap-2.5 group shrink-0">
       <img
@@ -42,22 +42,34 @@ const homeHref = localizedPath(locale, "/");
       />
       <span class="font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
         CertMate <span class="text-zinc-400 font-normal dark:text-zinc-600">/</span>
-        <span class="text-brand-700 dark:text-brand-400">Tools</span>
+        <span class="text-brand-700 dark:text-brand-400 hidden sm:inline">Tools</span>
       </span>
     </a>
 
-    <nav class="flex items-center gap-1 text-sm">
+    <nav class="flex items-center gap-0.5 sm:gap-1 text-sm">
       {
         !isHome && (
           <a
             href={homeHref}
             class:list={[
-              "hidden sm:inline-flex px-3 py-1.5 rounded-md transition-colors",
+              "inline-flex px-2.5 sm:px-3 py-1.5 rounded-md transition-colors",
               "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100",
               "dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-900",
             ]}
+            aria-label={m.navAllTools}
           >
-            {m.navAllTools}
+            <span class="hidden sm:inline">{m.navAllTools}</span>
+            <svg
+              viewBox="0 0 20 20"
+              class="h-4 w-4 sm:hidden fill-current"
+              aria-hidden="true"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M3 4a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm0 8a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H4a1 1 0 01-1-1v-4zm8-8a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V4zm0 8a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"
+                clip-rule="evenodd"
+              ></path>
+            </svg>
           </a>
         )
       }
@@ -81,7 +93,7 @@ const homeHref = localizedPath(locale, "/");
         target="_blank"
         rel="noopener"
         class:list={[
-          "px-3 py-1.5 rounded-md transition-colors inline-flex items-center gap-1.5",
+          "px-2.5 sm:px-3 py-1.5 rounded-md transition-colors inline-flex items-center gap-1.5",
           "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100",
           "dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-900",
         ]}
@@ -104,7 +116,7 @@ const homeHref = localizedPath(locale, "/");
           id="lang-toggle"
           type="button"
           class:list={[
-            "inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium uppercase tracking-wider transition-colors",
+            "inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-medium uppercase tracking-wider transition-colors min-w-14 justify-center",
             "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100",
             "dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-900",
           ]}

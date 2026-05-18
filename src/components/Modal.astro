@@ -15,7 +15,7 @@ const m = getMessages(locale);
   id={id}
   aria-labelledby={titleId}
   class:list={[
-    "p-0 rounded-2xl shadow-2xl border w-[min(56rem,calc(100vw-1.5rem))] max-h-[min(48rem,calc(100vh-2rem))] m-auto",
+    "p-0 rounded-2xl shadow-2xl border overflow-hidden w-[min(56rem,calc(100vw-1rem))] sm:w-[min(56rem,calc(100vw-1.5rem))] max-h-[min(48rem,calc(100dvh-1rem))] sm:max-h-[min(48rem,calc(100dvh-2rem))] m-auto",
     "bg-white border-zinc-200 text-zinc-900",
     "dark:bg-zinc-900 dark:border-zinc-800 dark:text-zinc-100",
   ]}
@@ -39,7 +39,7 @@ const m = getMessages(locale);
       type="button"
       data-modal-close={id}
       class:list={[
-        "shrink-0 inline-flex items-center justify-center h-8 w-8 rounded-md transition-colors",
+        "shrink-0 inline-flex items-center justify-center h-9 w-9 rounded-md transition-colors",
         "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900",
         "dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100",
       ]}
@@ -58,7 +58,7 @@ const m = getMessages(locale);
       </svg>
     </button>
   </div>
-  <div class="overflow-y-auto px-5 py-5 max-h-[calc(min(48rem,100vh-2rem)-3.5rem)]">
+  <div class="overflow-y-auto overscroll-contain px-4 sm:px-5 py-4 sm:py-5 max-h-[calc(min(48rem,100dvh-1rem)-3.5rem)] sm:max-h-[calc(min(48rem,100dvh-2rem)-3.5rem)]">
     <slot />
   </div>
 </dialog>
@@ -67,6 +67,35 @@ const m = getMessages(locale);
   (function () {
     const dlg = document.getElementById(id);
     if (!dlg) return;
+    const body = document.body;
+    const html = document.documentElement;
+    const counterAttr = "data-modal-open-count";
+
+    const lockPageScroll = () => {
+      const count = Number(body.getAttribute(counterAttr) || "0");
+      if (count === 0) {
+        const y = window.scrollY || window.pageYOffset || 0;
+        body.style.top = `-${y}px`;
+        body.classList.add("modal-open");
+      }
+      body.setAttribute(counterAttr, String(count + 1));
+      html.classList.add("modal-open");
+    };
+
+    const unlockPageScroll = () => {
+      const count = Number(body.getAttribute(counterAttr) || "0");
+      if (count <= 1) {
+        const y = Math.abs(parseInt(body.style.top || "0", 10));
+        body.classList.remove("modal-open");
+        html.classList.remove("modal-open");
+        body.style.top = "";
+        body.removeAttribute(counterAttr);
+        window.scrollTo(0, y);
+        return;
+      }
+      body.setAttribute(counterAttr, String(count - 1));
+    };
+
     document
       .querySelectorAll(`[data-modal-close="${id}"]`)
       .forEach((b) => b.addEventListener("click", () => dlg.close()));
@@ -83,5 +112,12 @@ const m = getMessages(locale);
         e.clientY <= r.bottom;
       if (!inside) dlg.close();
     });
+    dlg.addEventListener("close", unlockPageScroll);
+
+    const nativeShowModal = dlg.showModal.bind(dlg);
+    dlg.showModal = function () {
+      lockPageScroll();
+      nativeShowModal();
+    };
   })();
 </script>

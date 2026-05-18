@@ -181,7 +181,7 @@ const en: Messages = {
   homeHeadlineL2a: "you can",
   homeHeadlineL2b: "actually trust",
   homeIntro:
-    "Decode, validate, inspect and monitor TLS certificates without ever uploading them. Everything runs in your browser. No accounts, no ads, no analytics.",
+    "Decode, validate and inspect TLS certificates without ever uploading them. Everything runs in your browser. No accounts, no ads, no analytics.",
   homeCtaBrowse: "Browse the toolbox",
   homeCtaTry: "Try the certificate decoder →",
   homeOurTools: "Our tools",
@@ -288,7 +288,7 @@ const it: Messages = {
   homeHeadlineL2a: "per i certificati,",
   homeHeadlineL2b: "di cui ti puoi fidare",
   homeIntro:
-    "Decodifica, valida, ispeziona e monitora certificati TLS senza mai caricarli. Tutto gira nel tuo browser. Niente account, niente pubblicità, niente analytics.",
+    "Decodifica, valida e ispeziona certificati TLS senza mai caricarli. Tutto gira nel tuo browser. Niente account, niente pubblicità, niente analytics.",
   homeCtaBrowse: "Esplora gli strumenti",
   homeCtaTry: "Prova il decoder certificato →",
   homeOurTools: "I nostri strumenti",
@@ -362,7 +362,7 @@ const de: Messages = {
   homeHeadlineL2a: "der man",
   homeHeadlineL2b: "wirklich vertrauen kann",
   homeIntro:
-    "TLS-Zertifikate dekodieren, validieren, prüfen und überwachen — ohne jemals etwas hochzuladen. Alles läuft im Browser. Keine Konten, keine Werbung, kein Tracking.",
+    "TLS-Zertifikate dekodieren, validieren und prüfen — ohne jemals etwas hochzuladen. Alles läuft im Browser. Keine Konten, keine Werbung, kein Tracking.",
   homeCtaBrowse: "Toolbox öffnen",
   homeCtaTry: "Certificate Decoder testen →",
   homeOurTools: "Unsere Tools",
@@ -388,7 +388,7 @@ const fr: Messages = {
   homeHeadlineL2a: "à laquelle vous pouvez",
   homeHeadlineL2b: "vraiment faire confiance",
   homeIntro:
-    "Décodez, validez, inspectez et surveillez vos certificats TLS sans jamais les téléverser. Tout s'exécute dans votre navigateur. Aucun compte, aucune pub, aucun tracker.",
+    "Décodez, validez et inspectez vos certificats TLS sans jamais les téléverser. Tout s'exécute dans votre navigateur. Aucun compte, aucune pub, aucun tracker.",
   homeCtaBrowse: "Explorer la boîte à outils",
   homeCtaTry: "Essayer le décodeur de certificat →",
   homeOurTools: "Nos outils",

@@ -24,12 +24,12 @@ const liveTools = internalTools.filter((t) => t.status === "live");
     "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
   ]}
 >
-  <ul class="flex items-center gap-1.5 whitespace-nowrap pb-1">
+  <ul class="flex items-center gap-2 whitespace-nowrap pb-1">
     <li class="shrink-0">
       <a
         href={localizedPath(locale, "/")}
         class:list={[
-          "inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
+          "inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs sm:text-sm font-medium transition-colors",
           "text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100",
           "dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800",
         ]}
@@ -59,7 +59,7 @@ const liveTools = internalTools.filter((t) => t.status === "live");
               href={localizedPath(locale, `/${t.slug}/`)}
               aria-current={isActive ? "page" : undefined}
               class:list={[
-                "inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
+                "inline-flex items-center rounded-md px-2.5 py-1.5 text-xs sm:text-sm font-medium transition-colors",
                 isActive
                   ? "bg-brand-100 text-brand-800 ring-1 ring-brand-200 dark:bg-brand-900/40 dark:text-brand-100 dark:ring-brand-700/50"
                   : "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-zinc-100 dark:hover:bg-zinc-800",

@@ -59,7 +59,7 @@ const desc =
       >
         <div
           class:list={[
-            "flex items-center justify-between gap-3 border-b px-4 py-2.5",
+            "flex flex-wrap items-center justify-between gap-2 border-b px-4 py-2.5",
             "bg-zinc-50/60 border-zinc-100",
             "dark:bg-zinc-900/80 dark:border-zinc-800",
           ]}
@@ -93,7 +93,7 @@ const desc =
           maxlength="2097152"
           placeholder={m.csrDecoderPlaceholder}
           class:list={[
-            "mono w-full resize-y border-0 px-4 py-4 focus:outline-none focus:ring-0",
+            "mono w-full resize-y border-0 px-4 py-4 text-base sm:text-sm leading-relaxed min-h-48 focus:outline-none focus:ring-0",
             "bg-white text-zinc-900 placeholder:text-zinc-400",
             "dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder:text-zinc-600",
           ]}></textarea>
@@ -104,12 +104,12 @@ const desc =
           type="button"
           data-action="decode"
           class:list={[
-            "inline-flex items-center gap-2 rounded-md px-5 py-2.5 text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
+            "inline-flex w-full sm:w-auto justify-center items-center gap-2 rounded-md px-5 py-3 text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
             "bg-zinc-900 text-white hover:bg-zinc-800",
             "dark:bg-brand-500 dark:text-zinc-50 dark:hover:bg-brand-400",
           ]}>{m.decodeButton}</button
         >
-        <p id="status" role="status" aria-live="polite" class="text-sm text-zinc-500 dark:text-zinc-400"></p>
+        <p id="status" role="status" aria-live="polite" class="w-full sm:w-auto text-xs sm:text-sm leading-relaxed text-zinc-500 dark:text-zinc-400"></p>
       </div>
 
       <div

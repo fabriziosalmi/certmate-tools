@@ -32,18 +32,43 @@ const isExternal = !isInternal;
 const isSoon = isInternal && tool.status === "soon";
 ---
 
-<a
-  href={isSoon ? undefined : href}
-  target={isExternal ? "_blank" : undefined}
-  rel={isExternal ? "noopener" : undefined}
-  class:list={[
-    "group relative block rounded-xl border p-5 transition-colors",
-    isSoon
-      ? "opacity-70 cursor-not-allowed border-zinc-200 bg-white dark:bg-zinc-900/40 dark:border-zinc-800"
-      : "border-zinc-200 bg-white hover:border-brand-400 hover:bg-zinc-50/40 dark:bg-zinc-900/30 dark:border-zinc-800 dark:hover:border-brand-600 dark:hover:bg-zinc-900/60",
-  ]}
-  aria-disabled={isSoon}
->
+{
+  isSoon ? (
+    <div
+      class:list={[
+        "group relative block rounded-xl border p-4 sm:p-5 transition-colors opacity-70 cursor-not-allowed",
+        "border-zinc-200 bg-white dark:bg-zinc-900/40 dark:border-zinc-800",
+      ]}
+      aria-disabled="true"
+    >
+      <div class="flex items-start justify-between gap-3">
+        <h3 class="font-semibold leading-snug text-zinc-900 dark:text-zinc-50">
+          {title}
+        </h3>
+        <span
+          class:list={[
+            "inline-flex items-center shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider",
+            "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200",
+          ]}
+        >
+          {m.soonBadge}
+        </span>
+      </div>
+
+      <p class="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+        {blurb}
+      </p>
+    </div>
+  ) : (
+    <a
+      href={href}
+      target={isExternal ? "_blank" : undefined}
+      rel={isExternal ? "noopener" : undefined}
+      class:list={[
+        "group relative block rounded-xl border p-4 sm:p-5 transition-colors",
+        "border-zinc-200 bg-white hover:border-brand-400 hover:bg-zinc-50/40 dark:bg-zinc-900/30 dark:border-zinc-800 dark:hover:border-brand-600 dark:hover:bg-zinc-900/60",
+      ]}
+    >
   <div class="flex items-start justify-between gap-3">
     <h3
       class="font-semibold leading-snug text-zinc-900 dark:text-zinc-50"
@@ -95,4 +120,6 @@ const isSoon = isInternal && tool.status === "soon";
       </div>
     )
   }
-</a>
+    </a>
+  )
+}

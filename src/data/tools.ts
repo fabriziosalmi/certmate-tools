@@ -97,29 +97,6 @@ export const internalTools: InternalTool[] = [
     status: "live",
   },
   {
-    slug: "ct-search",
-    title: "CT Log Search",
-    tagline:
-      "A fast, modern frontend over certificate transparency logs. Filter by issuer, date, wildcard.",
-    category: "monitor",
-    keywords: ["crt.sh alternative", "certificate transparency search"],
-    status: "soon",
-  },
-  {
-    slug: "bulk-expiry",
-    title: "Bulk Expiry Checker",
-    tagline:
-      "Paste a list of hostnames — get a sortable table of issuer, expiry and a heads-up against the CA/B Forum validity schedule.",
-    category: "monitor",
-    keywords: [
-      "bulk ssl expiry",
-      "certificate expiry checker",
-      "sc-081v3",
-      "ca browser forum 47 day",
-    ],
-    status: "soon",
-  },
-  {
     slug: "acme-dns-01",
     title: "DNS-01 Challenge Helper",
     tagline:

@@ -55,3 +55,44 @@ notes and security advisory unless you ask to stay anonymous.
 
 Only the latest `main`-branch deployment of <https://tools.certmate.org> is
 supported. Older static builds are not maintained.
+
+## Security baseline (repo & CI)
+
+The repository uses a defensive baseline and expects maintainers to keep these
+controls enabled in GitHub settings.
+
+### Branch protection (`main`)
+
+- Require pull requests before merging (no direct pushes).
+- Require status checks to pass before merging (`CI` and deploy checks).
+- Require up-to-date branches before merge.
+- Require conversation resolution before merge.
+- Restrict who can push to `main` (maintainers only).
+- Require signed commits where your org/repo policy supports it.
+
+### GitHub Actions hardening
+
+- Pin all third-party actions to full commit SHA (not just mutable tags).
+- Use least-privilege permissions at job level.
+- Disable credential persistence in checkout steps.
+- Keep `fetch-depth` minimal unless full history is strictly required.
+- Install dependencies with `npm ci --ignore-scripts` in CI by default.
+
+### Dependency and supply-chain controls
+
+- Keep lockfile committed and reviewed in PRs.
+- Enable Dependabot security + version updates for npm and GitHub Actions.
+- Triage Dependabot alerts promptly.
+- Run `npm audit` in CI for production dependencies at high severity and above.
+
+### Secret and code scanning
+
+- Enable secret scanning and push protection.
+- Enable Dependabot alerts.
+- Enable Code Scanning (CodeQL) where available.
+
+### Release/deploy controls
+
+- Production deployments only from protected `main`.
+- Use GitHub Environments for deploy gates and audit trail.
+- Prefer immutable artifacts and reproducible builds.
