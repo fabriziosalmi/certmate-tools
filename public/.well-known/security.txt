@@ -1,0 +1,10 @@
+# RFC 9116 disclosure channels for tools.certmate.org.
+# Keep `Expires` rolling — re-issue at least once a year.
+
+Contact: https://github.com/fabriziosalmi/certmate-tools/security/advisories/new
+Contact: mailto:fabrizio.salmi@gmail.com
+Expires: 2027-05-19T00:00:00.000Z
+Preferred-Languages: en, it
+Canonical: https://tools.certmate.org/.well-known/security.txt
+Policy: https://github.com/fabriziosalmi/certmate-tools/blob/main/SECURITY.md
+Acknowledgments: https://github.com/fabriziosalmi/certmate-tools/security/advisories
