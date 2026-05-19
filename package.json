@@ -14,7 +14,7 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "@peculiar/x509": "^1.12.3",
+    "@peculiar/x509": "^2.0.0",
     "@tailwindcss/vite": "^4.0.0",
     "astro": "^6.3.5",
     "tailwindcss": "^4.0.0",
