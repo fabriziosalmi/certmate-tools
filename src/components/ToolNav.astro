@@ -18,6 +18,7 @@ const liveTools = internalTools.filter((t) => t.status === "live");
 ---
 
 <nav
+  id="tool-nav"
   aria-label="Tool navigation"
   class:list={[
     "-mx-4 px-4 sm:mx-0 sm:px-0 mb-5 overflow-x-auto",
@@ -73,3 +74,21 @@ const liveTools = internalTools.filter((t) => t.status === "live");
     }
   </ul>
 </nav>
+
+<script is:inline>
+  (function () {
+    const nav = document.getElementById("tool-nav");
+    if (!nav) return;
+    const active = nav.querySelector('[aria-current="page"]');
+    if (!(active instanceof HTMLElement)) return;
+    const navRect = nav.getBoundingClientRect();
+    const tabRect = active.getBoundingClientRect();
+    // Only scroll if the active tab is off-screen horizontally
+    if (tabRect.left < navRect.left || tabRect.right > navRect.right) {
+      nav.scrollTo({
+        left: active.offsetLeft - nav.clientWidth / 2 + active.clientWidth / 2,
+        behavior: "instant",
+      });
+    }
+  })();
+</script>

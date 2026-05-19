@@ -49,6 +49,11 @@ const xDefault = new URL(
   localizedPath(DEFAULT_LOCALE, cleanPath),
   Astro.site ?? "http://localhost"
 ).toString();
+
+const ogImageUrl = new URL(
+  "/certmate-logo-1024.png",
+  Astro.site ?? "http://localhost"
+).toString();
 ---
 
 <!doctype html>
@@ -83,10 +88,15 @@ const xDefault = new URL(
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:site_name" content="CertMate Tools" />
     <meta property="og:locale" content={locale} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1024" />
+    <meta property="og:image:height" content="1024" />
+    <meta property="og:image:alt" content="CertMate Tools logo" />
 
-    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
 
     <meta name="theme-color" content="#1d4ed8" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#020617" media="(prefers-color-scheme: dark)" />
