@@ -181,4 +181,11 @@ export const externalTools: ExternalTool[] = [
     why: "Official ENISA technical implementation guidance (June 2025).",
     category: "compliance",
   },
+  {
+    name: "nis2-public",
+    url: "https://github.com/fabriziosalmi/nis2-public",
+    why: "Open-source platform for NIS2 continuous posture management — governance, technical validation and incident response in one self-hosted stack.",
+    category: "compliance",
+    openSource: "https://github.com/fabriziosalmi/nis2-public",
+  },
 ];
