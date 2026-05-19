@@ -1,0 +1,12 @@
+# Default owner — every PR requires review from the maintainer.
+*                                       @fabriziosalmi
+
+# Security-sensitive paths: explicit re-owner for visibility in the PR UI.
+/SECURITY.md                            @fabriziosalmi
+/.github/                               @fabriziosalmi
+/.github/workflows/                     @fabriziosalmi
+/src/layouts/Layout.astro               @fabriziosalmi
+/src/lib/                               @fabriziosalmi
+/scripts/inject-csp.mjs                 @fabriziosalmi
+/scripts/check-no-network.mjs           @fabriziosalmi
+/public/.well-known/                    @fabriziosalmi
