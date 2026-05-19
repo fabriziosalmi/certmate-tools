@@ -135,7 +135,8 @@ const desc =
     SAMPLE_CSR,
     type DecodedCSR,
   } from "~/lib/csr-decoder";
-  import { escapeHtml, MAX_INPUT_BYTES } from "~/lib/util";
+  import { MAX_INPUT_BYTES } from "~/lib/util";
+  import { el, frag, mount, type ChildValue } from "~/lib/dom";
   import { detectLocale, getMessages } from "~/i18n";
 
   const locale = detectLocale(location.pathname);
@@ -163,116 +164,306 @@ const desc =
     $status.textContent = "";
   }
 
-  function chips(items: string[]): string {
+  function chips(items: string[]): HTMLElement {
     if (items.length === 0)
-      return `<p class="text-sm text-zinc-500 italic dark:text-zinc-500">none</p>`;
-    return `<div class="flex flex-wrap gap-1.5">${items.map((i) => `<span class="inline-flex rounded-md bg-zinc-100 text-zinc-800 px-2 py-1 text-xs font-medium mono dark:bg-zinc-800 dark:text-zinc-200">${escapeHtml(i)}</span>`).join("")}</div>`;
+      return el(
+        "p",
+        { class: "text-sm text-zinc-500 italic dark:text-zinc-500" },
+        "none"
+      );
+    return el(
+      "div",
+      { class: "flex flex-wrap gap-1.5" },
+      items.map((i) =>
+        el(
+          "span",
+          {
+            class:
+              "inline-flex rounded-md bg-zinc-100 text-zinc-800 px-2 py-1 text-xs font-medium mono dark:bg-zinc-800 dark:text-zinc-200",
+          },
+          i
+        )
+      )
+    );
   }
 
-  function copyableHex(value: string, label: string): string {
-    const id = `c-${Math.random().toString(36).slice(2, 8)}`;
-    return `<div class="flex items-start gap-2">
-      <code id="${id}" class="mono text-xs break-all flex-1">${escapeHtml(value)}</code>
-      <button type="button" class="shrink-0 text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100" data-copy="#${id}" aria-label="Copy ${escapeHtml(label)}">${m.copy}</button>
-    </div>`;
+  function copyableValue(value: string, label: string): HTMLElement {
+    const code = el(
+      "code",
+      { class: "mono text-xs break-all flex-1" },
+      value
+    );
+    const btn = el(
+      "button",
+      {
+        type: "button",
+        class:
+          "shrink-0 text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100",
+        "aria-label": `Copy ${label}`,
+      },
+      m.copy
+    );
+    btn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(code.textContent ?? "");
+        const prev = btn.textContent;
+        btn.textContent = m.copied;
+        setTimeout(() => (btn.textContent = prev), 1500);
+      } catch {}
+    });
+    return el("div", { class: "flex items-start gap-2" }, code, btn);
   }
 
-  function field(label: string, value: string, mono = false): string {
-    return `<div>
-      <dt class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">${escapeHtml(label)}</dt>
-      <dd class="${mono ? "mono " : ""}mt-1 text-sm text-zinc-900 break-all dark:text-zinc-100">${value}</dd>
-    </div>`;
+  function field(label: string, value: ChildValue, mono = false): HTMLElement {
+    return el(
+      "div",
+      null,
+      el(
+        "dt",
+        {
+          class:
+            "text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400",
+        },
+        label
+      ),
+      el(
+        "dd",
+        {
+          class: `${mono ? "mono " : ""}mt-1 text-sm text-zinc-900 break-all dark:text-zinc-100`,
+        },
+        value
+      )
+    );
   }
 
-  function section(title: string, body: string): string {
-    return `<div class="rounded-lg border border-zinc-200 bg-white p-5 dark:bg-zinc-900/40 dark:border-zinc-800"><h3 class="text-sm font-semibold uppercase tracking-wider text-brand-700 dark:text-brand-400 mb-3">${escapeHtml(title)}</h3>${body}</div>`;
+  function section(title: string, body: ChildValue): HTMLElement {
+    return el(
+      "div",
+      {
+        class:
+          "rounded-lg border border-zinc-200 bg-white p-5 dark:bg-zinc-900/40 dark:border-zinc-800",
+      },
+      el(
+        "h3",
+        {
+          class:
+            "text-sm font-semibold uppercase tracking-wider text-brand-700 dark:text-brand-400 mb-3",
+        },
+        title
+      ),
+      body
+    );
   }
 
-  function sigBadge(csr: DecodedCSR): string {
+  function sigBadge(csr: DecodedCSR): HTMLElement {
     if (csr.signatureValid === true) {
-      return `<span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 text-emerald-800 px-2.5 py-1 text-xs font-semibold ring-1 ring-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-200 dark:ring-emerald-900/60"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>${escapeHtml(m.validSignature)}</span>`;
+      return el(
+        "span",
+        {
+          class:
+            "inline-flex items-center gap-1.5 rounded-full bg-emerald-100 text-emerald-800 px-2.5 py-1 text-xs font-semibold ring-1 ring-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-200 dark:ring-emerald-900/60",
+        },
+        el("span", { class: "h-1.5 w-1.5 rounded-full bg-emerald-500" }),
+        m.validSignature
+      );
     }
     if (csr.signatureValid === false) {
-      return `<span class="inline-flex items-center gap-1.5 rounded-full bg-red-100 text-red-800 px-2.5 py-1 text-xs font-semibold ring-1 ring-red-200 dark:bg-red-950/50 dark:text-red-200 dark:ring-red-900/60"><span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>${escapeHtml(m.invalidSignature)}</span>`;
+      return el(
+        "span",
+        {
+          class:
+            "inline-flex items-center gap-1.5 rounded-full bg-red-100 text-red-800 px-2.5 py-1 text-xs font-semibold ring-1 ring-red-200 dark:bg-red-950/50 dark:text-red-200 dark:ring-red-900/60",
+        },
+        el("span", { class: "h-1.5 w-1.5 rounded-full bg-red-500" }),
+        m.invalidSignature
+      );
     }
     const detail = csr.signatureCheckError
-      ? ` — ${escapeHtml(csr.signatureCheckError)}`
+      ? ` — ${csr.signatureCheckError}`
       : "";
-    const titleAttr = csr.signatureCheckError
-      ? ` title="${escapeHtml(csr.signatureCheckError)}"`
-      : "";
-    return `<span${titleAttr} class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 text-amber-900 px-2.5 py-1 text-xs font-semibold ring-1 ring-amber-200 dark:bg-amber-950/40 dark:text-amber-200 dark:ring-amber-900/60"><span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>${escapeHtml(m.signatureCheckErrored)}${detail}</span>`;
+    return el(
+      "span",
+      {
+        title: csr.signatureCheckError ?? null,
+        class:
+          "inline-flex items-center gap-1.5 rounded-full bg-amber-100 text-amber-900 px-2.5 py-1 text-xs font-semibold ring-1 ring-amber-200 dark:bg-amber-950/40 dark:text-amber-200 dark:ring-amber-900/60",
+      },
+      el("span", { class: "h-1.5 w-1.5 rounded-full bg-amber-500" }),
+      `${m.signatureCheckErrored}${detail}`
+    );
   }
 
-  function renderCSR(csr: DecodedCSR): string {
+  function renderCSR(csr: DecodedCSR): HTMLElement {
     const cn = csr.subjectDN["CN"]?.[0] ?? csr.subject ?? "CSR";
-    const subjBody = `<dl class="grid grid-cols-[7rem_1fr] gap-x-4 gap-y-1.5 text-sm">
-      ${Object.entries(csr.subjectDN)
-        .map(
-          ([k, vs]) =>
-            `<dt class="text-zinc-500 font-medium dark:text-zinc-400">${escapeHtml(k)}</dt><dd class="text-zinc-900 mono break-all dark:text-zinc-100">${vs.map(escapeHtml).join("<br>")}</dd>`
-        )
-        .join("")}
-    </dl>`;
-    const keyBody = `<dl class="grid sm:grid-cols-2 gap-4">
-      ${field(m.commonAlgorithm, escapeHtml(csr.publicKey.algorithm))}
-      ${csr.publicKey.keySize ? field(m.commonKeySize, `${csr.publicKey.keySize} bits`) : ""}
-      ${csr.publicKey.namedCurve ? field(m.commonCurve, escapeHtml(csr.publicKey.namedCurve)) : ""}
-      ${field(m.commonSignature, escapeHtml(csr.signatureAlgorithm))}
-    </dl>`;
+
+    const subjBody = el(
+      "dl",
+      { class: "grid grid-cols-[7rem_1fr] gap-x-4 gap-y-1.5 text-sm" },
+      Object.entries(csr.subjectDN).flatMap(([k, vs]) => {
+        const ddChildren: ChildValue[] = [];
+        vs.forEach((v, i) => {
+          if (i > 0) ddChildren.push(el("br"));
+          ddChildren.push(v);
+        });
+        return [
+          el(
+            "dt",
+            { class: "text-zinc-500 font-medium dark:text-zinc-400" },
+            k
+          ),
+          el(
+            "dd",
+            { class: "text-zinc-900 mono break-all dark:text-zinc-100" },
+            ddChildren
+          ),
+        ];
+      })
+    );
+
+    const keyBody = el(
+      "dl",
+      { class: "grid sm:grid-cols-2 gap-4" },
+      field(m.commonAlgorithm, csr.publicKey.algorithm),
+      csr.publicKey.keySize
+        ? field(m.commonKeySize, `${csr.publicKey.keySize} bits`)
+        : null,
+      csr.publicKey.namedCurve
+        ? field(m.commonCurve, csr.publicKey.namedCurve)
+        : null,
+      field(m.commonSignature, csr.signatureAlgorithm)
+    );
+
     const sanBody =
       csr.san.length > 0
-        ? `<div class="flex flex-wrap gap-1.5">${csr.san
-            .map(
-              (e) =>
-                `<span class="inline-flex items-center rounded-md bg-zinc-100 text-zinc-800 pl-1.5 pr-2 py-0.5 text-xs font-medium dark:bg-zinc-800 dark:text-zinc-200"><span class="mr-1.5 rounded-sm bg-brand-100 text-brand-800 px-1 text-[10px] uppercase tracking-wider dark:bg-brand-900/40 dark:text-brand-200">${escapeHtml(e.type)}</span><span class="mono">${escapeHtml(e.value)}</span></span>`
+        ? el(
+            "div",
+            { class: "flex flex-wrap gap-1.5" },
+            csr.san.map((e) =>
+              el(
+                "span",
+                {
+                  class:
+                    "inline-flex items-center rounded-md bg-zinc-100 text-zinc-800 pl-1.5 pr-2 py-0.5 text-xs font-medium dark:bg-zinc-800 dark:text-zinc-200",
+                },
+                el(
+                  "span",
+                  {
+                    class:
+                      "mr-1.5 rounded-sm bg-brand-100 text-brand-800 px-1 text-[10px] uppercase tracking-wider dark:bg-brand-900/40 dark:text-brand-200",
+                  },
+                  e.type
+                ),
+                el("span", { class: "mono" }, e.value)
+              )
             )
-            .join("")}</div>`
-        : `<p class="text-sm text-zinc-500 italic dark:text-zinc-500">${escapeHtml(m.csrNoSAN)}</p>`;
-    const usageBody = `<div class="space-y-3">
-      <div><div class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">${escapeHtml(m.commonKeyUsage)}</div>${chips(csr.keyUsage)}</div>
-      <div><div class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">${escapeHtml(m.commonEKU)}</div>${chips(csr.extendedKeyUsage)}</div>
-      <div class="text-sm text-zinc-700 dark:text-zinc-300">${escapeHtml(m.commonCaRequested)}: <span class="font-semibold">${csr.isCA ? escapeHtml(m.commonYes) : escapeHtml(m.commonNo)}</span>${csr.pathLenConstraint != null ? `, pathlen ${csr.pathLenConstraint}` : ""}</div>
-    </div>`;
-    const idBody = `<dl class="space-y-3">
-      ${field(m.commonSpkiHash, copyableHex(csr.spkiFingerprintSha256, "spki"), true)}
-      ${csr.challengePassword ? field(m.csrChallengePassword, `<code class="mono">${escapeHtml(csr.challengePassword)}</code>`, true) : ""}
-      ${csr.unhandledOidAttrs.length ? field(m.csrOtherAttributes, chips(csr.unhandledOidAttrs)) : ""}
-    </dl>`;
-    return `<article class="space-y-4">
-      <header class="flex items-start justify-between gap-3 flex-wrap">
-        <div>
-          <h2 class="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50">${escapeHtml(cn)}</h2>
-          <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">${escapeHtml(m.csrSubtitle)}</p>
-        </div>
-        ${sigBadge(csr)}
-      </header>
-      <div class="grid lg:grid-cols-2 gap-4">
-        ${section(m.commonSubject, subjBody)}
-        ${section(m.csrSectionPublicKey, keyBody)}
-      </div>
-      ${section(m.csrSectionRequestedSAN, sanBody)}
-      <div class="grid lg:grid-cols-2 gap-4">
-        ${section(m.csrSectionRequestedUsage, usageBody)}
-        ${section(m.csrSectionIdentifiers, idBody)}
-      </div>
-    </article>`;
-  }
+          )
+        : el(
+            "p",
+            { class: "text-sm text-zinc-500 italic dark:text-zinc-500" },
+            m.csrNoSAN
+          );
 
-  function bindCopy(root: HTMLElement) {
-    root.querySelectorAll<HTMLButtonElement>("button[data-copy]").forEach((b) => {
-      b.addEventListener("click", async () => {
-        const sel = b.getAttribute("data-copy");
-        const target = sel ? root.querySelector(sel) : null;
-        if (!target) return;
-        try {
-          await navigator.clipboard.writeText(target.textContent ?? "");
-          const old = b.textContent;
-          b.textContent = m.copied;
-          setTimeout(() => (b.textContent = old), 1500);
-        } catch {}
-      });
-    });
+    const usageBody = el(
+      "div",
+      { class: "space-y-3" },
+      el(
+        "div",
+        null,
+        el(
+          "div",
+          {
+            class:
+              "text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1",
+          },
+          m.commonKeyUsage
+        ),
+        chips(csr.keyUsage)
+      ),
+      el(
+        "div",
+        null,
+        el(
+          "div",
+          {
+            class:
+              "text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1",
+          },
+          m.commonEKU
+        ),
+        chips(csr.extendedKeyUsage)
+      ),
+      el(
+        "div",
+        { class: "text-sm text-zinc-700 dark:text-zinc-300" },
+        `${m.commonCaRequested}: `,
+        el(
+          "span",
+          { class: "font-semibold" },
+          csr.isCA ? m.commonYes : m.commonNo
+        ),
+        csr.pathLenConstraint != null ? `, pathlen ${csr.pathLenConstraint}` : ""
+      )
+    );
+
+    const idBody = el(
+      "dl",
+      { class: "space-y-3" },
+      field(
+        m.commonSpkiHash,
+        copyableValue(csr.spkiFingerprintSha256, "spki"),
+        true
+      ),
+      csr.challengePassword
+        ? field(
+            m.csrChallengePassword,
+            el("code", { class: "mono" }, csr.challengePassword),
+            true
+          )
+        : null,
+      csr.unhandledOidAttrs.length
+        ? field(m.csrOtherAttributes, chips(csr.unhandledOidAttrs))
+        : null
+    );
+
+    return el(
+      "article",
+      { class: "space-y-4" },
+      el(
+        "header",
+        { class: "flex items-start justify-between gap-3 flex-wrap" },
+        el(
+          "div",
+          null,
+          el(
+            "h2",
+            {
+              class:
+                "text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50",
+            },
+            cn
+          ),
+          el(
+            "p",
+            { class: "mt-1 text-sm text-zinc-500 dark:text-zinc-400" },
+            m.csrSubtitle
+          )
+        ),
+        sigBadge(csr)
+      ),
+      el(
+        "div",
+        { class: "grid lg:grid-cols-2 gap-4" },
+        section(m.commonSubject, subjBody),
+        section(m.csrSectionPublicKey, keyBody)
+      ),
+      section(m.csrSectionRequestedSAN, sanBody),
+      el(
+        "div",
+        { class: "grid lg:grid-cols-2 gap-4" },
+        section(m.csrSectionRequestedUsage, usageBody),
+        section(m.csrSectionIdentifiers, idBody)
+      )
+    );
   }
 
   async function decode() {
@@ -296,10 +487,15 @@ const desc =
         return;
       }
       $subtitle.textContent = m.decodedSuccess(r.csrs.length);
-      $body.innerHTML = r.csrs
-        .map(renderCSR)
-        .join('<hr class="my-6 border-zinc-100 dark:border-zinc-800">');
-      bindCopy($body);
+      const blocks: Node[] = [];
+      r.csrs.forEach((csr, i) => {
+        if (i > 0)
+          blocks.push(
+            el("hr", { class: "my-6 border-zinc-100 dark:border-zinc-800" })
+          );
+        blocks.push(renderCSR(csr));
+      });
+      mount($body, frag(...blocks));
       $status.textContent = m.decodedSuccess(r.csrs.length);
       if (!$modal.open) $modal.showModal();
     } finally {

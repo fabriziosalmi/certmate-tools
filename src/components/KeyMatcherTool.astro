@@ -150,7 +150,8 @@ const desc =
 
 <script>
   import { matchKeyAndCert } from "~/lib/key-match";
-  import { escapeHtml, MAX_INPUT_BYTES } from "~/lib/util";
+  import { MAX_INPUT_BYTES } from "~/lib/util";
+  import { el, mount } from "~/lib/dom";
   import { detectLocale, getMessages } from "~/i18n";
 
   const locale = detectLocale(location.pathname);
@@ -197,9 +198,27 @@ const desc =
         return;
       }
       const res = r.result;
+
       const badge = res.match
-        ? `<span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 text-emerald-800 px-2.5 py-1 text-xs font-semibold ring-1 ring-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-200 dark:ring-emerald-900/60"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>${escapeHtml(m.keyMatcherMatch)}</span>`
-        : `<span class="inline-flex items-center gap-1.5 rounded-full bg-red-100 text-red-800 px-2.5 py-1 text-xs font-semibold ring-1 ring-red-200 dark:bg-red-950/50 dark:text-red-200 dark:ring-red-900/60"><span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>${escapeHtml(m.keyMatcherNoMatch)}</span>`;
+        ? el(
+            "span",
+            {
+              class:
+                "inline-flex items-center gap-1.5 rounded-full bg-emerald-100 text-emerald-800 px-2.5 py-1 text-xs font-semibold ring-1 ring-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-200 dark:ring-emerald-900/60",
+            },
+            el("span", { class: "h-1.5 w-1.5 rounded-full bg-emerald-500" }),
+            m.keyMatcherMatch
+          )
+        : el(
+            "span",
+            {
+              class:
+                "inline-flex items-center gap-1.5 rounded-full bg-red-100 text-red-800 px-2.5 py-1 text-xs font-semibold ring-1 ring-red-200 dark:bg-red-950/50 dark:text-red-200 dark:ring-red-900/60",
+            },
+            el("span", { class: "h-1.5 w-1.5 rounded-full bg-red-500" }),
+            m.keyMatcherNoMatch
+          );
+
       const fields: Array<[string, string]> = [
         [m.commonSubject, res.certSubject],
         [m.commonCommonName, res.certCommonName ?? "—"],
@@ -207,29 +226,92 @@ const desc =
       ];
       if (res.keyKeySize) fields.push([m.commonKeySize, `${res.keyKeySize} bits`]);
       if (res.keyNamedCurve) fields.push([m.commonNamedCurve, res.keyNamedCurve]);
-      const fieldHtml = fields
-        .map(
-          ([k, v]) =>
-            `<div><dt class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">${escapeHtml(k)}</dt><dd class="mt-1 text-sm text-zinc-900 dark:text-zinc-100 break-all mono">${escapeHtml(v)}</dd></div>`
-        )
-        .join("");
+
+      const fieldRow = ([k, v]: [string, string]) =>
+        el(
+          "div",
+          null,
+          el(
+            "dt",
+            {
+              class:
+                "text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400",
+            },
+            k
+          ),
+          el(
+            "dd",
+            { class: "mt-1 text-sm text-zinc-900 dark:text-zinc-100 break-all mono" },
+            v
+          )
+        );
+
+      const hashRow = (label: string, value: string) =>
+        el(
+          "div",
+          null,
+          el(
+            "dt",
+            {
+              class:
+                "text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400",
+            },
+            label
+          ),
+          el("dd", { class: "mono mt-1 break-all" }, value)
+        );
+
       $subtitle.textContent = res.match
         ? m.keyMatcherMatches
         : m.keyMatcherDoesNotMatch;
-      $body.innerHTML = `<article class="space-y-4">
-        <header class="flex items-start justify-between gap-3 flex-wrap">
-          <div>
-            <h2 class="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50">${escapeHtml(res.certCommonName ?? res.certSubject)}</h2>
-            <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">${escapeHtml(res.reason)}</p>
-          </div>
-          ${badge}
-        </header>
-        <div class="grid sm:grid-cols-2 gap-4 rounded-lg border border-zinc-200 bg-white p-5 dark:bg-zinc-900/40 dark:border-zinc-800">${fieldHtml}</div>
-        <div class="rounded-lg border border-zinc-200 bg-white p-5 dark:bg-zinc-900/40 dark:border-zinc-800 space-y-3 text-sm">
-          <div><dt class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">${escapeHtml(m.keyMatcherCertSpkiSha)}</dt><dd class="mono mt-1 break-all">${escapeHtml(res.certSpkiSha256)}</dd></div>
-          <div><dt class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">${escapeHtml(m.keyMatcherDerivedSpkiSha)}</dt><dd class="mono mt-1 break-all">${escapeHtml(res.derivedSpkiSha256)}</dd></div>
-        </div>
-      </article>`;
+
+      mount(
+        $body,
+        el(
+          "article",
+          { class: "space-y-4" },
+          el(
+            "header",
+            { class: "flex items-start justify-between gap-3 flex-wrap" },
+            el(
+              "div",
+              null,
+              el(
+                "h2",
+                {
+                  class:
+                    "text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50",
+                },
+                res.certCommonName ?? res.certSubject
+              ),
+              el(
+                "p",
+                { class: "mt-1 text-sm text-zinc-500 dark:text-zinc-400" },
+                res.reason
+              )
+            ),
+            badge
+          ),
+          el(
+            "div",
+            {
+              class:
+                "grid sm:grid-cols-2 gap-4 rounded-lg border border-zinc-200 bg-white p-5 dark:bg-zinc-900/40 dark:border-zinc-800",
+            },
+            fields.map(fieldRow)
+          ),
+          el(
+            "div",
+            {
+              class:
+                "rounded-lg border border-zinc-200 bg-white p-5 dark:bg-zinc-900/40 dark:border-zinc-800 space-y-3 text-sm",
+            },
+            hashRow(m.keyMatcherCertSpkiSha, res.certSpkiSha256),
+            hashRow(m.keyMatcherDerivedSpkiSha, res.derivedSpkiSha256)
+          )
+        )
+      );
+
       $status.textContent = $subtitle.textContent;
       if (!$modal.open) $modal.showModal();
     } finally {

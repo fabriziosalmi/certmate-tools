@@ -3,30 +3,12 @@ import {
   bufToBase64Url,
   bufToHexColon,
   coercePem,
-  escapeHtml,
   extractPemBlocks,
   hexToBigIntDecimal,
   parseDN,
   safeHttpUrl,
   wrapAsPem,
 } from "~/lib/util";
-
-describe("escapeHtml", () => {
-  it("escapes the standard XSS-sensitive characters", () => {
-    expect(escapeHtml("<script>alert('x')</script>")).toBe(
-      "&lt;script&gt;alert(&#039;x&#039;)&lt;/script&gt;"
-    );
-  });
-
-  it("escapes ampersand before any other entity", () => {
-    expect(escapeHtml("Tom & Jerry")).toBe("Tom &amp; Jerry");
-    expect(escapeHtml("a &amp; b")).toBe("a &amp;amp; b");
-  });
-
-  it("coerces non-string inputs without throwing", () => {
-    expect(escapeHtml(123 as unknown as string)).toBe("123");
-  });
-});
 
 describe("bufToHexColon", () => {
   it("returns colon-separated upper-case bytes", () => {

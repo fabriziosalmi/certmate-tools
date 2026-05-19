@@ -164,7 +164,8 @@ const desc =
 
 <script>
   import { computeDns01, generateSampleAccountKey } from "~/lib/acme-dns01";
-  import { escapeHtml, MAX_INPUT_BYTES } from "~/lib/util";
+  import { MAX_INPUT_BYTES } from "~/lib/util";
+  import { el, mount } from "~/lib/dom";
   import { detectLocale, getMessages } from "~/i18n";
 
   const locale = detectLocale(location.pathname);
@@ -220,41 +221,144 @@ const desc =
         return;
       }
       const out = r.result;
-      const copy = (id: string, value: string) =>
-        `<div class="flex items-start gap-2"><code id="${id}" class="mono text-xs break-all flex-1">${escapeHtml(value)}</code><button type="button" class="shrink-0 text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100" data-copy="#${id}">${m.copy}</button></div>`;
-      $subtitle.textContent = "Add this TXT record at the displayed name.";
-      $body.innerHTML = `<article class="space-y-4">
-        <div class="rounded-lg border border-emerald-200 bg-emerald-50/60 p-5 dark:bg-emerald-950/30 dark:border-emerald-900/60">
-          <div class="text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-300 mb-1">DNS record</div>
-          <div class="mono text-sm break-all">
-            ${escapeHtml(out.recordName)} <span class="text-zinc-400 dark:text-zinc-500">IN</span> <span class="text-zinc-400 dark:text-zinc-500">TXT</span> "${escapeHtml(out.txtValue)}"
-          </div>
-        </div>
-        <div class="rounded-lg border border-zinc-200 bg-white p-5 dark:bg-zinc-900/40 dark:border-zinc-800 space-y-3">
-          <div><dt class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">TXT value</dt><dd class="mt-1">${copy("txt", out.txtValue)}</dd></div>
-          <div><dt class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Key authorization</dt><dd class="mt-1">${copy("ka", out.keyAuthorization)}</dd></div>
-          <div><dt class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">JWK thumbprint (RFC 7638)</dt><dd class="mt-1">${copy("tp", out.thumbprintB64Url)}</dd></div>
-        </div>
-        <details class="rounded-lg border border-zinc-200 bg-white p-5 dark:bg-zinc-900/40 dark:border-zinc-800">
-          <summary class="cursor-pointer font-semibold text-zinc-900 dark:text-zinc-100">How is this computed?</summary>
-          <pre class="mono mt-3 text-xs leading-relaxed text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap">key_authorization = token + "." + base64url(SHA-256(canonical_JWK(account_pub)))
-TXT value         = base64url(SHA-256(key_authorization))</pre>
-          <p class="mt-3 text-xs text-zinc-500 dark:text-zinc-400">References: <a class="underline" target="_blank" rel="noopener" href="https://www.rfc-editor.org/rfc/rfc8555">RFC 8555 §8.4</a>, <a class="underline" target="_blank" rel="noopener" href="https://www.rfc-editor.org/rfc/rfc7638">RFC 7638</a>.</p>
-        </details>
-      </article>`;
-      $body.querySelectorAll<HTMLButtonElement>("button[data-copy]").forEach((b) => {
-        b.addEventListener("click", async () => {
-          const sel = b.getAttribute("data-copy");
-          const t = sel ? $body.querySelector(sel) : null;
-          if (!t) return;
+
+      const copyRow = (id: string, value: string) => {
+        const code = el(
+          "code",
+          { id, class: "mono text-xs break-all flex-1" },
+          value
+        );
+        const btn = el(
+          "button",
+          {
+            type: "button",
+            class:
+              "shrink-0 text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100",
+          },
+          m.copy
+        );
+        btn.addEventListener("click", async () => {
           try {
-            await navigator.clipboard.writeText(t.textContent ?? "");
-            const old = b.textContent;
-            b.textContent = m.copied;
-            setTimeout(() => (b.textContent = old), 1500);
+            await navigator.clipboard.writeText(code.textContent ?? "");
+            const prev = btn.textContent;
+            btn.textContent = m.copied;
+            setTimeout(() => (btn.textContent = prev), 1500);
           } catch {}
         });
-      });
+        return el("div", { class: "flex items-start gap-2" }, code, btn);
+      };
+
+      const labeled = (label: string, body: Node) =>
+        el(
+          "div",
+          null,
+          el(
+            "dt",
+            {
+              class:
+                "text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400",
+            },
+            label
+          ),
+          el("dd", { class: "mt-1" }, body)
+        );
+
+      $subtitle.textContent = "Add this TXT record at the displayed name.";
+      mount(
+        $body,
+        el(
+          "article",
+          { class: "space-y-4" },
+          el(
+            "div",
+            {
+              class:
+                "rounded-lg border border-emerald-200 bg-emerald-50/60 p-5 dark:bg-emerald-950/30 dark:border-emerald-900/60",
+            },
+            el(
+              "div",
+              {
+                class:
+                  "text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-300 mb-1",
+              },
+              "DNS record"
+            ),
+            el(
+              "div",
+              { class: "mono text-sm break-all" },
+              out.recordName,
+              " ",
+              el("span", { class: "text-zinc-400 dark:text-zinc-500" }, "IN"),
+              " ",
+              el("span", { class: "text-zinc-400 dark:text-zinc-500" }, "TXT"),
+              ` "${out.txtValue}"`
+            )
+          ),
+          el(
+            "div",
+            {
+              class:
+                "rounded-lg border border-zinc-200 bg-white p-5 dark:bg-zinc-900/40 dark:border-zinc-800 space-y-3",
+            },
+            labeled("TXT value", copyRow("txt", out.txtValue)),
+            labeled("Key authorization", copyRow("ka", out.keyAuthorization)),
+            labeled(
+              "JWK thumbprint (RFC 7638)",
+              copyRow("tp", out.thumbprintB64Url)
+            )
+          ),
+          el(
+            "details",
+            {
+              class:
+                "rounded-lg border border-zinc-200 bg-white p-5 dark:bg-zinc-900/40 dark:border-zinc-800",
+            },
+            el(
+              "summary",
+              {
+                class:
+                  "cursor-pointer font-semibold text-zinc-900 dark:text-zinc-100",
+              },
+              "How is this computed?"
+            ),
+            el(
+              "pre",
+              {
+                class:
+                  "mono mt-3 text-xs leading-relaxed text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap",
+              },
+              'key_authorization = token + "." + base64url(SHA-256(canonical_JWK(account_pub)))\nTXT value         = base64url(SHA-256(key_authorization))'
+            ),
+            el(
+              "p",
+              { class: "mt-3 text-xs text-zinc-500 dark:text-zinc-400" },
+              "References: ",
+              el(
+                "a",
+                {
+                  class: "underline",
+                  target: "_blank",
+                  rel: "noopener",
+                  href: "https://www.rfc-editor.org/rfc/rfc8555",
+                },
+                "RFC 8555 §8.4"
+              ),
+              ", ",
+              el(
+                "a",
+                {
+                  class: "underline",
+                  target: "_blank",
+                  rel: "noopener",
+                  href: "https://www.rfc-editor.org/rfc/rfc7638",
+                },
+                "RFC 7638"
+              ),
+              "."
+            )
+          )
+        )
+      );
       $status.textContent = $subtitle.textContent;
       if (!$modal.open) $modal.showModal();
     } finally {
