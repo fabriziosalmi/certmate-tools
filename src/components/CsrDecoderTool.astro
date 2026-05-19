@@ -13,11 +13,7 @@ const m = getMessages(locale);
 const desc =
   locale === "it"
     ? "Decodifica online qualsiasi CSR PKCS#10 nel browser. Vedi CN, SAN, parametri chiave, attributi richiesti — niente upload."
-    : locale === "de"
-      ? "Beliebige PKCS#10-CSRs online im Browser dekodieren. CN, SAN, Schlüsselparameter und Attribute — kein Upload."
-      : locale === "fr"
-        ? "Décodez n'importe quel CSR PKCS#10 dans le navigateur. CN, SAN, paramètres de clé et attributs — aucun upload."
-        : "Decode any PKCS#10 Certificate Signing Request in your browser. See CN, SAN, key parameters and challenge attributes — no upload.";
+    : "Decode any PKCS#10 Certificate Signing Request in your browser. See CN, SAN, key parameters and challenge attributes — no upload.";
 ---
 
 <Layout
@@ -199,7 +195,13 @@ const desc =
     if (csr.signatureValid === false) {
       return `<span class="inline-flex items-center gap-1.5 rounded-full bg-red-100 text-red-800 px-2.5 py-1 text-xs font-semibold ring-1 ring-red-200 dark:bg-red-950/50 dark:text-red-200 dark:ring-red-900/60"><span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>${escapeHtml(m.invalidSignature)}</span>`;
     }
-    return `<span class="inline-flex items-center gap-1.5 rounded-full bg-zinc-100 text-zinc-700 px-2.5 py-1 text-xs font-medium dark:bg-zinc-800 dark:text-zinc-300">Signature not checked</span>`;
+    const detail = csr.signatureCheckError
+      ? ` — ${escapeHtml(csr.signatureCheckError)}`
+      : "";
+    const titleAttr = csr.signatureCheckError
+      ? ` title="${escapeHtml(csr.signatureCheckError)}"`
+      : "";
+    return `<span${titleAttr} class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 text-amber-900 px-2.5 py-1 text-xs font-semibold ring-1 ring-amber-200 dark:bg-amber-950/40 dark:text-amber-200 dark:ring-amber-900/60"><span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>${escapeHtml(m.signatureCheckErrored)}${detail}</span>`;
   }
 
   function renderCSR(csr: DecodedCSR): string {
@@ -213,10 +215,10 @@ const desc =
         .join("")}
     </dl>`;
     const keyBody = `<dl class="grid sm:grid-cols-2 gap-4">
-      ${field("Algorithm", escapeHtml(csr.publicKey.algorithm))}
-      ${csr.publicKey.keySize ? field("Key size", `${csr.publicKey.keySize} bits`) : ""}
-      ${csr.publicKey.namedCurve ? field("Curve", escapeHtml(csr.publicKey.namedCurve)) : ""}
-      ${field("Signature", escapeHtml(csr.signatureAlgorithm))}
+      ${field(m.commonAlgorithm, escapeHtml(csr.publicKey.algorithm))}
+      ${csr.publicKey.keySize ? field(m.commonKeySize, `${csr.publicKey.keySize} bits`) : ""}
+      ${csr.publicKey.namedCurve ? field(m.commonCurve, escapeHtml(csr.publicKey.namedCurve)) : ""}
+      ${field(m.commonSignature, escapeHtml(csr.signatureAlgorithm))}
     </dl>`;
     const sanBody =
       csr.san.length > 0
@@ -226,33 +228,33 @@ const desc =
                 `<span class="inline-flex items-center rounded-md bg-zinc-100 text-zinc-800 pl-1.5 pr-2 py-0.5 text-xs font-medium dark:bg-zinc-800 dark:text-zinc-200"><span class="mr-1.5 rounded-sm bg-brand-100 text-brand-800 px-1 text-[10px] uppercase tracking-wider dark:bg-brand-900/40 dark:text-brand-200">${escapeHtml(e.type)}</span><span class="mono">${escapeHtml(e.value)}</span></span>`
             )
             .join("")}</div>`
-        : `<p class="text-sm text-zinc-500 italic dark:text-zinc-500">No SAN requested.</p>`;
+        : `<p class="text-sm text-zinc-500 italic dark:text-zinc-500">${escapeHtml(m.csrNoSAN)}</p>`;
     const usageBody = `<div class="space-y-3">
-      <div><div class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">Key Usage</div>${chips(csr.keyUsage)}</div>
-      <div><div class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">Extended Key Usage</div>${chips(csr.extendedKeyUsage)}</div>
-      <div class="text-sm text-zinc-700 dark:text-zinc-300">CA requested: <span class="font-semibold">${csr.isCA ? "yes" : "no"}</span>${csr.pathLenConstraint != null ? `, pathlen ${csr.pathLenConstraint}` : ""}</div>
+      <div><div class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">${escapeHtml(m.commonKeyUsage)}</div>${chips(csr.keyUsage)}</div>
+      <div><div class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">${escapeHtml(m.commonEKU)}</div>${chips(csr.extendedKeyUsage)}</div>
+      <div class="text-sm text-zinc-700 dark:text-zinc-300">${escapeHtml(m.commonCaRequested)}: <span class="font-semibold">${csr.isCA ? escapeHtml(m.commonYes) : escapeHtml(m.commonNo)}</span>${csr.pathLenConstraint != null ? `, pathlen ${csr.pathLenConstraint}` : ""}</div>
     </div>`;
     const idBody = `<dl class="space-y-3">
-      ${field("Public key SHA-256", copyableHex(csr.spkiFingerprintSha256, "spki"), true)}
-      ${csr.challengePassword ? field("Challenge password", `<code class="mono">${escapeHtml(csr.challengePassword)}</code>`, true) : ""}
-      ${csr.unhandledOidAttrs.length ? field("Other attribute OIDs", chips(csr.unhandledOidAttrs)) : ""}
+      ${field(m.commonSpkiHash, copyableHex(csr.spkiFingerprintSha256, "spki"), true)}
+      ${csr.challengePassword ? field(m.csrChallengePassword, `<code class="mono">${escapeHtml(csr.challengePassword)}</code>`, true) : ""}
+      ${csr.unhandledOidAttrs.length ? field(m.csrOtherAttributes, chips(csr.unhandledOidAttrs)) : ""}
     </dl>`;
     return `<article class="space-y-4">
       <header class="flex items-start justify-between gap-3 flex-wrap">
         <div>
           <h2 class="text-lg font-bold tracking-tight text-zinc-900 dark:text-zinc-50">${escapeHtml(cn)}</h2>
-          <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">PKCS#10 Certificate Signing Request</p>
+          <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">${escapeHtml(m.csrSubtitle)}</p>
         </div>
         ${sigBadge(csr)}
       </header>
       <div class="grid lg:grid-cols-2 gap-4">
-        ${section("Subject", subjBody)}
-        ${section("Public Key", keyBody)}
+        ${section(m.commonSubject, subjBody)}
+        ${section(m.csrSectionPublicKey, keyBody)}
       </div>
-      ${section("Requested SAN", sanBody)}
+      ${section(m.csrSectionRequestedSAN, sanBody)}
       <div class="grid lg:grid-cols-2 gap-4">
-        ${section("Requested Usage", usageBody)}
-        ${section("Identifiers", idBody)}
+        ${section(m.csrSectionRequestedUsage, usageBody)}
+        ${section(m.csrSectionIdentifiers, idBody)}
       </div>
     </article>`;
   }

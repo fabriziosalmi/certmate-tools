@@ -1,12 +1,10 @@
-export const LOCALES = ["en", "it", "de", "fr"] as const;
+export const LOCALES = ["en", "it"] as const;
 export type Locale = (typeof LOCALES)[number];
 export const DEFAULT_LOCALE: Locale = "en";
 
 export const LOCALE_LABELS: Record<Locale, string> = {
   en: "English",
   it: "Italiano",
-  de: "Deutsch",
-  fr: "Français",
 };
 
 export function isLocale(
@@ -117,6 +115,7 @@ export interface Messages {
   dropHint: string;
   invalidSignature: string;
   validSignature: string;
+  signatureCheckErrored: string;
 
   // tool-specific (titles + taglines + placeholders)
   certDecoderTitle: string;
@@ -135,6 +134,110 @@ export interface Messages {
   acmeDns01Tagline: string;
   nis2ReadinessTitle: string;
   nis2ReadinessTagline: string;
+
+  // chain builder + key matcher chrome
+  chainBuilderHint: string;
+  chainBuilderRunButton: string;
+  chainBuilderStatusEmpty: string;
+  chainBuilderDownloadBundle: string;
+  keyMatcherCertLabel: string;
+  keyMatcherKeyLabel: string;
+  keyMatcherRunButton: string;
+  keyMatcherStatusEmpty: string;
+
+  // shared result panel labels
+  commonSubject: string;
+  commonIssuer: string;
+  commonValidity: string;
+  commonExpired: string;
+  commonNotYetValid: string;
+  commonPublicKey: string;
+  commonAlgorithm: string;
+  commonKeySize: string;
+  commonCurve: string;
+  commonSignature: string;
+  commonCommonName: string;
+  commonKeyAlgorithm: string;
+  commonNamedCurve: string;
+  commonSAN: string;
+  commonNoSAN: string;
+  commonKeyUsage: string;
+  commonEKU: string;
+  commonSpkiHash: string;
+  commonSki: string;
+  commonAki: string;
+  commonSelfSigned: string;
+  commonCaRequested: string;
+  commonYes: string;
+  commonNo: string;
+  commonIssuedBy: string;
+
+  // chain builder result panel
+  chainRoleLeaf: string;
+  chainRoleRoot: string;
+  chainRoleIntermediate: string;
+  chainOrder: string;
+  chainOverallValid: string;
+  chainOverallIssues: string;
+  chainLinkOk: string;
+  chainLinkFailed: string;
+  chainPerLink: string;
+  chainNoLinks: string;
+  chainMissingParentPrefix: string;
+  chainExpectedIssuer: string;
+  chainFetchAia: string;
+  chainSubtitle: (n: number) => string;
+
+  // key matcher result panel
+  keyMatcherMatch: string;
+  keyMatcherNoMatch: string;
+  keyMatcherMatches: string;
+  keyMatcherDoesNotMatch: string;
+  keyMatcherCertSpkiSha: string;
+  keyMatcherDerivedSpkiSha: string;
+
+  // csr result panel
+  csrChallengePassword: string;
+  csrOtherAttributes: string;
+  csrNoSAN: string;
+  csrSubtitle: string;
+  csrSectionRequestedUsage: string;
+  csrSectionIdentifiers: string;
+  csrSectionPublicKey: string;
+  csrSectionRequestedSAN: string;
+
+  // cert decoder result panel
+  certNotBefore: string;
+  certNotAfter: string;
+  certTotalValidity: (days: number) => string;
+  certStatus: string;
+  certStatusExpiredDaysAgo: (days: number) => string;
+  certStatusNotYetValid: string;
+  certStatusExpiresInDays: (days: number) => string;
+  certStatusValidDaysLeft: (days: number) => string;
+  certIdxOfTotal: (idx: number, total: number) => string;
+  certSerialHex: string;
+  certSerialDec: string;
+  certBasicConstraints: string;
+  certCaTrue: string;
+  certCaFalse: string;
+  certCertificatePolicies: string;
+  certCaIssuersAia: string;
+  certOcsp: string;
+  certCrlDistribution: string;
+  certNoExtensions: string;
+  certSectionPublicKeySignature: string;
+  certSectionIdentifiersFingerprints: string;
+  certSectionDistributionPolicies: string;
+  certSectionKeyUsage: string;
+  certEmptyDn: string;
+  certNone: string;
+
+  // hostname validator + acme dns01 chrome
+  hostnameValidatorRunButton: string;
+  hostnameValidatorStatusEmpty: string;
+  acmeDns01RunButton: string;
+  acmeDns01StatusEmpty: string;
 }
 
 const en: Messages = {
@@ -176,7 +279,7 @@ const en: Messages = {
   catComplianceBlurb:
     "NIS2, DORA, eIDAS 2.0 — TLS posture mapped to the articles.",
 
-  homeBadge: (live) => `${live} live · more landing weekly`,
+  homeBadge: (live) => `${live} tools · 100% client-side · MIT`,
   homeHeadlineL1: "The certificate toolbox",
   homeHeadlineL2a: "you can",
   homeHeadlineL2b: "actually trust",
@@ -216,6 +319,7 @@ const en: Messages = {
   dropHint: "… or drop a file anywhere on this card.",
   invalidSignature: "Signature does not verify against the embedded public key.",
   validSignature: "Signature verified against the embedded public key.",
+  signatureCheckErrored: "Could not verify signature",
 
   certDecoderTitle: "Certificate Decoder",
   certDecoderTagline:
@@ -229,7 +333,7 @@ const en: Messages = {
     "-----BEGIN CERTIFICATE REQUEST-----\nMIIDFTCCAf0CAQAwgY0xCzAJBgNVBAYTAklUMQ4w...\n-----END CERTIFICATE REQUEST-----",
   chainBuilderTitle: "Chain Builder & Validator",
   chainBuilderTagline:
-    "Paste a bundle of PEM blocks. Reorder them into a valid leaf → root chain and spot what's missing.",
+    "Paste a bundle of PEM blocks. Reorder them into a valid leaf → root chain, spot what's missing and export a clean fullchain.pem.",
   keyMatcherTitle: "Key ↔ Cert Matcher",
   keyMatcherTagline:
     "Confirm a private key and certificate match. Both stay in your browser — Web Crypto only.",
@@ -242,6 +346,103 @@ const en: Messages = {
   nis2ReadinessTitle: "NIS2 TLS Readiness Check",
   nis2ReadinessTagline:
     "An interactive checklist that maps your TLS / cert posture to NIS2 Art. 21(2)(h) and Italian D.Lgs. 138/2024.",
+
+  chainBuilderHint: "Paste leaf, intermediates and (optionally) root — any order",
+  chainBuilderRunButton: "Build & validate chain",
+  chainBuilderStatusEmpty: "Paste one or more PEM blocks.",
+  chainBuilderDownloadBundle: "Download fullchain.pem",
+
+  commonSubject: "Subject",
+  commonIssuer: "Issuer",
+  commonValidity: "Validity",
+  commonExpired: "EXPIRED",
+  commonNotYetValid: "NOT YET VALID",
+  commonPublicKey: "Public key",
+  commonAlgorithm: "Algorithm",
+  commonKeySize: "Key size",
+  commonCurve: "Curve",
+  commonSignature: "Signature",
+  commonCommonName: "Common name",
+  commonKeyAlgorithm: "Key algorithm",
+  commonNamedCurve: "Named curve",
+  commonSAN: "Subject Alternative Names",
+  commonNoSAN: "No SAN.",
+  commonKeyUsage: "Key Usage",
+  commonEKU: "Extended Key Usage",
+  commonSpkiHash: "Public key SHA-256",
+  commonSki: "Subject Key Identifier",
+  commonAki: "Authority Key Identifier",
+  commonSelfSigned: "self-signed",
+  commonCaRequested: "CA requested",
+  commonYes: "yes",
+  commonNo: "no",
+  commonIssuedBy: "issued by",
+
+  chainRoleLeaf: "leaf",
+  chainRoleRoot: "root",
+  chainRoleIntermediate: "intermediate",
+  chainOrder: "Chain order: leaf → root",
+  chainOverallValid: "chain valid",
+  chainOverallIssues: "issues found",
+  chainLinkOk: "link OK",
+  chainLinkFailed: "link failed",
+  chainPerLink: "Per-link verification",
+  chainNoLinks: "No links to verify (single cert).",
+  chainMissingParentPrefix: "Missing parent for cert",
+  chainExpectedIssuer: "expected issuer",
+  chainFetchAia: "Fetch from AIA:",
+  chainSubtitle: (n) => `${n} certificate${n === 1 ? "" : "s"} ordered.`,
+
+  keyMatcherMatch: "match",
+  keyMatcherNoMatch: "no match",
+  keyMatcherMatches: "Private key matches the certificate.",
+  keyMatcherDoesNotMatch: "Private key does NOT match the certificate.",
+  keyMatcherCertSpkiSha: "Cert SPKI SHA-256",
+  keyMatcherDerivedSpkiSha: "Derived SPKI SHA-256",
+
+  csrChallengePassword: "Challenge password",
+  csrOtherAttributes: "Other attribute OIDs",
+  csrNoSAN: "No SAN requested.",
+  csrSubtitle: "PKCS#10 Certificate Signing Request",
+  csrSectionRequestedUsage: "Requested Usage",
+  csrSectionIdentifiers: "Identifiers",
+  csrSectionPublicKey: "Public Key",
+  csrSectionRequestedSAN: "Requested SAN",
+  keyMatcherCertLabel: "Certificate (PEM)",
+  keyMatcherKeyLabel: "Private key (PKCS#8 PEM)",
+  keyMatcherRunButton: "Match",
+  keyMatcherStatusEmpty: "Paste both a certificate and a private key.",
+
+  certNotBefore: "Not Before",
+  certNotAfter: "Not After",
+  certTotalValidity: (d) => `${d} day${d === 1 ? "" : "s"}`,
+  certStatus: "Status",
+  certStatusExpiredDaysAgo: (d) => `Expired ${d} day${d === 1 ? "" : "s"} ago`,
+  certStatusNotYetValid: "Not yet valid",
+  certStatusExpiresInDays: (d) => `Expires in ${d} day${d === 1 ? "" : "s"}`,
+  certStatusValidDaysLeft: (d) => `Valid · ${d} day${d === 1 ? "" : "s"} left`,
+  certIdxOfTotal: (i, t) => `${i} of ${t}`,
+  certSerialHex: "Serial (hex)",
+  certSerialDec: "Serial (decimal)",
+  certBasicConstraints: "Basic Constraints",
+  certCaTrue: "CA: TRUE",
+  certCaFalse: "CA: false",
+  certCertificatePolicies: "Certificate Policies",
+  certCaIssuersAia: "CA Issuers (AIA)",
+  certOcsp: "OCSP",
+  certCrlDistribution: "CRL Distribution",
+  certNoExtensions: "No AIA / CRL / Policy extensions.",
+  certSectionPublicKeySignature: "Public Key & Signature",
+  certSectionIdentifiersFingerprints: "Identifiers & Fingerprints",
+  certSectionDistributionPolicies: "Distribution & Policies",
+  certSectionKeyUsage: "Key Usage",
+  certEmptyDn: "empty",
+  certNone: "none",
+
+  hostnameValidatorRunButton: "Check coverage",
+  hostnameValidatorStatusEmpty: "Paste a certificate first.",
+  acmeDns01RunButton: "Compute TXT value",
+  acmeDns01StatusEmpty: "Paste a JWK and a token.",
 };
 
 const it: Messages = {
@@ -283,7 +484,7 @@ const it: Messages = {
   catComplianceBlurb:
     "NIS2, DORA, eIDAS 2.0 — posture TLS mappata articolo per articolo.",
 
-  homeBadge: (live) => `${live} attivi · altri ogni settimana`,
+  homeBadge: (live) => `${live} tool · 100% client-side · MIT`,
   homeHeadlineL1: "La cassetta degli attrezzi",
   homeHeadlineL2a: "per i certificati,",
   homeHeadlineL2b: "di cui ti puoi fidare",
@@ -325,6 +526,7 @@ const it: Messages = {
   invalidSignature:
     "La firma non verifica contro la public key inclusa.",
   validSignature: "Firma verificata contro la public key inclusa.",
+  signatureCheckErrored: "Impossibile verificare la firma",
 
   certDecoderTitle: "Decoder Certificati",
   certDecoderTagline:
@@ -338,7 +540,7 @@ const it: Messages = {
     "-----BEGIN CERTIFICATE REQUEST-----\nMIIDFTCCAf0CAQAwgY0xCzAJBgNVBAYTAklUMQ4w...\n-----END CERTIFICATE REQUEST-----",
   chainBuilderTitle: "Chain Builder & Validator",
   chainBuilderTagline:
-    "Incolla un bundle PEM. Riordina in catena valida leaf → root e individua cosa manca.",
+    "Incolla un bundle PEM. Riordina in catena valida leaf → root, individua cosa manca ed esporta un fullchain.pem pulito.",
   keyMatcherTitle: "Match Chiave ↔ Certificato",
   keyMatcherTagline:
     "Verifica che chiave privata e certificato corrispondano. Tutto resta nel browser — solo Web Crypto.",
@@ -351,61 +553,106 @@ const it: Messages = {
   nis2ReadinessTitle: "NIS2 TLS Readiness",
   nis2ReadinessTagline:
     "Checklist interattiva che mappa la tua postura TLS / cert all'art. 21(2)(h) NIS2 e al D.Lgs. 138/2024.",
+
+  chainBuilderHint: "Incolla leaf, intermediate ed (opzionale) root — in qualsiasi ordine",
+  chainBuilderRunButton: "Costruisci e valida la catena",
+  chainBuilderStatusEmpty: "Incolla uno o più blocchi PEM.",
+  chainBuilderDownloadBundle: "Scarica fullchain.pem",
+  keyMatcherCertLabel: "Certificato (PEM)",
+  keyMatcherKeyLabel: "Chiave privata (PKCS#8 PEM)",
+  keyMatcherRunButton: "Verifica",
+  keyMatcherStatusEmpty: "Incolla sia un certificato che una chiave privata.",
+
+  commonSubject: "Subject",
+  commonIssuer: "Issuer",
+  commonValidity: "Validità",
+  commonExpired: "SCADUTO",
+  commonNotYetValid: "NON ANCORA VALIDO",
+  commonPublicKey: "Chiave pubblica",
+  commonAlgorithm: "Algoritmo",
+  commonKeySize: "Lunghezza chiave",
+  commonCurve: "Curva",
+  commonSignature: "Firma",
+  commonCommonName: "Common name",
+  commonKeyAlgorithm: "Algoritmo chiave",
+  commonNamedCurve: "Curva nominata",
+  commonSAN: "Subject Alternative Names",
+  commonNoSAN: "Nessun SAN.",
+  commonKeyUsage: "Key Usage",
+  commonEKU: "Extended Key Usage",
+  commonSpkiHash: "SHA-256 chiave pubblica",
+  commonSki: "Subject Key Identifier",
+  commonAki: "Authority Key Identifier",
+  commonSelfSigned: "auto-firmato",
+  commonCaRequested: "CA richiesto",
+  commonYes: "sì",
+  commonNo: "no",
+  commonIssuedBy: "emesso da",
+
+  chainRoleLeaf: "leaf",
+  chainRoleRoot: "root",
+  chainRoleIntermediate: "intermediate",
+  chainOrder: "Ordine catena: leaf → root",
+  chainOverallValid: "catena valida",
+  chainOverallIssues: "problemi rilevati",
+  chainLinkOk: "link OK",
+  chainLinkFailed: "link fallito",
+  chainPerLink: "Verifica per link",
+  chainNoLinks: "Nessun link da verificare (cert singolo).",
+  chainMissingParentPrefix: "Manca il parent del cert",
+  chainExpectedIssuer: "issuer atteso",
+  chainFetchAia: "Recupera da AIA:",
+  chainSubtitle: (n) => `${n} certificat${n === 1 ? "o" : "i"} in ordine.`,
+
+  keyMatcherMatch: "match",
+  keyMatcherNoMatch: "no match",
+  keyMatcherMatches: "La chiave privata corrisponde al certificato.",
+  keyMatcherDoesNotMatch: "La chiave privata NON corrisponde al certificato.",
+  keyMatcherCertSpkiSha: "SHA-256 SPKI certificato",
+  keyMatcherDerivedSpkiSha: "SHA-256 SPKI derivato",
+
+  csrChallengePassword: "Challenge password",
+  csrOtherAttributes: "Altri attributi OID",
+  csrNoSAN: "Nessun SAN richiesto.",
+  csrSubtitle: "Certificate Signing Request PKCS#10",
+  csrSectionRequestedUsage: "Utilizzi richiesti",
+  csrSectionIdentifiers: "Identificatori",
+  csrSectionPublicKey: "Chiave pubblica",
+  csrSectionRequestedSAN: "SAN richiesti",
+
+  certNotBefore: "Valido dal",
+  certNotAfter: "Valido fino al",
+  certTotalValidity: (d) => `${d} giorn${d === 1 ? "o" : "i"}`,
+  certStatus: "Stato",
+  certStatusExpiredDaysAgo: (d) => `Scaduto da ${d} giorn${d === 1 ? "o" : "i"}`,
+  certStatusNotYetValid: "Non ancora valido",
+  certStatusExpiresInDays: (d) => `Scade tra ${d} giorn${d === 1 ? "o" : "i"}`,
+  certStatusValidDaysLeft: (d) => `Valido · ${d} giorn${d === 1 ? "o" : "i"} restant${d === 1 ? "e" : "i"}`,
+  certIdxOfTotal: (i, t) => `${i} di ${t}`,
+  certSerialHex: "Seriale (hex)",
+  certSerialDec: "Seriale (decimale)",
+  certBasicConstraints: "Basic Constraints",
+  certCaTrue: "CA: TRUE",
+  certCaFalse: "CA: false",
+  certCertificatePolicies: "Policy del certificato",
+  certCaIssuersAia: "CA Issuers (AIA)",
+  certOcsp: "OCSP",
+  certCrlDistribution: "Distribuzione CRL",
+  certNoExtensions: "Nessuna estensione AIA / CRL / Policy.",
+  certSectionPublicKeySignature: "Chiave pubblica e firma",
+  certSectionIdentifiersFingerprints: "Identificatori e fingerprint",
+  certSectionDistributionPolicies: "Distribuzione e policy",
+  certSectionKeyUsage: "Key Usage",
+  certEmptyDn: "vuoto",
+  certNone: "nessuno",
+
+  hostnameValidatorRunButton: "Verifica copertura",
+  hostnameValidatorStatusEmpty: "Incolla prima un certificato.",
+  acmeDns01RunButton: "Calcola valore TXT",
+  acmeDns01StatusEmpty: "Incolla una JWK e un token.",
 };
 
-const de: Messages = {
-  ...en,
-  brandTagline: "Kostenlose, datenschutzfreundliche SSL- und Zertifikat-Tools",
-  navAllTools: "Alle Tools",
-  homeBadge: (live) => `${live} aktiv · weitere kommen wöchentlich`,
-  homeHeadlineL1: "Die Zertifikat-Toolbox",
-  homeHeadlineL2a: "der man",
-  homeHeadlineL2b: "wirklich vertrauen kann",
-  homeIntro:
-    "TLS-Zertifikate dekodieren, validieren und prüfen — ohne jemals etwas hochzuladen. Alles läuft im Browser. Keine Konten, keine Werbung, kein Tracking.",
-  homeCtaBrowse: "Toolbox öffnen",
-  homeCtaTry: "Certificate Decoder testen →",
-  homeOurTools: "Unsere Tools",
-  homeBottomTitle: "Verwalten Sie Dutzende von Zertifikaten?",
-  homeBottomBody:
-    "Die maximale Laufzeit öffentlicher TLS-Zertifikate sinkt planmäßig — das CA/Browser Forum Ballot SC-081v3 senkt das Limit auf 200 Tage ab März 2026, 100 Tage ab 2027 und 47 Tage ab 2029. CertMate ist der Open-Source-Manager für diese Automatisierungsrealität.",
-  homeBottomCta: "CertMate auf GitHub →",
-  decodeButton: "Dekodieren",
-  decodingButton: "Verarbeitung…",
-  tryWithSample: "Mit Beispiel ausprobieren",
-  clear: "Leeren",
-  closeModal: "Schließen",
-  copy: "kopieren",
-  copied: "kopiert",
-};
-
-const fr: Messages = {
-  ...en,
-  brandTagline: "Outils SSL & certificats gratuits, sans collecte de données",
-  navAllTools: "Tous les outils",
-  homeBadge: (live) => `${live} en ligne · d'autres chaque semaine`,
-  homeHeadlineL1: "La boîte à outils certificats",
-  homeHeadlineL2a: "à laquelle vous pouvez",
-  homeHeadlineL2b: "vraiment faire confiance",
-  homeIntro:
-    "Décodez, validez et inspectez vos certificats TLS sans jamais les téléverser. Tout s'exécute dans votre navigateur. Aucun compte, aucune pub, aucun tracker.",
-  homeCtaBrowse: "Explorer la boîte à outils",
-  homeCtaTry: "Essayer le décodeur de certificat →",
-  homeOurTools: "Nos outils",
-  homeBottomTitle: "Vous gérez des dizaines de certificats ?",
-  homeBottomBody:
-    "Les durées de validité des certificats TLS publics baissent — le ballot CA/Browser Forum SC-081v3 plafonne la validité à 200 jours dès mars 2026, 100 jours dès 2027 et 47 jours dès 2029. CertMate est le gestionnaire open-source pensé pour cette automatisation.",
-  homeBottomCta: "CertMate sur GitHub →",
-  decodeButton: "Décoder",
-  decodingButton: "En cours…",
-  tryWithSample: "Essayer avec un exemple",
-  clear: "Effacer",
-  closeModal: "Fermer",
-  copy: "copier",
-  copied: "copié",
-};
-
-export const messages: Record<Locale, Messages> = { en, it, de, fr };
+export const messages: Record<Locale, Messages> = { en, it };
 
 export function getMessages(locale: Locale | undefined): Messages {
   return messages[locale ?? DEFAULT_LOCALE] ?? messages[DEFAULT_LOCALE];

@@ -43,6 +43,7 @@ export interface ChainNode {
   ski?: string;
   aki?: string;
   fingerprintSha256: string;
+  pem: string;
 }
 
 export interface ChainLink {
@@ -71,7 +72,7 @@ export type ChainOutcome =
   | { ok: true; result: ChainResult }
   | { ok: false; error: string };
 
-function makeNode(idx: number, cert: X509Certificate, fp: string): ChainNode {
+function makeNode(idx: number, cert: X509Certificate, fp: string, pem: string): ChainNode {
   const subDN = parseDN(cert.subject);
   const isuDN = parseDN(cert.issuer);
   const ski = cert
@@ -96,6 +97,7 @@ function makeNode(idx: number, cert: X509Certificate, fp: string): ChainNode {
     ski,
     aki,
     fingerprintSha256: fp,
+    pem,
   };
 }
 
@@ -126,7 +128,7 @@ export async function buildChain(pemInput: string): Promise<ChainOutcome> {
       const fp = bufToHexColon(await sha("SHA-256", c.rawData));
       // De-duplicate by fingerprint
       if (nodes.some((n) => n.fingerprintSha256 === fp)) continue;
-      nodes.push(makeNode(nodes.length, c, fp));
+      nodes.push(makeNode(nodes.length, c, fp, pem));
       certs.push(c);
     }
 
@@ -228,6 +230,6 @@ export async function buildChain(pemInput: string): Promise<ChainOutcome> {
 }
 
 /** Serialize the ordered chain back to a single PEM bundle (leaf first). */
-export function chainToBundle(blocks: string[], ordered: number[]): string {
-  return ordered.map((i) => blocks[i]).join("\n");
+export function chainToBundle(nodes: ChainNode[], ordered: number[]): string {
+  return ordered.map((i) => nodes[i]!.pem.trim()).join("\n") + "\n";
 }

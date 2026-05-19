@@ -13,11 +13,7 @@ const m = getMessages(locale);
 const desc =
   locale === "it"
     ? "Calcola nel browser il valore TXT atteso da un server ACME per la DNS-01 challenge (RFC 8555 §8.4). La tua account key non lascia mai il browser."
-    : locale === "de"
-      ? "Berechnen Sie im Browser den TXT-Wert für die ACME DNS-01-Challenge (RFC 8555 §8.4). Ihr Account-Schlüssel verlässt nie den Browser."
-      : locale === "fr"
-        ? "Calculez dans le navigateur la valeur TXT attendue pour le challenge ACME DNS-01 (RFC 8555 §8.4). Votre clé de compte ne quitte jamais le navigateur."
-        : "Compute the TXT value an ACME server expects for the DNS-01 challenge (RFC 8555 §8.4), client-side. Your account key never leaves the browser.";
+    : "Compute the TXT value an ACME server expects for the DNS-01 challenge (RFC 8555 §8.4), client-side. Your account key never leaves the browser.";
 ---
 
 <Layout
@@ -134,7 +130,7 @@ const desc =
             "inline-flex w-full sm:w-auto justify-center items-center gap-2 rounded-md px-5 py-3 text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
             "bg-zinc-900 text-white hover:bg-zinc-800",
             "dark:bg-brand-500 dark:text-zinc-50 dark:hover:bg-brand-400",
-          ]}>Compute TXT value</button
+          ]}>{m.acmeDns01RunButton}</button
         >
         <button
           type="button"
@@ -188,7 +184,7 @@ const desc =
   function setBusy(v: boolean) {
     busy = v;
     $btn.disabled = v;
-    $btn.textContent = v ? "Working…" : "Compute TXT value";
+    $btn.textContent = v ? m.decodingButton : m.acmeDns01RunButton;
   }
   function showError(msg: string) {
     $error.textContent = msg;
@@ -200,7 +196,7 @@ const desc =
     if (busy) return;
     $error.classList.add("hidden");
     if (!$jwk.value.trim() || !$token.value.trim()) {
-      $status.textContent = "Paste a JWK and a token.";
+      $status.textContent = m.acmeDns01StatusEmpty;
       return;
     }
     if (
@@ -208,11 +204,11 @@ const desc =
       $token.value.length > 4096 ||
       $domain.value.length > 1024
     ) {
-      showError("Input is too large.");
+      showError(m.inputTooLarge);
       return;
     }
     setBusy(true);
-    $status.textContent = "Working…";
+    $status.textContent = m.decodingButton;
     try {
       const r = await computeDns01({
         jwk: $jwk.value,

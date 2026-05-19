@@ -73,7 +73,7 @@ export const internalTools: InternalTool[] = [
     slug: "chain-builder",
     title: "Chain Builder & Validator",
     tagline:
-      "Drag-drop PEM blocks, fetch intermediates by AIA, validate order and export a clean fullchain.pem.",
+      "Paste a bundle of PEM blocks. We reorder them into a leaf → root chain, verify every signature, flag what's missing and export a clean fullchain.pem.",
     category: "validate",
     keywords: ["certificate chain", "chain validator", "intermediate fetcher"],
     status: "live",
@@ -109,7 +109,7 @@ export const internalTools: InternalTool[] = [
     slug: "nis2-tls-readiness",
     title: "NIS2 TLS Readiness Check",
     tagline:
-      "Scan a domain and map TLS findings to NIS2 Art. 21(2)(h) and Det. ACN 379907/2025. Export evidence pack.",
+      "Interactive checklist mapping your TLS / cert posture to NIS2 Art. 21(2)(h), Det. ACN 379907/2025 and DORA. Export an evidence pack.",
     category: "compliance",
     keywords: ["nis2 tls", "audit certificati nis2", "nis2 compliance check"],
     status: "live",

@@ -51,13 +51,9 @@ const groupedExternal = externalCategoryOrder
   .filter((g) => g.tools.length > 0);
 
 const seoDescription =
-  locale === "en"
-    ? "Free, privacy-first online tools for TLS certificates, CSRs, ACME, DNS and EU compliance. Everything runs in your browser — no uploads, no tracking."
-    : locale === "it"
-      ? "Strumenti online gratuiti e privacy-first per certificati TLS, CSR, ACME, DNS e compliance EU. Tutto nel tuo browser — niente upload, niente tracking."
-      : locale === "de"
-        ? "Kostenlose, datenschutzfreundliche Online-Tools für TLS-Zertifikate, CSRs, ACME, DNS und EU-Compliance. Alles im Browser — kein Upload, kein Tracking."
-        : "Outils gratuits et respectueux de la vie privée pour certificats TLS, CSR, ACME, DNS et conformité UE. Tout dans le navigateur — aucun upload, aucun tracker.";
+  locale === "it"
+    ? "Strumenti online gratuiti e privacy-first per certificati TLS, CSR, ACME, DNS e compliance EU. Tutto nel tuo browser — niente upload, niente tracking."
+    : "Free, privacy-first online tools for TLS certificates, CSRs, ACME, DNS and EU compliance. Everything runs in your browser — no uploads, no tracking.";
 ---
 
 <Layout

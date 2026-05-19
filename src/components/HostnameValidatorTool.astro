@@ -13,11 +13,7 @@ const m = getMessages(locale);
 const desc =
   locale === "it"
     ? "Verifica nel browser quali hostname un certificato copre, secondo RFC 6125: wildcard, IDN, fallback CN. Niente upload."
-    : locale === "de"
-      ? "Im Browser prüfen, welche Hostnamen ein Zertifikat gemäß RFC 6125 abdeckt — Wildcards, IDN, CN-Fallback. Kein Upload."
-      : locale === "fr"
-        ? "Vérifiez dans le navigateur quels noms d'hôte un certificat couvre selon RFC 6125 — wildcards, IDN, repli sur CN. Aucun upload."
-        : "Check in your browser which hostnames a certificate covers, under RFC 6125 — wildcards, IDN, CN fallback. No upload.";
+    : "Check in your browser which hostnames a certificate covers, under RFC 6125 — wildcards, IDN, CN fallback. No upload.";
 ---
 
 <Layout
@@ -114,7 +110,7 @@ const desc =
             "inline-flex w-full sm:w-auto justify-center items-center gap-2 rounded-md px-5 py-3 text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed",
             "bg-zinc-900 text-white hover:bg-zinc-800",
             "dark:bg-brand-500 dark:text-zinc-50 dark:hover:bg-brand-400",
-          ]}>Check coverage</button
+          ]}>{m.hostnameValidatorRunButton}</button
         >
         <p id="status" role="status" aria-live="polite" class="w-full sm:w-auto text-xs sm:text-sm leading-relaxed text-zinc-500 dark:text-zinc-400"></p>
       </div>
@@ -143,6 +139,10 @@ const desc =
 <script>
   import { validateHostname, type HostnameMatchResult } from "~/lib/hostname-validator";
   import { escapeHtml, MAX_INPUT_BYTES } from "~/lib/util";
+  import { detectLocale, getMessages } from "~/i18n";
+
+  const locale = detectLocale(location.pathname);
+  const m = getMessages(locale);
 
   const $cert = document.getElementById("cert-input") as HTMLTextAreaElement;
   const $host = document.getElementById("hostname-input") as HTMLInputElement;
@@ -157,7 +157,7 @@ const desc =
   function setBusy(v: boolean) {
     busy = v;
     $btn.disabled = v;
-    $btn.textContent = v ? "Working…" : "Check coverage";
+    $btn.textContent = v ? m.decodingButton : m.hostnameValidatorRunButton;
   }
   function showError(msg: string) {
     $error.textContent = msg;
@@ -198,19 +198,19 @@ const desc =
     if (busy) return;
     $error.classList.add("hidden");
     if (!$cert.value.trim()) {
-      $status.textContent = "Paste a certificate first.";
+      $status.textContent = m.hostnameValidatorStatusEmpty;
       return;
     }
     if (!$host.value.trim()) {
-      $status.textContent = "Enter at least one hostname.";
+      $status.textContent = m.hostnameValidatorStatusEmpty;
       return;
     }
     if ($cert.value.length > MAX_INPUT_BYTES || $host.value.length > MAX_INPUT_BYTES / 8) {
-      showError("Input is too large.");
+      showError(m.inputTooLarge);
       return;
     }
     setBusy(true);
-    $status.textContent = "Working…";
+    $status.textContent = m.decodingButton;
     try {
       const r = await validateHostname({ pem: $cert.value, hostname: $host.value });
       if (!r.ok) {

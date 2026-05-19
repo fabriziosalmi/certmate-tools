@@ -14,11 +14,7 @@ const m = getMessages(locale);
 const seoDescription =
   locale === "it"
     ? "Decodifica online qualsiasi certificato SSL/TLS X.509 nel browser. Incolla PEM o DER e vedi Subject, SAN, validità, chiave, firma, fingerprint — niente upload, niente tracking."
-    : locale === "de"
-      ? "Beliebige SSL/TLS-X.509-Zertifikate online im Browser dekodieren. PEM oder DER einfügen und Subject, SAN, Gültigkeit, Schlüssel, Signatur und Fingerprints sehen — kein Upload, kein Tracking."
-      : locale === "fr"
-        ? "Décoder n'importe quel certificat SSL/TLS X.509 dans le navigateur. Collez un PEM ou DER et consultez Subject, SAN, validité, clé, signature, empreintes — aucun upload, aucun tracker."
-        : "Decode any SSL/TLS X.509 certificate in your browser. Paste a PEM or DER and see Subject, SAN, validity, key, signature, fingerprints — no upload, no tracking.";
+    : "Decode any SSL/TLS X.509 certificate in your browser. Paste a PEM or DER and see Subject, SAN, validity, key, signature, fingerprints — no upload, no tracking.";
 ---
 
 <Layout
@@ -226,31 +222,31 @@ const seoDescription =
       const days = Math.abs(cert.daysUntilExpiry);
       return `<span class="inline-flex items-center gap-1.5 rounded-full bg-red-100 text-red-800 px-2.5 py-1 text-xs font-semibold ring-1 ring-red-200 dark:bg-red-950/50 dark:text-red-200 dark:ring-red-900/60">
         <span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>
-        Expired ${days} day${days === 1 ? "" : "s"} ago
+        ${escapeHtml(m.certStatusExpiredDaysAgo(days))}
       </span>`;
     }
     if (cert.notYetValid) {
       return `<span class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 text-amber-800 px-2.5 py-1 text-xs font-semibold ring-1 ring-amber-200 dark:bg-amber-950/40 dark:text-amber-200 dark:ring-amber-900/60">
         <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
-        Not yet valid
+        ${escapeHtml(m.certStatusNotYetValid)}
       </span>`;
     }
     if (cert.daysUntilExpiry <= 14) {
       return `<span class="inline-flex items-center gap-1.5 rounded-full bg-amber-100 text-amber-800 px-2.5 py-1 text-xs font-semibold ring-1 ring-amber-200 dark:bg-amber-950/40 dark:text-amber-200 dark:ring-amber-900/60">
         <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
-        Expires in ${cert.daysUntilExpiry} day${cert.daysUntilExpiry === 1 ? "" : "s"}
+        ${escapeHtml(m.certStatusExpiresInDays(cert.daysUntilExpiry))}
       </span>`;
     }
     return `<span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 text-emerald-800 px-2.5 py-1 text-xs font-semibold ring-1 ring-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-200 dark:ring-emerald-900/60">
       <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-      Valid · ${cert.daysUntilExpiry} day${cert.daysUntilExpiry === 1 ? "" : "s"} left
+      ${escapeHtml(m.certStatusValidDaysLeft(cert.daysUntilExpiry))}
     </span>`;
   }
 
   function renderDN(dn: Record<string, string[]>): string {
     const entries = Object.entries(dn);
     if (entries.length === 0)
-      return `<p class="text-sm text-zinc-500 italic dark:text-zinc-500">empty</p>`;
+      return `<p class="text-sm text-zinc-500 italic dark:text-zinc-500">${escapeHtml(m.certEmptyDn)}</p>`;
     return `<dl class="grid grid-cols-[7rem_1fr] gap-x-4 gap-y-1.5 text-sm">
       ${entries
         .map(
@@ -266,7 +262,7 @@ const seoDescription =
 
   function chips(items: string[]): string {
     if (items.length === 0)
-      return `<p class="text-sm text-zinc-500 italic dark:text-zinc-500">none</p>`;
+      return `<p class="text-sm text-zinc-500 italic dark:text-zinc-500">${escapeHtml(m.certNone)}</p>`;
     return `<div class="flex flex-wrap gap-1.5">
       ${items
         .map(
@@ -279,7 +275,7 @@ const seoDescription =
 
   function sanChips(items: SanEntry[]): string {
     if (items.length === 0)
-      return `<p class="text-sm text-zinc-500 italic dark:text-zinc-500">none</p>`;
+      return `<p class="text-sm text-zinc-500 italic dark:text-zinc-500">${escapeHtml(m.certNone)}</p>`;
     return `<div class="flex flex-wrap gap-1.5">
       ${items
         .map(
@@ -323,14 +319,14 @@ const seoDescription =
     const cn = cert.subjectDN["CN"]?.[0] ?? cert.subject ?? "Certificate";
     const chainLabel =
       total > 1
-        ? ` <span class="ml-2 text-xs font-medium text-zinc-500 dark:text-zinc-400">${idx + 1} of ${total}</span>`
+        ? ` <span class="ml-2 text-xs font-medium text-zinc-500 dark:text-zinc-400">${escapeHtml(m.certIdxOfTotal(idx + 1, total))}</span>`
         : "";
 
     const validityBody = `<dl class="grid sm:grid-cols-2 gap-4">
-      ${field("Not Before", escapeHtml(formatDate(cert.notBefore)), true)}
-      ${field("Not After", escapeHtml(formatDate(cert.notAfter)), true)}
-      ${field("Total validity", `${cert.validityDays} days`)}
-      ${field("Status", statusBadge(cert))}
+      ${field(m.certNotBefore, escapeHtml(formatDate(cert.notBefore)), true)}
+      ${field(m.certNotAfter, escapeHtml(formatDate(cert.notAfter)), true)}
+      ${field(m.commonValidity, escapeHtml(m.certTotalValidity(cert.validityDays)))}
+      ${field(m.certStatus, statusBadge(cert))}
     </dl>
     ${
       !cert.isCA && cert.validityDays > 100
@@ -346,46 +342,46 @@ const seoDescription =
     }`;
 
     const keyBody = `<dl class="grid sm:grid-cols-2 gap-4">
-      ${field("Algorithm", escapeHtml(cert.publicKey.algorithm))}
-      ${cert.publicKey.keySize ? field("Key size", `${cert.publicKey.keySize} bits`) : ""}
-      ${cert.publicKey.namedCurve ? field("Curve", escapeHtml(cert.publicKey.namedCurve)) : ""}
-      ${field("Signature", escapeHtml(cert.signatureAlgorithm))}
+      ${field(m.commonAlgorithm, escapeHtml(cert.publicKey.algorithm))}
+      ${cert.publicKey.keySize ? field(m.commonKeySize, `${cert.publicKey.keySize} bits`) : ""}
+      ${cert.publicKey.namedCurve ? field(m.commonCurve, escapeHtml(cert.publicKey.namedCurve)) : ""}
+      ${field(m.commonSignature, escapeHtml(cert.signatureAlgorithm))}
     </dl>`;
 
     const idBody = `<dl class="space-y-3">
-      ${field("Serial (hex)", copyableHex(cert.serial, "serial-hex"), true)}
-      ${field("Serial (decimal)", escapeHtml(cert.serialDec), true)}
+      ${field(m.certSerialHex, copyableHex(cert.serial, "serial-hex"), true)}
+      ${field(m.certSerialDec, escapeHtml(cert.serialDec), true)}
       ${field("SHA-1", copyableHex(cert.fingerprintSha1, "sha1"), true)}
       ${field("SHA-256", copyableHex(cert.fingerprintSha256, "sha256"), true)}
       ${field("SHA-512", copyableHex(cert.fingerprintSha512, "sha512"), true)}
-      ${cert.subjectKeyId ? field("Subject Key Identifier", copyableHex(cert.subjectKeyId, "ski"), true) : ""}
-      ${cert.authorityKeyId ? field("Authority Key Identifier", copyableHex(cert.authorityKeyId, "aki"), true) : ""}
+      ${cert.subjectKeyId ? field(m.commonSki, copyableHex(cert.subjectKeyId, "ski"), true) : ""}
+      ${cert.authorityKeyId ? field(m.commonAki, copyableHex(cert.authorityKeyId, "aki"), true) : ""}
     </dl>`;
 
     const usageBody = `<div class="space-y-4">
       <div>
-        <div class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2">Basic Constraints</div>
+        <div class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2">${escapeHtml(m.certBasicConstraints)}</div>
         <div class="text-sm">
           ${
             cert.isCA
-              ? `<span class="font-semibold text-zinc-900 dark:text-zinc-100">CA: TRUE</span>${cert.pathLenConstraint != null ? ` <span class="text-zinc-500 dark:text-zinc-400">· pathlen ${cert.pathLenConstraint}</span>` : ""}`
-              : `<span class="text-zinc-700 dark:text-zinc-300">CA: false</span>`
+              ? `<span class="font-semibold text-zinc-900 dark:text-zinc-100">${escapeHtml(m.certCaTrue)}</span>${cert.pathLenConstraint != null ? ` <span class="text-zinc-500 dark:text-zinc-400">· pathlen ${cert.pathLenConstraint}</span>` : ""}`
+              : `<span class="text-zinc-700 dark:text-zinc-300">${escapeHtml(m.certCaFalse)}</span>`
           }
-          ${cert.selfSigned ? `<span class="ml-2 inline-flex items-center rounded-md bg-zinc-100 text-zinc-700 px-1.5 py-0.5 text-[10px] uppercase tracking-wider dark:bg-zinc-800 dark:text-zinc-300">self-signed</span>` : ""}
+          ${cert.selfSigned ? `<span class="ml-2 inline-flex items-center rounded-md bg-zinc-100 text-zinc-700 px-1.5 py-0.5 text-[10px] uppercase tracking-wider dark:bg-zinc-800 dark:text-zinc-300">${escapeHtml(m.commonSelfSigned)}</span>` : ""}
         </div>
       </div>
       <div>
-        <div class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2">Key Usage</div>
+        <div class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2">${escapeHtml(m.commonKeyUsage)}</div>
         ${chips(cert.keyUsage)}
       </div>
       <div>
-        <div class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2">Extended Key Usage</div>
+        <div class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2">${escapeHtml(m.commonEKU)}</div>
         ${chips(cert.extendedKeyUsage)}
       </div>
     </div>`;
 
     const aiaIssuersBlock = cert.aiaIssuers.length
-      ? `<div><div class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">CA Issuers (AIA)</div>${cert.aiaIssuers
+      ? `<div><div class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">${escapeHtml(m.certCaIssuersAia)}</div>${cert.aiaIssuers
           .map(
             (u) =>
               `<a class="block mono text-brand-700 hover:underline break-all dark:text-brand-400" href="${escapeHtml(u)}" target="_blank" rel="noopener">${escapeHtml(u)}</a>`
@@ -393,7 +389,7 @@ const seoDescription =
           .join("")}</div>`
       : "";
     const aiaOcspBlock = cert.aiaOcsp.length
-      ? `<div><div class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">OCSP</div>${cert.aiaOcsp
+      ? `<div><div class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">${escapeHtml(m.certOcsp)}</div>${cert.aiaOcsp
           .map(
             (u) =>
               `<a class="block mono text-brand-700 hover:underline break-all dark:text-brand-400" href="${escapeHtml(u)}" target="_blank" rel="noopener">${escapeHtml(u)}</a>`
@@ -401,7 +397,7 @@ const seoDescription =
           .join("")}</div>`
       : "";
     const crlBlock = cert.crlUrls.length
-      ? `<div><div class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">CRL Distribution</div>${cert.crlUrls
+      ? `<div><div class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">${escapeHtml(m.certCrlDistribution)}</div>${cert.crlUrls
           .map(
             (u) =>
               `<a class="block mono text-brand-700 hover:underline break-all dark:text-brand-400" href="${escapeHtml(u)}" target="_blank" rel="noopener">${escapeHtml(u)}</a>`
@@ -409,7 +405,7 @@ const seoDescription =
           .join("")}</div>`
       : "";
     const policiesBlock = cert.policies.length
-      ? `<div><div class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">Certificate Policies</div>${chips(cert.policies)}</div>`
+      ? `<div><div class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1">${escapeHtml(m.certCertificatePolicies)}</div>${chips(cert.policies)}</div>`
       : "";
     const linksBody = `<div class="space-y-4 text-sm">
       ${aiaIssuersBlock}${aiaOcspBlock}${crlBlock}${policiesBlock}
@@ -418,7 +414,7 @@ const seoDescription =
         !cert.aiaOcsp.length &&
         !cert.crlUrls.length &&
         !cert.policies.length
-          ? `<p class="text-zinc-500 italic dark:text-zinc-500">No AIA / CRL / Policy extensions.</p>`
+          ? `<p class="text-zinc-500 italic dark:text-zinc-500">${escapeHtml(m.certNoExtensions)}</p>`
           : ""
       }
     </div>`;
@@ -430,27 +426,27 @@ const seoDescription =
             ${escapeHtml(cn)}${chainLabel}
           </h2>
           <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-            issued by ${escapeHtml(cert.issuerDN["CN"]?.[0] ?? cert.issuer)}
+            ${escapeHtml(m.commonIssuedBy)} ${escapeHtml(cert.issuerDN["CN"]?.[0] ?? cert.issuer)}
           </p>
         </div>
         ${statusBadge(cert)}
       </header>
 
       <div class="grid lg:grid-cols-2 gap-4">
-        ${section("Subject", renderDN(cert.subjectDN))}
-        ${section("Issuer", renderDN(cert.issuerDN))}
+        ${section(m.commonSubject, renderDN(cert.subjectDN))}
+        ${section(m.commonIssuer, renderDN(cert.issuerDN))}
       </div>
 
-      ${section("Subject Alternative Names", sanChips(cert.san))}
-      ${section("Validity", validityBody)}
+      ${section(m.commonSAN, sanChips(cert.san))}
+      ${section(m.commonValidity, validityBody)}
 
       <div class="grid lg:grid-cols-2 gap-4">
-        ${section("Public Key & Signature", keyBody)}
-        ${section("Key Usage", usageBody)}
+        ${section(m.certSectionPublicKeySignature, keyBody)}
+        ${section(m.certSectionKeyUsage, usageBody)}
       </div>
 
-      ${section("Identifiers & Fingerprints", idBody)}
-      ${section("Distribution & Policies", linksBody)}
+      ${section(m.certSectionIdentifiersFingerprints, idBody)}
+      ${section(m.certSectionDistributionPolicies, linksBody)}
     </article>`;
   }
 
