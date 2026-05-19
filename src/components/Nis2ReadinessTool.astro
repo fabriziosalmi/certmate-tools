@@ -1,7 +1,7 @@
 ---
 import Layout from "~/layouts/Layout.astro";
 import ToolNav from "~/components/ToolNav.astro";
-import { getMessages, type Locale } from "~/i18n";
+import { getMessages, localizedPath, type Locale } from "~/i18n";
 
 interface Props {
   locale: Locale;
@@ -9,42 +9,142 @@ interface Props {
 const { locale } = Astro.props;
 const m = getMessages(locale);
 
-const sections =
+type Severity = "p0" | "p1";
+interface ChecklistLink {
+  href: string;
+  label: string;
+  internal?: boolean;
+}
+interface ChecklistItem {
+  q: string;
+  severity: Severity;
+  how: string;
+  links?: ChecklistLink[];
+}
+interface ChecklistSection {
+  ref: string;
+  items: ChecklistItem[];
+}
+
+const chainBuilderPath = localizedPath(locale, "/chain-builder/");
+const certDecoderPath = localizedPath(locale, "/certificate-decoder/");
+
+const sections: ChecklistSection[] =
   locale === "it"
     ? [
         {
           ref: "Art. 21(2)(h) NIS2 — Crittografia",
           items: [
-            "Tutti i servizi pubblici espongono solo TLS 1.2+ con TLS 1.3 abilitato preferito.",
-            "TLS 1.0/1.1 disabilitati su ogni endpoint esposto in internet.",
-            "Cipher suite legacy (RC4, 3DES, NULL, EXPORT) disabilitate.",
-            "Catena di certificati completa servita (no AIA chasing client-side).",
-            "HSTS abilitato su tutti i siti, con max-age ≥ 31536000.",
+            {
+              q: "Tutti i servizi pubblici espongono solo TLS 1.2+ con TLS 1.3 abilitato preferito.",
+              severity: "p0",
+              how: "Scansiona ogni endpoint pubblico con SSL Labs o internet.nl: la riga 'Protocols' deve mostrare TLS 1.2 e TLS 1.3 come unici abilitati.",
+              links: [
+                { href: "https://www.ssllabs.com/ssltest/", label: "SSL Labs" },
+                { href: "https://internet.nl/", label: "internet.nl" },
+              ],
+            },
+            {
+              q: "TLS 1.0/1.1 disabilitati su ogni endpoint esposto in internet.",
+              severity: "p0",
+              how: "Stesse scansioni: 'TLS 1.0' e 'TLS 1.1' devono risultare disabilitati / non negoziabili. Verifica anche dietro ai load balancer.",
+              links: [{ href: "https://testssl.sh/", label: "testssl.sh (CLI)" }],
+            },
+            {
+              q: "Cipher suite legacy (RC4, 3DES, NULL, EXPORT) disabilitate.",
+              severity: "p0",
+              how: "Nella sezione 'Cipher Suites' di SSL Labs nessuna voce deve contenere RC4, 3DES, NULL, EXPORT, DES, MD5.",
+              links: [{ href: "https://www.ssllabs.com/ssltest/", label: "SSL Labs" }],
+            },
+            {
+              q: "Catena di certificati completa servita (no AIA chasing client-side).",
+              severity: "p0",
+              how: "Usa Chain Builder con la bundle prodotta dal server: deve riportare 'chain valid' senza 'missing intermediate'.",
+              links: [
+                { href: chainBuilderPath, label: "Chain Builder", internal: true },
+                { href: "https://www.ssllabs.com/ssltest/", label: "SSL Labs (sezione Certification Paths)" },
+              ],
+            },
+            {
+              q: "HSTS abilitato su tutti i siti, con max-age ≥ 31536000.",
+              severity: "p1",
+              how: "curl -sI https://host | grep -i strict-transport-security. Il valore max-age deve essere ≥ 31536000 (1 anno). Considera l'invio al preload list.",
+              links: [{ href: "https://hstspreload.org/", label: "HSTS Preload" }],
+            },
           ],
         },
         {
           ref: "Det. ACN 379907/2025 — Inventario e ciclo di vita",
           items: [
-            "Inventario centralizzato dei certificati pubblici con scadenze monitorate.",
-            "Alert automatici su scadenza certificato (T-30 e T-7).",
-            "Procedura documentata di rinnovo (chi, come, con quale CA).",
-            "Procedura di revoca rapida documentata, testata negli ultimi 12 mesi.",
+            {
+              q: "Inventario centralizzato dei certificati pubblici con scadenze monitorate.",
+              severity: "p0",
+              how: "Fornisci la sorgente dell'inventario (CMDB, spreadsheet, dashboard). Per la postura esterna, crt.sh elenca tutti i tuoi certificati pubblici.",
+              links: [{ href: "https://crt.sh/", label: "crt.sh (CT search)" }],
+            },
+            {
+              q: "Alert automatici su scadenza certificato (T-30 e T-7).",
+              severity: "p1",
+              how: "Mostra la configurazione di monitoring (Prometheus, Nagios, cron) o un servizio CT-monitor con notifiche.",
+              links: [{ href: "https://sslmate.com/certspotter/", label: "Cert Spotter" }],
+            },
+            {
+              q: "Procedura documentata di rinnovo (chi, come, con quale CA).",
+              severity: "p1",
+              how: "Fornisci il documento di procedura: deve indicare owner, CA usate, trigger del rinnovo e tempistiche.",
+            },
+            {
+              q: "Procedura di revoca rapida documentata, testata negli ultimi 12 mesi.",
+              severity: "p1",
+              how: "Fornisci la procedura + il report dell'ultima esercitazione (data, esito, persone coinvolte).",
+            },
           ],
         },
         {
           ref: "Art. 23 NIS2 — Notifica incidenti",
           items: [
-            "Runbook di notifica ACN per incidente PKI (24h early warning, 72h notifica, 1 mese report finale).",
-            "Contatti di emergenza CA/registrar documentati e raggiungibili 24×7.",
-            "Procedura di rotazione chiave privata in caso di compromissione testata.",
+            {
+              q: "Runbook di notifica ACN per incidente PKI (24h early warning, 72h notifica, 1 mese report finale).",
+              severity: "p0",
+              how: "Fornisci il runbook. Verifica che le tempistiche siano allineate all'Art. 23 NIS2 e che indichi il canale ACN previsto.",
+            },
+            {
+              q: "Contatti di emergenza CA/registrar documentati e raggiungibili 24×7.",
+              severity: "p1",
+              how: "Mostra la rubrica con telefono/email H24 della CA e del registrar. Test di raggiungibilità almeno annuale raccomandato.",
+            },
+            {
+              q: "Procedura di rotazione chiave privata in caso di compromissione testata.",
+              severity: "p0",
+              how: "Fornisci procedura + report dell'ultima drill (key rotation completa: revoca, riemissione, redeploy, hsts/HPKP fallout).",
+            },
           ],
         },
         {
           ref: "DORA / eIDAS — Resilienza e qualified",
           items: [
-            "Policy di cifratura documentata (data at rest / in transit / in use), allineata a RTS 2024/1774 art. 6.",
-            "Per servizi PSD2 / eIDAS Art. 45a: certificato QWAC presso TSP qualificato.",
-            "Almeno un fornitore secondario di emergenza per i certificati pubblici (multi-CA).",
+            {
+              q: "Policy di cifratura documentata (data at rest / in transit / in use), allineata a RTS 2024/1774 art. 6.",
+              severity: "p0",
+              how: "Fornisci la policy. Deve mappare esplicitamente i tre stati del dato e richiamare l'art. 6(2) del Regolamento delegato (UE) 2024/1774.",
+              links: [
+                { href: "https://eur-lex.europa.eu/eli/reg_del/2024/1774/oj", label: "RTS 2024/1774" },
+              ],
+            },
+            {
+              q: "Per servizi PSD2 / eIDAS Art. 45a: certificato QWAC presso TSP qualificato.",
+              severity: "p1",
+              how: "Solo se applicabile (PSD2 / open banking). Il certificato deve provenire da un TSP della EU Trust List e contenere il QcStatement PSD2.",
+              links: [
+                { href: "https://eidas.ec.europa.eu/efda/tl-browser/", label: "EU Trust List browser" },
+                { href: certDecoderPath, label: "Certificate Decoder", internal: true },
+              ],
+            },
+            {
+              q: "Almeno un fornitore secondario di emergenza per i certificati pubblici (multi-CA).",
+              severity: "p1",
+              how: "Mostra l'evidenza contrattuale o operativa di una seconda CA usabile in caso di outage della primaria (es. Let's Encrypt + ZeroSSL).",
+            },
           ],
         },
       ]
@@ -52,36 +152,116 @@ const sections =
         {
           ref: "NIS2 Art. 21(2)(h) — Cryptography",
           items: [
-            "All public-facing services accept TLS 1.2+ only, with TLS 1.3 enabled and preferred.",
-            "TLS 1.0 and 1.1 disabled on every internet-exposed endpoint.",
-            "Legacy cipher suites (RC4, 3DES, NULL, EXPORT) disabled.",
-            "Full certificate chain served (no client-side AIA chasing required).",
-            "HSTS enabled on all sites, with max-age ≥ 31536000.",
+            {
+              q: "All public-facing services accept TLS 1.2+ only, with TLS 1.3 enabled and preferred.",
+              severity: "p0",
+              how: "Scan every public endpoint with SSL Labs or internet.nl: the 'Protocols' row must show only TLS 1.2 and TLS 1.3 as enabled.",
+              links: [
+                { href: "https://www.ssllabs.com/ssltest/", label: "SSL Labs" },
+                { href: "https://internet.nl/", label: "internet.nl" },
+              ],
+            },
+            {
+              q: "TLS 1.0 and 1.1 disabled on every internet-exposed endpoint.",
+              severity: "p0",
+              how: "Same scans must show 'TLS 1.0' and 'TLS 1.1' as not negotiable. Also verify behind load balancers and CDNs.",
+              links: [{ href: "https://testssl.sh/", label: "testssl.sh (CLI)" }],
+            },
+            {
+              q: "Legacy cipher suites (RC4, 3DES, NULL, EXPORT) disabled.",
+              severity: "p0",
+              how: "In the SSL Labs 'Cipher Suites' section no entry must contain RC4, 3DES, NULL, EXPORT, DES, MD5.",
+              links: [{ href: "https://www.ssllabs.com/ssltest/", label: "SSL Labs" }],
+            },
+            {
+              q: "Full certificate chain served (no client-side AIA chasing required).",
+              severity: "p0",
+              how: "Run Chain Builder against your server's chain — it must report 'chain valid' with no 'missing intermediate'.",
+              links: [
+                { href: chainBuilderPath, label: "Chain Builder", internal: true },
+                { href: "https://www.ssllabs.com/ssltest/", label: "SSL Labs (Certification Paths)" },
+              ],
+            },
+            {
+              q: "HSTS enabled on all sites, with max-age ≥ 31536000.",
+              severity: "p1",
+              how: "curl -sI https://host | grep -i strict-transport-security. max-age must be ≥ 31536000 (1 year). Consider HSTS preload submission.",
+              links: [{ href: "https://hstspreload.org/", label: "HSTS Preload" }],
+            },
           ],
         },
         {
           ref: "Italian ACN det. 379907/2025 — Inventory & lifecycle",
           items: [
-            "Centralized inventory of public certificates with expiry tracking.",
-            "Automatic expiry alerts at T-30 and T-7 days.",
-            "Documented renewal procedure (who, how, which CA).",
-            "Documented fast-revocation procedure, tested in the last 12 months.",
+            {
+              q: "Centralized inventory of public certificates with expiry tracking.",
+              severity: "p0",
+              how: "Provide the inventory source (CMDB, spreadsheet, dashboard). For external posture, crt.sh lists all your public certs.",
+              links: [{ href: "https://crt.sh/", label: "crt.sh (CT search)" }],
+            },
+            {
+              q: "Automatic expiry alerts at T-30 and T-7 days.",
+              severity: "p1",
+              how: "Show the monitoring config (Prometheus, Nagios, cron) or a CT-based monitor service with notifications.",
+              links: [{ href: "https://sslmate.com/certspotter/", label: "Cert Spotter" }],
+            },
+            {
+              q: "Documented renewal procedure (who, how, which CA).",
+              severity: "p1",
+              how: "Provide the procedure document: must name the owner, the CA(s) in use, and the renewal trigger.",
+            },
+            {
+              q: "Documented fast-revocation procedure, tested in the last 12 months.",
+              severity: "p1",
+              how: "Provide the procedure + last drill report (date, outcome, people involved).",
+            },
           ],
         },
         {
           ref: "NIS2 Art. 23 — Incident reporting",
           items: [
-            "PKI incident runbook for ACN notification (24h early warning, 72h notification, 1-month final report).",
-            "Emergency contacts for CA / registrar documented and reachable 24×7.",
-            "Private-key rotation procedure tested for compromise scenarios.",
+            {
+              q: "PKI incident runbook for ACN notification (24h early warning, 72h notification, 1-month final report).",
+              severity: "p0",
+              how: "Provide the runbook. Verify timing alignment with NIS2 Art. 23 and that the ACN notification channel is named.",
+            },
+            {
+              q: "Emergency contacts for CA / registrar documented and reachable 24×7.",
+              severity: "p1",
+              how: "Show the contact roster with H24 phone/email for CA and registrar. Annual reachability test recommended.",
+            },
+            {
+              q: "Private-key rotation procedure tested for compromise scenarios.",
+              severity: "p0",
+              how: "Provide procedure + last drill report (full rotation: revoke, reissue, redeploy, HSTS/HPKP fallout).",
+            },
           ],
         },
         {
           ref: "DORA / eIDAS — Resilience & qualified",
           items: [
-            "Documented encryption policy (data at rest / in transit / in use) aligned to RTS 2024/1774 art. 6.",
-            "For PSD2 / eIDAS Art. 45a-targeted services: QWAC from a qualified TSP.",
-            "At least one secondary CA fallback for public certificates (multi-CA).",
+            {
+              q: "Documented encryption policy (data at rest / in transit / in use) aligned to RTS 2024/1774 art. 6.",
+              severity: "p0",
+              how: "Provide the policy. It must explicitly map the three data states and reference art. 6(2) of Commission Delegated Regulation (EU) 2024/1774.",
+              links: [
+                { href: "https://eur-lex.europa.eu/eli/reg_del/2024/1774/oj", label: "RTS 2024/1774" },
+              ],
+            },
+            {
+              q: "For PSD2 / eIDAS Art. 45a-targeted services: QWAC from a qualified TSP.",
+              severity: "p1",
+              how: "Only if applicable (PSD2 / open banking). The certificate must come from an EU Trust List TSP and include the PSD2 QcStatement.",
+              links: [
+                { href: "https://eidas.ec.europa.eu/efda/tl-browser/", label: "EU Trust List browser" },
+                { href: certDecoderPath, label: "Certificate Decoder", internal: true },
+              ],
+            },
+            {
+              q: "At least one secondary CA fallback for public certificates (multi-CA).",
+              severity: "p1",
+              how: "Show contractual or operational evidence of a secondary CA usable on primary outage (e.g., Let's Encrypt + ZeroSSL).",
+            },
           ],
         },
       ];
@@ -89,11 +269,7 @@ const sections =
 const desc =
   locale === "it"
     ? "Checklist interattiva client-side che mappa la tua postura TLS / certificati a NIS2 Art. 21(2)(h), Det. ACN 379907/2025, DORA. Esporta un evidence pack."
-    : locale === "de"
-      ? "Interaktive Client-Side-Checkliste, die Ihre TLS- und Zertifikatslage auf NIS2 Art. 21(2)(h), DORA und eIDAS 2.0 abbildet."
-      : locale === "fr"
-        ? "Liste de contrôle interactive côté client qui cartographie votre posture TLS et certificats vis-à-vis de la NIS2 Art. 21(2)(h), DORA et eIDAS 2.0."
-        : "Client-side interactive checklist that maps your TLS / certificate posture to NIS2 Art. 21(2)(h), Italian D.Lgs. 138/2024 and DORA.";
+    : "Client-side interactive checklist that maps your TLS / certificate posture to NIS2 Art. 21(2)(h), Italian D.Lgs. 138/2024 and DORA.";
 ---
 
 <Layout
@@ -119,6 +295,52 @@ const desc =
       <p class="mt-3 text-zinc-600 leading-relaxed max-w-2xl dark:text-zinc-400">
         {m.nis2ReadinessTagline}
       </p>
+
+      <div
+        class:list={[
+          "mt-5 grid sm:grid-cols-3 gap-3 text-sm",
+        ]}
+      >
+        <div class="rounded-lg border border-zinc-200 bg-zinc-50/60 p-3 dark:border-zinc-800 dark:bg-zinc-900/40">
+          <div class="text-[10px] font-semibold uppercase tracking-wider text-brand-700 dark:text-brand-400 mb-1">
+            {locale === "it" ? "1 — Rispondi" : "1 — Answer"}
+          </div>
+          <p class="text-xs text-zinc-600 dark:text-zinc-400 leading-snug">
+            {locale === "it"
+              ? "Yes / No / N/A su ogni item. Le risposte restano in locale (localStorage)."
+              : "Yes / No / N/A on every item. Answers stay local (localStorage)."}
+          </p>
+        </div>
+        <div class="rounded-lg border border-zinc-200 bg-zinc-50/60 p-3 dark:border-zinc-800 dark:bg-zinc-900/40">
+          <div class="text-[10px] font-semibold uppercase tracking-wider text-brand-700 dark:text-brand-400 mb-1">
+            {locale === "it" ? "2 — Verifica" : "2 — Evidence"}
+          </div>
+          <p class="text-xs text-zinc-600 dark:text-zinc-400 leading-snug">
+            {locale === "it"
+              ? "Per ogni item, apri \"come verificarlo\" — link a tool interni ed esterni."
+              : "Open “how to verify” on each item — links to internal and external tools."}
+          </p>
+        </div>
+        <div class="rounded-lg border border-zinc-200 bg-zinc-50/60 p-3 dark:border-zinc-800 dark:bg-zinc-900/40">
+          <div class="text-[10px] font-semibold uppercase tracking-wider text-brand-700 dark:text-brand-400 mb-1">
+            {locale === "it" ? "3 — Esporta" : "3 — Export"}
+          </div>
+          <p class="text-xs text-zinc-600 dark:text-zinc-400 leading-snug">
+            {locale === "it"
+              ? "Scarica un evidence pack Markdown o JSON da allegare al fascicolo di audit."
+              : "Download a Markdown or JSON evidence pack to attach to your audit file."}
+          </p>
+        </div>
+      </div>
+
+      <p class="mt-4 text-xs text-zinc-500 dark:text-zinc-500 leading-relaxed max-w-2xl">
+        <span class="font-semibold text-zinc-600 dark:text-zinc-400">
+          {locale === "it" ? "Avviso:" : "Notice:"}
+        </span>{" "}
+        {locale === "it"
+          ? "questa checklist riflette la lettura tecnica delle norme citate (NIS2, D.Lgs. 138/2024, DORA) ed è uno strumento di supporto. Non sostituisce una valutazione legale o un audit formale."
+          : "this checklist reflects a technical reading of the cited regulations (NIS2, Italian D.Lgs. 138/2024, DORA) and is a working aid. It does not replace formal legal assessment or audit."}
+      </p>
     </header>
 
     <div
@@ -130,10 +352,18 @@ const desc =
     >
       <div class="flex items-center gap-3 sm:gap-4">
         <div class="flex-1">
-          <div class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+          <div id="score-label" class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
             Score
           </div>
-          <div class="mt-1.5 h-2 rounded-full bg-zinc-100 overflow-hidden dark:bg-zinc-800">
+          <div
+            id="bar-track"
+            class="mt-1.5 h-2 rounded-full bg-zinc-100 overflow-hidden dark:bg-zinc-800"
+            role="progressbar"
+            aria-labelledby="score-label"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="0"
+          >
             <div
               id="bar"
               class="h-full bg-brand-500 transition-all duration-200"
@@ -144,15 +374,112 @@ const desc =
         </div>
         <div class="text-right">
           <div id="score" class="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-50">0%</div>
-          <button
-            type="button"
-            data-action="download"
-            class="text-xs font-medium text-brand-700 hover:text-brand-800 dark:text-brand-400 dark:hover:text-brand-300"
-            >Download evidence pack</button
-          >
+          <div class="mt-0.5 flex items-center justify-end gap-2 text-xs flex-wrap">
+            <button
+              type="button"
+              data-action="download-md"
+              class="font-medium text-brand-700 hover:text-brand-800 dark:text-brand-400 dark:hover:text-brand-300"
+              >{locale === "it" ? "Esporta .md" : "Export .md"}</button
+            >
+            <span class="text-zinc-300 dark:text-zinc-700" aria-hidden="true">·</span>
+            <button
+              type="button"
+              data-action="download-json"
+              class="font-medium text-brand-700 hover:text-brand-800 dark:text-brand-400 dark:hover:text-brand-300"
+              >{locale === "it" ? "Esporta .json" : "Export .json"}</button
+            >
+            <span class="text-zinc-300 dark:text-zinc-700" aria-hidden="true">·</span>
+            <button
+              type="button"
+              data-action="reset"
+              class="font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+              >Reset</button
+            >
+          </div>
         </div>
       </div>
     </div>
+
+    <details
+      class:list={[
+        "mb-6 rounded-xl border p-4 sm:p-5 group",
+        "bg-white border-zinc-200",
+        "dark:bg-zinc-900/40 dark:border-zinc-800",
+      ]}
+    >
+      <summary class="cursor-pointer text-sm font-semibold text-zinc-700 dark:text-zinc-300 select-none flex items-center gap-2">
+        <svg
+          viewBox="0 0 12 12"
+          class="h-3 w-3 fill-current transition-transform group-open:rotate-90"
+          aria-hidden="true"
+        >
+          <path d="M4 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        {locale === "it" ? "Metadati audit (opzionali, finiscono nell'export)" : "Audit metadata (optional, included in export)"}
+      </summary>
+      <div class="mt-4 grid sm:grid-cols-2 gap-3">
+        <label class="block">
+          <span class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+            {locale === "it" ? "Organizzazione" : "Organization"}
+          </span>
+          <input
+            id="meta-org"
+            type="text"
+            autocomplete="organization"
+            placeholder={locale === "it" ? "Acme SpA" : "Acme Inc."}
+            class:list={[
+              "mt-1 w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/30",
+              "bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400",
+              "dark:bg-zinc-900 dark:border-zinc-700 dark:text-zinc-100 dark:placeholder:text-zinc-600",
+            ]}
+          />
+        </label>
+        <label class="block">
+          <span class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+            {locale === "it" ? "Servizio / Scope" : "Service / Scope"}
+          </span>
+          <input
+            id="meta-scope"
+            type="text"
+            placeholder={locale === "it" ? "Portale clienti" : "Customer portal"}
+            class:list={[
+              "mt-1 w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/30",
+              "bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400",
+              "dark:bg-zinc-900 dark:border-zinc-700 dark:text-zinc-100 dark:placeholder:text-zinc-600",
+            ]}
+          />
+        </label>
+        <label class="block">
+          <span class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+            {locale === "it" ? "Auditor / compilatore" : "Auditor / filled by"}
+          </span>
+          <input
+            id="meta-auditor"
+            type="text"
+            placeholder={locale === "it" ? "Mario Rossi" : "Jane Doe"}
+            class:list={[
+              "mt-1 w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/30",
+              "bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400",
+              "dark:bg-zinc-900 dark:border-zinc-700 dark:text-zinc-100 dark:placeholder:text-zinc-600",
+            ]}
+          />
+        </label>
+        <label class="block">
+          <span class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+            {locale === "it" ? "Data dell'audit" : "Audit date"}
+          </span>
+          <input
+            id="meta-date"
+            type="date"
+            class:list={[
+              "mt-1 w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/30",
+              "bg-white border-zinc-300 text-zinc-900",
+              "dark:bg-zinc-900 dark:border-zinc-700 dark:text-zinc-100",
+            ]}
+          />
+        </label>
+      </div>
+    </details>
 
     <form id="nis2-form" class="space-y-8">
       {
@@ -168,13 +495,42 @@ const desc =
               {s.ref}
             </h2>
             <ul class="space-y-3">
-              {s.items.map((q, qi) => (
-                <li class="flex items-start gap-2.5 sm:gap-3">
+              {s.items.map((item, qi) => (
+                <li
+                  class="flex items-start gap-2.5 sm:gap-3"
+                  data-severity={item.severity}
+                >
                   <span class="text-zinc-400 mt-1 dark:text-zinc-600 text-xs select-none">
                     {si + 1}.{qi + 1}
                   </span>
-                  <div class="flex-1">
-                    <p class="text-sm leading-relaxed text-zinc-800 dark:text-zinc-200">{q}</p>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-start gap-2 flex-wrap">
+                      <p
+                        data-q-text
+                        class="text-sm leading-relaxed text-zinc-800 dark:text-zinc-200 flex-1 min-w-0"
+                      >
+                        {item.q}
+                      </p>
+                      <span
+                        class:list={[
+                          "shrink-0 inline-flex items-center rounded-md px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider ring-1",
+                          item.severity === "p0"
+                            ? "bg-red-50 text-red-800 ring-red-200 dark:bg-red-950/40 dark:text-red-200 dark:ring-red-900/60"
+                            : "bg-zinc-100 text-zinc-700 ring-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:ring-zinc-700",
+                        ]}
+                        title={
+                          item.severity === "p0"
+                            ? locale === "it"
+                              ? "P0 — requisito tecnico critico"
+                              : "P0 — critical technical requirement"
+                            : locale === "it"
+                              ? "P1 — buona pratica raccomandata"
+                              : "P1 — recommended good practice"
+                        }
+                      >
+                        {item.severity}
+                      </span>
+                    </div>
                     <div class="mt-2 flex flex-wrap gap-2 text-xs">
                       <label class="inline-flex items-center gap-1.5 rounded-md px-2 py-1.5 bg-zinc-50 dark:bg-zinc-800/50">
                         <input
@@ -204,6 +560,42 @@ const desc =
                         <span class="text-zinc-700 dark:text-zinc-300">N/A</span>
                       </label>
                     </div>
+                    <details class="mt-2 group">
+                      <summary class="cursor-pointer text-xs text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100 select-none inline-flex items-center gap-1">
+                        <svg
+                          viewBox="0 0 12 12"
+                          class="h-3 w-3 fill-current transition-transform group-open:rotate-90"
+                          aria-hidden="true"
+                        >
+                          <path d="M4 2l4 4-4 4" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        {locale === "it" ? "Come verificarlo" : "How to verify"}
+                      </summary>
+                      <div class="mt-2 ml-4 pl-3 border-l border-zinc-200 dark:border-zinc-800 space-y-2 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">
+                        <p>{item.how}</p>
+                        {item.links && item.links.length > 0 && (
+                          <ul class="flex flex-wrap gap-x-3 gap-y-1">
+                            {item.links.map((l) => (
+                              <li>
+                                <a
+                                  href={l.href}
+                                  target={l.internal ? undefined : "_blank"}
+                                  rel={l.internal ? undefined : "noopener"}
+                                  class="text-brand-700 hover:underline dark:text-brand-400 inline-flex items-center gap-0.5"
+                                >
+                                  {l.label}
+                                  {!l.internal && (
+                                    <span class="text-[10px]" aria-hidden="true">
+                                      ↗
+                                    </span>
+                                  )}
+                                </a>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    </details>
                   </div>
                 </li>
               ))}
@@ -263,9 +655,113 @@ const desc =
 </Layout>
 
 <script>
+  import { detectLocale } from "~/i18n";
+
+  type Answer = "yes" | "no" | "na";
+  interface PersistShape {
+    answers: Record<string, Answer>;
+    meta: { org: string; scope: string; auditor: string; date: string };
+  }
+
+  const locale = detectLocale(location.pathname);
   const form = document.getElementById("nis2-form") as HTMLFormElement;
   const bar = document.getElementById("bar") as HTMLElement;
+  const barTrack = document.getElementById("bar-track") as HTMLElement;
   const scoreEl = document.getElementById("score") as HTMLElement;
+  const $org = document.getElementById("meta-org") as HTMLInputElement;
+  const $scope = document.getElementById("meta-scope") as HTMLInputElement;
+  const $auditor = document.getElementById("meta-auditor") as HTMLInputElement;
+  const $date = document.getElementById("meta-date") as HTMLInputElement;
+
+  // Locale-scoped key: question text differs per language, mixing answers
+  // across locales would attach the wrong response to the wrong question.
+  const STORAGE_KEY = `nis2-readiness-v1:${locale}`;
+
+  function readStore(): PersistShape {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return emptyState();
+      const obj = JSON.parse(raw) as unknown;
+      if (obj && typeof obj === "object") {
+        const o = obj as Partial<PersistShape> & Record<string, unknown>;
+        // Migrate v1 schema (answers stored at the top level)
+        if (!o.answers && !o.meta) {
+          return { answers: o as Record<string, Answer>, meta: emptyMeta() };
+        }
+        return {
+          answers: (o.answers as Record<string, Answer>) ?? {},
+          meta: { ...emptyMeta(), ...(o.meta ?? {}) },
+        };
+      }
+    } catch {
+      /* localStorage may be blocked (private mode, third-party iframe) */
+    }
+    return emptyState();
+  }
+
+  function emptyMeta(): PersistShape["meta"] {
+    return { org: "", scope: "", auditor: "", date: "" };
+  }
+  function emptyState(): PersistShape {
+    return { answers: {}, meta: emptyMeta() };
+  }
+
+  function writeStore(state: PersistShape): void {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch {
+      /* quota exceeded or storage blocked — silent fallback */
+    }
+  }
+
+  function readMetaFromForm(): PersistShape["meta"] {
+    return {
+      org: $org.value.trim(),
+      scope: $scope.value.trim(),
+      auditor: $auditor.value.trim(),
+      date: $date.value.trim(),
+    };
+  }
+
+  function readAnswersFromForm(): Record<string, Answer> {
+    const out: Record<string, Answer> = {};
+    form
+      .querySelectorAll<HTMLInputElement>("input[type=radio]:checked")
+      .forEach((r) => {
+        out[r.name] = r.value as Answer;
+      });
+    return out;
+  }
+
+  function restoreFromStore(): void {
+    const state = readStore();
+    Object.entries(state.answers).forEach(([name, value]) => {
+      const radio = form.querySelector<HTMLInputElement>(
+        `input[type=radio][name="${name}"][value="${value}"]`
+      );
+      if (radio) radio.checked = true;
+    });
+    $org.value = state.meta.org;
+    $scope.value = state.meta.scope;
+    $auditor.value = state.meta.auditor;
+    $date.value = state.meta.date;
+  }
+
+  function persist(): void {
+    writeStore({ answers: readAnswersFromForm(), meta: readMetaFromForm() });
+  }
+
+  // P0 = critical, weighted 2x against P1 in the overall score.
+  const SEVERITY_WEIGHT = { p0: 2, p1: 1 } as const;
+
+  function severityForName(name: string): "p0" | "p1" {
+    const radio = form.querySelector<HTMLInputElement>(
+      `input[type=radio][name="${name}"]`
+    );
+    const li = radio?.closest<HTMLLIElement>("li[data-severity]");
+    const sev = li?.dataset.severity;
+    return sev === "p0" ? "p0" : "p1";
+  }
 
   function recompute(): void {
     const radios = form.querySelectorAll<HTMLInputElement>(
@@ -277,54 +773,196 @@ const desc =
       if (r.checked) groups.set(r.name, r.value);
     });
 
-    let total = 0;
-    let yes = 0;
-    groups.forEach((v) => {
-      if (v === "yes" || v === "no") total += 1;
-      if (v === "yes") yes += 1;
+    let totalWeighted = 0;
+    let yesWeighted = 0;
+    let totalAnswered = 0;
+    let yesAnswered = 0;
+    let p0Total = 0;
+    let p0Failed = 0;
+    groups.forEach((v, name) => {
+      const w = SEVERITY_WEIGHT[severityForName(name)];
+      if (v === "yes" || v === "no") {
+        totalWeighted += w;
+        totalAnswered += 1;
+        if (severityForName(name) === "p0") {
+          p0Total += 1;
+          if (v === "no") p0Failed += 1;
+        }
+      }
+      if (v === "yes") {
+        yesWeighted += w;
+        yesAnswered += 1;
+      }
     });
 
-    const score = total === 0 ? 0 : Math.round((yes / total) * 100);
+    const score =
+      totalWeighted === 0 ? 0 : Math.round((yesWeighted / totalWeighted) * 100);
     scoreEl.textContent = `${score}%`;
     bar.style.width = `${score}%`;
+    barTrack.setAttribute("aria-valuenow", String(score));
+    barTrack.setAttribute(
+      "aria-valuetext",
+      `${score}% — ${yesAnswered} of ${totalAnswered} applicable items satisfied (weighted P0 ×2)`
+    );
 
-    // Tint the bar from amber to emerald as the score rises.
-    if (score >= 80) bar.className = "h-full bg-emerald-500 transition-all duration-200";
-    else if (score >= 50) bar.className = "h-full bg-brand-500 transition-all duration-200";
-    else bar.className = "h-full bg-amber-500 transition-all duration-200";
+    // Any P0 = "no" forces amber regardless of weighted score: a single
+    // mandatory failure invalidates an "almost green" overall.
+    if (p0Failed > 0) {
+      bar.className = "h-full bg-amber-500 transition-all duration-200";
+    } else if (score >= 80) {
+      bar.className = "h-full bg-emerald-500 transition-all duration-200";
+    } else if (score >= 50) {
+      bar.className = "h-full bg-brand-500 transition-all duration-200";
+    } else {
+      bar.className = "h-full bg-amber-500 transition-all duration-200";
+    }
   }
 
-  form.addEventListener("change", recompute);
+  form.addEventListener("change", () => {
+    persist();
+    recompute();
+  });
+  [$org, $scope, $auditor, $date].forEach(($el) => {
+    $el.addEventListener("input", persist);
+    $el.addEventListener("change", persist);
+  });
 
   document
-    .querySelector('[data-action="download"]')
+    .querySelector('[data-action="reset"]')
     ?.addEventListener("click", () => {
-      const radios = form.querySelectorAll<HTMLInputElement>(
-        "input[type=radio]"
-      );
-      const groups = new Map<string, string | null>();
-      radios.forEach((r) => {
-        if (!groups.has(r.name)) groups.set(r.name, null);
-        if (r.checked) groups.set(r.name, r.value);
-      });
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+      } catch {
+        /* ignored */
+      }
+      form
+        .querySelectorAll<HTMLInputElement>("input[type=radio]:checked")
+        .forEach((r) => {
+          r.checked = false;
+        });
+      $org.value = "";
+      $scope.value = "";
+      $auditor.value = "";
+      $date.value = "";
+      recompute();
+    });
 
-      const sections = Array.from(
-        form.querySelectorAll<HTMLElement>("section")
-      );
+  restoreFromStore();
+  recompute();
+
+  interface CollectedItem {
+    si: number;
+    qi: number;
+    question: string;
+    severity: "p0" | "p1";
+    answer: Answer | null;
+  }
+  interface CollectedSection {
+    ref: string;
+    items: CollectedItem[];
+  }
+
+  function collectSections(): CollectedSection[] {
+    const answers = readAnswersFromForm();
+    return Array.from(form.querySelectorAll<HTMLElement>("section")).map(
+      (sec, si) => {
+        const ref = sec.querySelector("h2")?.textContent?.trim() ?? "";
+        const items = Array.from(sec.querySelectorAll<HTMLLIElement>("li[data-severity]")).map(
+          (li, qi): CollectedItem => {
+            const question =
+              li.querySelector("[data-q-text]")?.textContent?.trim() ?? "";
+            const severity = li.dataset.severity === "p0" ? "p0" : "p1";
+            const answer = (answers[`q-${si}-${qi}`] ?? null) as Answer | null;
+            return { si, qi, question, severity, answer };
+          }
+        );
+        return { ref, items };
+      }
+    );
+  }
+
+  function currentScore(): {
+    score: number;
+    yesWeighted: number;
+    totalWeighted: number;
+    yesAnswered: number;
+    totalAnswered: number;
+    p0Failed: number;
+  } {
+    const all = collectSections().flatMap((s) => s.items);
+    let yesWeighted = 0;
+    let totalWeighted = 0;
+    let yesAnswered = 0;
+    let totalAnswered = 0;
+    let p0Failed = 0;
+    all.forEach((it) => {
+      if (it.answer === "yes" || it.answer === "no") {
+        const w = SEVERITY_WEIGHT[it.severity];
+        totalWeighted += w;
+        totalAnswered += 1;
+        if (it.answer === "yes") {
+          yesWeighted += w;
+          yesAnswered += 1;
+        } else if (it.severity === "p0") {
+          p0Failed += 1;
+        }
+      }
+    });
+    const score =
+      totalWeighted === 0 ? 0 : Math.round((yesWeighted / totalWeighted) * 100);
+    return { score, yesWeighted, totalWeighted, yesAnswered, totalAnswered, p0Failed };
+  }
+
+  function dlBlob(blob: Blob, filename: string): void {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function filenameStem(): string {
+    const meta = readMetaFromForm();
+    const date = meta.date || new Date().toISOString().slice(0, 10);
+    const slug = (meta.org || meta.scope || "audit")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 40) || "audit";
+    return `nis2-tls-readiness-${slug}-${date}`;
+  }
+
+  document
+    .querySelector('[data-action="download-md"]')
+    ?.addEventListener("click", () => {
+      const meta = readMetaFromForm();
+      const sections = collectSections();
+      const s = currentScore();
       const lines: string[] = [];
       lines.push("# NIS2 TLS Readiness — evidence pack");
-      lines.push(`Generated: ${new Date().toISOString()}`);
+      lines.push("");
+      lines.push(`- Generated: ${new Date().toISOString()}`);
+      if (meta.org) lines.push(`- Organization: ${meta.org}`);
+      if (meta.scope) lines.push(`- Service / scope: ${meta.scope}`);
+      if (meta.auditor) lines.push(`- Auditor: ${meta.auditor}`);
+      if (meta.date) lines.push(`- Audit date: ${meta.date}`);
+      lines.push(
+        `- Score: ${s.score}% (${s.yesAnswered}/${s.totalAnswered} items, weighted P0 ×2)`
+      );
+      if (s.p0Failed > 0) {
+        lines.push(`- **P0 failures: ${s.p0Failed}** — review before sign-off.`);
+      }
       lines.push("");
 
-      sections.forEach((sec, si) => {
-        const h2 = sec.querySelector("h2")?.textContent?.trim() ?? "";
-        lines.push(`## ${h2}`);
-        const items = Array.from(sec.querySelectorAll<HTMLElement>("li"));
-        items.forEach((li, qi) => {
-          const q = li.querySelector("p")?.textContent?.trim() ?? "";
-          const ans = groups.get(`q-${si}-${qi}`) ?? "—";
-          const marker = ans === "yes" ? "[x]" : ans === "no" ? "[ ]" : "[?]";
-          lines.push(`- ${marker} ${q} _(${ans})_`);
+      sections.forEach((sec) => {
+        lines.push(`## ${sec.ref}`);
+        sec.items.forEach((it) => {
+          const marker =
+            it.answer === "yes" ? "[x]" : it.answer === "no" ? "[ ]" : "[?]";
+          const ans = it.answer ?? "—";
+          const sev = it.severity.toUpperCase();
+          lines.push(`- ${marker} \`${sev}\` ${it.question} _(${ans})_`);
         });
         lines.push("");
       });
@@ -333,16 +971,52 @@ const desc =
       lines.push("- Directive (EU) 2022/2555 — NIS2");
       lines.push("- D.Lgs. 138/2024 (IT) and ACN Determinazione 379907/2025");
       lines.push("- Regulation (EU) 2022/2554 — DORA");
+      lines.push("- Commission Delegated Regulation (EU) 2024/1774 — RTS encryption");
       lines.push("");
       lines.push("---");
       lines.push("Built with https://tools.certmate.org");
 
-      const blob = new Blob([lines.join("\n")], { type: "text/markdown" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `nis2-tls-readiness-${new Date().toISOString().slice(0, 10)}.md`;
-      a.click();
-      URL.revokeObjectURL(url);
+      dlBlob(
+        new Blob([lines.join("\n")], { type: "text/markdown" }),
+        `${filenameStem()}.md`
+      );
+    });
+
+  document
+    .querySelector('[data-action="download-json"]')
+    ?.addEventListener("click", () => {
+      const meta = readMetaFromForm();
+      const sections = collectSections();
+      const s = currentScore();
+      const payload = {
+        schema: "nis2-tls-readiness/v1",
+        generatedAt: new Date().toISOString(),
+        locale,
+        meta,
+        score: {
+          weighted: s.score,
+          yesWeighted: s.yesWeighted,
+          totalWeighted: s.totalWeighted,
+          yesAnswered: s.yesAnswered,
+          totalAnswered: s.totalAnswered,
+          p0Failed: s.p0Failed,
+          weighting: { p0: 2, p1: 1 },
+        },
+        sections: sections.map((sec) => ({
+          ref: sec.ref,
+          items: sec.items.map((it) => ({
+            id: `q-${it.si}-${it.qi}`,
+            severity: it.severity,
+            question: it.question,
+            answer: it.answer,
+          })),
+        })),
+      };
+      dlBlob(
+        new Blob([JSON.stringify(payload, null, 2)], {
+          type: "application/json",
+        }),
+        `${filenameStem()}.json`
+      );
     });
 </script>
