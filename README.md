@@ -1,5 +1,9 @@
 # certmate-tools
 
+[![CI](https://github.com/fabriziosalmi/certmate-tools/actions/workflows/ci.yml/badge.svg)](https://github.com/fabriziosalmi/certmate-tools/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/fabriziosalmi/certmate-tools/actions/workflows/codeql.yml/badge.svg)](https://github.com/fabriziosalmi/certmate-tools/actions/workflows/codeql.yml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/fabriziosalmi/certmate-tools/badge)](https://scorecard.dev/viewer/?uri=github.com/fabriziosalmi/certmate-tools)
+
 Free online tools for TLS, SSL certificates, ACME, domain & DNS — privacy-first, client-side, zero upload.
 
 Companion to [CertMate](https://github.com/fabriziosalmi/certmate) — open-source SSL certificate management.

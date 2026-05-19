@@ -138,7 +138,8 @@ const desc =
 
 <script>
   import { validateHostname, type HostnameMatchResult } from "~/lib/hostname-validator";
-  import { escapeHtml, MAX_INPUT_BYTES } from "~/lib/util";
+  import { MAX_INPUT_BYTES } from "~/lib/util";
+  import { el, frag, mount } from "~/lib/dom";
   import { detectLocale, getMessages } from "~/i18n";
 
   const locale = detectLocale(location.pathname);
@@ -165,33 +166,107 @@ const desc =
     $status.textContent = "";
   }
 
-  function renderResult(r: HostnameMatchResult): string {
+  function renderResult(r: HostnameMatchResult): HTMLElement {
     const badge = r.matched
-      ? `<span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 text-emerald-800 px-2.5 py-1 text-xs font-semibold ring-1 ring-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-200 dark:ring-emerald-900/60"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>covered</span>`
-      : `<span class="inline-flex items-center gap-1.5 rounded-full bg-red-100 text-red-800 px-2.5 py-1 text-xs font-semibold ring-1 ring-red-200 dark:bg-red-950/50 dark:text-red-200 dark:ring-red-900/60"><span class="h-1.5 w-1.5 rounded-full bg-red-500"></span>not covered</span>`;
-    const rules = r.rules
-      .map(
-        (rl) =>
-          `<li class="flex items-start gap-2"><span class="${rl.ok ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"} mt-0.5">${rl.ok ? "✓" : "✗"}</span><span><span class="font-medium">${escapeHtml(rl.rule)}</span> — <span class="text-zinc-600 dark:text-zinc-400">${escapeHtml(rl.detail)}</span></span></li>`
+      ? el(
+          "span",
+          {
+            class:
+              "inline-flex items-center gap-1.5 rounded-full bg-emerald-100 text-emerald-800 px-2.5 py-1 text-xs font-semibold ring-1 ring-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-200 dark:ring-emerald-900/60",
+          },
+          el("span", { class: "h-1.5 w-1.5 rounded-full bg-emerald-500" }),
+          "covered"
+        )
+      : el(
+          "span",
+          {
+            class:
+              "inline-flex items-center gap-1.5 rounded-full bg-red-100 text-red-800 px-2.5 py-1 text-xs font-semibold ring-1 ring-red-200 dark:bg-red-950/50 dark:text-red-200 dark:ring-red-900/60",
+          },
+          el("span", { class: "h-1.5 w-1.5 rounded-full bg-red-500" }),
+          "not covered"
+        );
+
+    const ruleItems = r.rules.map((rl) =>
+      el(
+        "li",
+        { class: "flex items-start gap-2" },
+        el(
+          "span",
+          {
+            class: `${rl.ok ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"} mt-0.5`,
+          },
+          rl.ok ? "✓" : "✗"
+        ),
+        el(
+          "span",
+          null,
+          el("span", { class: "font-medium" }, rl.rule),
+          " — ",
+          el(
+            "span",
+            { class: "text-zinc-600 dark:text-zinc-400" },
+            rl.detail
+          )
+        )
       )
-      .join("");
+    );
+
     const matchLine = r.matchedEntry
-      ? `<p class="text-sm text-zinc-600 dark:text-zinc-400 mt-1">matched by <code class="mono bg-zinc-100 dark:bg-zinc-800 px-1.5 rounded">${escapeHtml(r.matchedEntry.type)}: ${escapeHtml(r.matchedEntry.value)}</code></p>`
-      : "";
+      ? el(
+          "p",
+          { class: "text-sm text-zinc-600 dark:text-zinc-400 mt-1" },
+          "matched by ",
+          el(
+            "code",
+            { class: "mono bg-zinc-100 dark:bg-zinc-800 px-1.5 rounded" },
+            `${r.matchedEntry.type}: ${r.matchedEntry.value}`
+          )
+        )
+      : null;
+
     const notes = r.notes.length
-      ? `<ul class="mt-3 text-xs text-amber-800 dark:text-amber-300 space-y-1 list-disc pl-5">${r.notes.map((n) => `<li>${escapeHtml(n)}</li>`).join("")}</ul>`
-      : "";
-    return `<article class="rounded-lg border border-zinc-200 bg-white p-5 dark:bg-zinc-900/40 dark:border-zinc-800">
-      <header class="flex items-start justify-between gap-3 flex-wrap">
-        <div>
-          <h3 class="text-base font-semibold text-zinc-900 dark:text-zinc-50 break-all">${escapeHtml(r.hostname)}</h3>
-          ${matchLine}
-        </div>
-        ${badge}
-      </header>
-      <ul class="mt-3 space-y-1.5 text-sm text-zinc-700 dark:text-zinc-300">${rules}</ul>
-      ${notes}
-    </article>`;
+      ? el(
+          "ul",
+          {
+            class:
+              "mt-3 text-xs text-amber-800 dark:text-amber-300 space-y-1 list-disc pl-5",
+          },
+          r.notes.map((n) => el("li", null, n))
+        )
+      : null;
+
+    return el(
+      "article",
+      {
+        class:
+          "rounded-lg border border-zinc-200 bg-white p-5 dark:bg-zinc-900/40 dark:border-zinc-800",
+      },
+      el(
+        "header",
+        { class: "flex items-start justify-between gap-3 flex-wrap" },
+        el(
+          "div",
+          null,
+          el(
+            "h3",
+            {
+              class:
+                "text-base font-semibold text-zinc-900 dark:text-zinc-50 break-all",
+            },
+            r.hostname
+          ),
+          matchLine
+        ),
+        badge
+      ),
+      el(
+        "ul",
+        { class: "mt-3 space-y-1.5 text-sm text-zinc-700 dark:text-zinc-300" },
+        ruleItems
+      ),
+      notes
+    );
   }
 
   async function check() {
@@ -219,7 +294,12 @@ const desc =
       }
       const ok = r.results.filter((x) => x.matched).length;
       $subtitle.textContent = `${ok}/${r.results.length} hostnames covered.`;
-      $body.innerHTML = r.results.map(renderResult).join('<div class="my-3"></div>');
+      const cards: Node[] = [];
+      r.results.forEach((res, i) => {
+        if (i > 0) cards.push(el("div", { class: "my-3" }));
+        cards.push(renderResult(res));
+      });
+      mount($body, frag(...cards));
       $status.textContent = $subtitle.textContent;
       if (!$modal.open) $modal.showModal();
     } finally {

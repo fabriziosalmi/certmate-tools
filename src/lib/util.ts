@@ -6,15 +6,6 @@
 export const MAX_INPUT_BYTES = 2 * 1024 * 1024; // 2 MB hard cap
 export const MAX_PEM_BLOCKS = 16;
 
-export function escapeHtml(s: string): string {
-  return String(s)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
 export function bufToHexColon(buf: ArrayBuffer | Uint8Array): string {
   const bytes = buf instanceof Uint8Array ? buf : new Uint8Array(buf);
   return Array.from(bytes, (b) => b.toString(16).padStart(2, "0"))

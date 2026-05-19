@@ -104,6 +104,22 @@ const ogImageUrl = new URL(
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
     <meta name="format-detection" content="telephone=no" />
+
+    {/*
+      Content-Security-Policy is finalized at build time by scripts/inject-csp.mjs,
+      which computes per-page SHA-256 hashes for every inline <script>/<style>
+      and substitutes them for the __CSP_SCRIPT_HASHES__ / __CSP_STYLE_HASHES__
+      tokens. connect-src 'none' enforces the no-upload promise at the browser
+      level: any regression that adds fetch/XHR/WebSocket will be blocked.
+    */}
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self' __CSP_SCRIPT_HASHES__; style-src 'self' __CSP_STYLE_HASHES__; img-src 'self' data:; font-src 'self' data:; connect-src 'none'; form-action 'none'; frame-ancestors 'none'; base-uri 'none'; manifest-src 'self'; object-src 'none'; upgrade-insecure-requests"
+    />
+    <meta
+      http-equiv="Permissions-Policy"
+      content="accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), camera=(), display-capture=(), document-domain=(), encrypted-media=(), fullscreen=(self), geolocation=(), gyroscope=(), keyboard-map=(), magnetometer=(), microphone=(), midi=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), sync-xhr=(), usb=(), web-share=(), xr-spatial-tracking=(), interest-cohort=(), browsing-topics=()"
+    />
   </head>
   <body
     class:list={[

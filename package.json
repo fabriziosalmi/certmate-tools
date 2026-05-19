@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build",
+    "build": "node scripts/check-no-innerhtml.mjs && astro build && node scripts/inject-csp.mjs && node scripts/check-no-network.mjs",
     "preview": "astro preview",
     "astro": "astro",
     "check": "astro check",

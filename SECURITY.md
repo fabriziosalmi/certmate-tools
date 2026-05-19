@@ -56,6 +56,37 @@ notes and security advisory unless you ask to stay anonymous.
 Only the latest `main`-branch deployment of <https://tools.certmate.org> is
 supported. Older static builds are not maintained.
 
+## Runtime defenses (shipped in the static site)
+
+The "no upload" promise is enforced by the browser, not just by code review.
+
+- **Content-Security-Policy** with `default-src 'none'`, `connect-src 'none'`,
+  `frame-ancestors 'none'`, `base-uri 'none'`, `form-action 'none'`,
+  `object-src 'none'`. The CSP is delivered via `<meta http-equiv>` on every
+  HTML page. `script-src` and `style-src` are `'self'` plus per-page
+  `sha256-…` hashes of inline blocks computed at build time — there is no
+  `'unsafe-inline'` and no `'unsafe-eval'`.
+- `connect-src 'none'` is the load-bearing rule: any future regression that
+  introduces `fetch()`, `XMLHttpRequest`, `WebSocket`, `EventSource`,
+  `sendBeacon` or a cross-origin dynamic import will be blocked by the
+  browser, even if it slips past review.
+- **Build-time guards** fail the production build if either invariant is
+  broken: `scripts/check-no-network.mjs` scans `dist/` for any network
+  primitive, and `scripts/check-no-innerhtml.mjs` scans `src/` to prevent
+  `innerHTML` / `outerHTML` / `insertAdjacentHTML` / `set:html` /
+  `document.write` from ever returning.
+- **DOM-builder helpers** (`src/lib/dom.ts`: `el`, `frag`, `mount`, `text`)
+  are the only sanctioned way to render dynamic content. They funnel every
+  string through `createTextNode` / `setAttribute`, so escaping is enforced
+  by construction rather than by caller discipline — there is no `escapeHtml`
+  to remember to call.
+- **Permissions-Policy** disables every powerful browser API the tools do not
+  need (camera, microphone, geolocation, payment, USB, etc.).
+- Other hardening headers via meta: `referrer = strict-origin-when-cross-origin`,
+  `X-Content-Type-Options: nosniff`, `format-detection: telephone=no`.
+- **`/.well-known/security.txt`** (RFC 9116) advertises the disclosure
+  channels above.
+
 ## Security baseline (repo & CI)
 
 The repository uses a defensive baseline and expects maintainers to keep these
