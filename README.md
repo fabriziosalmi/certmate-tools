@@ -8,6 +8,16 @@ Free online tools for TLS, SSL certificates, ACME, domain & DNS — privacy-firs
 
 Companion to [CertMate](https://github.com/fabriziosalmi/certmate) — open-source SSL certificate management.
 
+## Ecosystem
+
+Part of the [CertMate](https://github.com/fabriziosalmi/certmate) ecosystem:
+
+- **[CertMate](https://github.com/fabriziosalmi/certmate)** — open-source SSL certificate management (API + UI).
+- **[certmate-agent](https://github.com/fabriziosalmi/certmate-agent)** — conversational assistant: a local LLM mapped 1:1 to CertMate's REST API, with RAG over the docs.
+- **[nis2-public](https://github.com/fabriziosalmi/nis2-public)** — NIS2 continuous posture management & remediation.
+
+**Enterprise / high-scale** — multi-tenant, mTLS, white-label and NIS2-aligned deployments are available through *CertMate-ng* (source-available, BSL 1.1, EU-built). Contact **fabrizio.salmi@gmail.com**.
+
 ## Security
 
 See the full policy and operational hardening checklist in [SECURITY.md](./SECURITY.md).
