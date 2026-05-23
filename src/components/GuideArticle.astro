@@ -1,0 +1,51 @@
+---
+import Layout from "~/layouts/Layout.astro";
+import { guides, guideContent } from "~/data/guides";
+import { localizedPath, type Locale } from "~/i18n";
+
+interface Props {
+  slug: string;
+  locale: Locale;
+}
+
+const { slug, locale } = Astro.props;
+const guide = guides.find((g) => g.slug === slug)!;
+const c = guideContent(guide, locale);
+const toolHref = localizedPath(locale, `/${guide.toolSlug}/`);
+const guidesHref = localizedPath(locale, "/guides/");
+const backLabel = locale === "it" ? "Tutte le guide" : "All guides";
+---
+
+<Layout title={c.title} description={c.description} keywords={[guide.slug.replace(/-/g, " ")]}>
+  <article class="mx-auto w-full max-w-3xl px-4 py-10 sm:py-14">
+    <nav class="mb-6 text-sm">
+      <a href={guidesHref} class="text-blue-700 hover:underline dark:text-blue-400">&larr; {backLabel}</a>
+    </nav>
+
+    <h1 class="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{c.title}</h1>
+    <p class="mt-4 text-lg leading-relaxed text-zinc-600 dark:text-zinc-300">{c.intro}</p>
+
+    {c.sections.map((s) => (
+      <section class="mt-8">
+        <h2 class="text-xl font-semibold text-zinc-900 dark:text-zinc-100">{s.heading}</h2>
+        {s.body.map((p) => (
+          <p class="mt-3 leading-relaxed text-zinc-700 dark:text-zinc-300">{p}</p>
+        ))}
+      </section>
+    ))}
+
+    <div class="mt-12 rounded-xl border border-blue-200 bg-blue-50 p-6 dark:border-blue-900/40 dark:bg-blue-950/30">
+      <a
+        href={toolHref}
+        class="inline-flex items-center gap-2 rounded-lg bg-blue-700 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-800"
+      >
+        {c.toolCta} &rarr;
+      </a>
+      <p class="mt-3 text-xs text-zinc-500 dark:text-zinc-400">
+        {locale === "it"
+          ? "Tutto lato client: niente upload, niente tracciamento."
+          : "Runs entirely client-side: no upload, no tracking."}
+      </p>
+    </div>
+  </article>
+</Layout>

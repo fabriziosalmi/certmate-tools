@@ -1,10 +1,16 @@
 import type { APIRoute } from "astro";
 import { internalTools } from "~/data/tools";
+import { guides } from "~/data/guides";
 import { LOCALES, DEFAULT_LOCALE, localizedPath } from "~/i18n";
 
 const SITE = "https://tools.certmate.org";
 
-const routes = ["/", ...internalTools.filter((t) => t.status === "live").map((t) => `/${t.slug}/`)];
+const routes = [
+  "/",
+  ...internalTools.filter((t) => t.status === "live").map((t) => `/${t.slug}/`),
+  "/guides/",
+  ...guides.map((g) => `/guides/${g.slug}/`),
+];
 
 function urlEntry(path: string): string {
   const loc = `${SITE}${localizedPath(DEFAULT_LOCALE, path)}`;
