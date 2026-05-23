@@ -1,0 +1,12 @@
+---
+import type { GetStaticPaths } from "astro";
+import GuideArticle from "~/components/GuideArticle.astro";
+import { guides } from "~/data/guides";
+
+export const getStaticPaths: GetStaticPaths = () =>
+  guides.map((g) => ({ params: { guide: g.slug } }));
+
+const { guide } = Astro.params;
+---
+
+<GuideArticle slug={guide as string} locale="en" />

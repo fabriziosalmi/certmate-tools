@@ -1,0 +1,13 @@
+---
+import type { GetStaticPaths } from "astro";
+import GuidesIndex from "~/components/GuidesIndex.astro";
+import { LOCALES, DEFAULT_LOCALE, isLocale, type Locale } from "~/i18n";
+
+export const getStaticPaths: GetStaticPaths = () =>
+  LOCALES.filter((l) => l !== DEFAULT_LOCALE).map((lang) => ({ params: { lang } }));
+
+const { lang } = Astro.params;
+const locale: Locale = isLocale(lang) ? lang : DEFAULT_LOCALE;
+---
+
+<GuidesIndex locale={locale} />

@@ -1,0 +1,40 @@
+---
+import Layout from "~/layouts/Layout.astro";
+import { guides, guideContent } from "~/data/guides";
+import { localizedPath, type Locale } from "~/i18n";
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const title = locale === "it" ? "Guide TLS / SSL" : "TLS / SSL guides";
+const description =
+  locale === "it"
+    ? "Guide pratiche per decodificare certificati e CSR, verificare chiavi e costruire catene — ognuna collegata allo strumento client-side che la mette in pratica."
+    : "Practical how-to guides for decoding certificates and CSRs, verifying keys and building chains — each linked to the client-side tool that does it.";
+---
+
+<Layout title={title} description={description}>
+  <section class="mx-auto w-full max-w-3xl px-4 py-10 sm:py-14">
+    <h1 class="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">{title}</h1>
+    <p class="mt-4 text-lg leading-relaxed text-zinc-600 dark:text-zinc-300">{description}</p>
+
+    <ul class="mt-8 grid gap-3">
+      {guides.map((g) => {
+        const c = guideContent(g, locale);
+        return (
+          <li>
+            <a
+              href={localizedPath(locale, `/guides/${g.slug}/`)}
+              class="block rounded-lg border border-zinc-200 p-4 transition-colors hover:border-blue-500 dark:border-zinc-800"
+            >
+              <span class="font-semibold text-zinc-900 dark:text-zinc-100">{c.title}</span>
+              <span class="mt-1 block text-sm text-zinc-600 dark:text-zinc-400">{c.description}</span>
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+  </section>
+</Layout>

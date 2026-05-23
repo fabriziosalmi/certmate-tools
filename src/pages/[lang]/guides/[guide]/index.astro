@@ -1,0 +1,16 @@
+---
+import type { GetStaticPaths } from "astro";
+import GuideArticle from "~/components/GuideArticle.astro";
+import { guides } from "~/data/guides";
+import { LOCALES, DEFAULT_LOCALE, isLocale, type Locale } from "~/i18n";
+
+export const getStaticPaths: GetStaticPaths = () =>
+  LOCALES.filter((l) => l !== DEFAULT_LOCALE).flatMap((lang) =>
+    guides.map((g) => ({ params: { lang, guide: g.slug } }))
+  );
+
+const { lang, guide } = Astro.params;
+const locale: Locale = isLocale(lang) ? lang : DEFAULT_LOCALE;
+---
+
+<GuideArticle slug={guide as string} locale={locale} />
