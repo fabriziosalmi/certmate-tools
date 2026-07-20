@@ -1,0 +1,148 @@
+---
+import Layout from "~/layouts/Layout.astro";
+
+// Standalone /privacy route (language-neutral, bilingual EN/IT content).
+// certmate-tools runs entirely client-side: the CSP is injected at build
+// time (scripts/inject-csp.mjs), no analytics, the only device storage is
+// the functional theme preference. Some tools may call the third-party
+// service the user explicitly queries; nothing is uploaded to us.
+const title = "Privacy & legal";
+const description =
+  "How tools.certmate.org handles data: runs in your browser, no cookies, no analytics, no upload. Data controller, processors and your GDPR rights.";
+
+const h2 = "mt-10 text-xl font-semibold text-zinc-900 dark:text-zinc-50";
+const p = "mt-3 text-zinc-600 dark:text-zinc-300 leading-relaxed";
+const ul = "mt-3 list-disc space-y-1 pl-5 text-zinc-600 dark:text-zinc-300";
+const a = "text-brand-700 hover:underline dark:text-brand-400";
+const kicker = "mt-14 text-xs font-semibold uppercase tracking-[0.2em] text-brand-700 dark:text-brand-400";
+---
+
+<Layout title={title} description={description}>
+  <section class="mx-auto max-w-3xl px-5 py-16">
+    <h1 class="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+      Privacy &amp; legal notice
+    </h1>
+    <p class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
+      Last updated: 20 July 2026 · tools.certmate.org
+    </p>
+
+    <p class={kicker}>English</p>
+
+    <h2 class={h2}>Data controller</h2>
+    <p class={p}>
+      <strong>Fabrizio Salmi</strong> — Genoa, Italy. tools.certmate.org is part
+      of the open-source, MIT-licensed CertMate project (personal, non-commercial).
+      Contact: <a class={a} href="mailto:fabrizio.salmi@gmail.com">fabrizio.salmi@gmail.com</a>.
+    </p>
+
+    <h2 class={h2}>How the tools work</h2>
+    <p class={p}>
+      The tools on this site (certificate/CSR decoders, key matcher, chain
+      builder, validators…) run <strong>entirely in your browser</strong>. The
+      certificates, keys and values you paste are processed locally and are
+      <strong>never uploaded to us</strong>. Some tools may, only when you
+      actively use them, send the value you entered directly from your browser
+      to the third-party service you queried (for example a public
+      certificate-transparency log or a CA endpoint) to return results; that
+      request happens between your browser and that service under its own policy.
+    </p>
+
+    <h2 class={h2}>What we process, and why</h2>
+    <ul class={ul}>
+      <li><strong>Your IP and basic request data</strong> are processed transiently by our infrastructure providers to deliver the page and protect it. Legal basis: legitimate interest (Art. 6(1)(f) GDPR).</li>
+      <li><strong>No analytics</strong>, no tracking pixels, no advertising.</li>
+      <li><strong>No accounts, no forms, no newsletter.</strong></li>
+    </ul>
+
+    <h2 class={h2}>Cookies &amp; device storage</h2>
+    <p class={p}>
+      This site sets <strong>no cookies</strong>. The only thing stored on your
+      device is your <strong>light/dark theme preference</strong> (functional),
+      set only because you asked for it. No cookie-consent banner is required.
+    </p>
+
+    <h2 class={h2}>Processors &amp; international transfers</h2>
+    <ul class={ul}>
+      <li><strong>GitHub, Inc.</strong> (USA) — static hosting (GitHub Pages).</li>
+      <li><strong>Cloudflare, Inc.</strong> (USA) — CDN, HTTPS and edge security.</li>
+    </ul>
+    <p class={p}>
+      Serving the site transfers technical data (such as your IP) to the USA,
+      covered by the providers' DPAs and the EU–US Data Privacy Framework /
+      Standard Contractual Clauses.
+    </p>
+
+    <h2 class={h2}>Your rights</h2>
+    <p class={p}>
+      Access, rectification, erasure, restriction, objection, portability
+      (Arts. 15–22 GDPR) — email
+      <a class={a} href="mailto:fabrizio.salmi@gmail.com">fabrizio.salmi@gmail.com</a>.
+      You may complain to the
+      <a class={a} href="https://www.garanteprivacy.it" target="_blank" rel="noopener">Garante per la protezione dei dati personali</a>.
+      No profiling, no automated decision-making.
+    </p>
+
+    <p class={kicker}>Italiano</p>
+
+    <h2 class={h2}>Titolare del trattamento</h2>
+    <p class={p}>
+      <strong>Fabrizio Salmi</strong> — Genova, Italia. tools.certmate.org fa
+      parte del progetto open-source CertMate (licenza MIT; personale, non
+      commerciale). Contatto:
+      <a class={a} href="mailto:fabrizio.salmi@gmail.com">fabrizio.salmi@gmail.com</a>.
+    </p>
+
+    <h2 class={h2}>Come funzionano i tool</h2>
+    <p class={p}>
+      I tool di questo sito (decoder di certificati/CSR, key matcher, chain
+      builder, validatori…) girano <strong>interamente nel tuo browser</strong>.
+      Certificati, chiavi e valori che incolli sono elaborati localmente e
+      <strong>non vengono mai caricati sui nostri server</strong>. Alcuni tool
+      possono, solo quando li usi attivamente, inviare il valore inserito
+      direttamente dal tuo browser al servizio di terze parti che interroghi
+      (es. un registro di certificate-transparency o un endpoint di una CA) per
+      restituire i risultati; quella richiesta avviene tra il tuo browser e quel
+      servizio secondo la sua informativa.
+    </p>
+
+    <h2 class={h2}>Quali dati trattiamo e perché</h2>
+    <ul class={ul}>
+      <li><strong>IP e dati basilari della richiesta</strong> trattati in modo transitorio dai fornitori di infrastruttura per erogare e proteggere la pagina. Base giuridica: legittimo interesse (art. 6(1)(f) GDPR).</li>
+      <li><strong>Nessuna analitica</strong>, nessun pixel, nessuna pubblicità.</li>
+      <li><strong>Nessun account, modulo o newsletter.</strong></li>
+    </ul>
+
+    <h2 class={h2}>Cookie e memoria del dispositivo</h2>
+    <p class={p}>
+      Il sito <strong>non imposta cookie</strong>. L'unica cosa memorizzata è la
+      tua <strong>preferenza di tema</strong> chiaro/scuro (funzionale). Nessun
+      banner di consenso richiesto.
+    </p>
+
+    <h2 class={h2}>Responsabili e trasferimenti extra-UE</h2>
+    <ul class={ul}>
+      <li><strong>GitHub, Inc.</strong> (USA) — hosting statico (GitHub Pages).</li>
+      <li><strong>Cloudflare, Inc.</strong> (USA) — CDN, HTTPS e sicurezza edge.</li>
+    </ul>
+    <p class={p}>
+      L'erogazione trasferisce dati tecnici (come l'IP) verso gli USA, coperti
+      dagli accordi sul trattamento e dal Data Privacy Framework UE–USA / SCC.
+    </p>
+
+    <h2 class={h2}>I tuoi diritti</h2>
+    <p class={p}>
+      Accesso, rettifica, cancellazione, limitazione, opposizione, portabilità
+      (artt. 15–22 GDPR) — scrivi a
+      <a class={a} href="mailto:fabrizio.salmi@gmail.com">fabrizio.salmi@gmail.com</a>.
+      Reclamo al
+      <a class={a} href="https://www.garanteprivacy.it" target="_blank" rel="noopener">Garante</a>.
+      Nessuna profilazione né decisione automatizzata.
+    </p>
+
+    <hr class="mt-12 border-zinc-200 dark:border-zinc-800" />
+    <p class="mt-6 text-sm text-zinc-500 dark:text-zinc-400">
+      Publisher / Titolare: Fabrizio Salmi — Genoa, Italy —
+      <a class={a} href="mailto:fabrizio.salmi@gmail.com">fabrizio.salmi@gmail.com</a>
+    </p>
+  </section>
+</Layout>
