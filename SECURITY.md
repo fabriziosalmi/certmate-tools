@@ -62,10 +62,10 @@ The "no upload" promise is enforced by the browser, not just by code review.
 
 - **Content-Security-Policy** with `default-src 'none'`, `connect-src 'none'`,
   `base-uri 'none'`, `form-action 'none'`, `object-src 'none'`. The CSP is
-  delivered via `<meta http-equiv>` on every HTML page — which means
-  `frame-ancestors` (present in the policy for completeness) is **not**
-  enforced: that directive requires a real header. Framing protection comes
-  from the edge instead, where GitHub Pages sends
+  delivered via `<meta http-equiv>` on every HTML page. `frame-ancestors` is
+  deliberately **not** in the policy: that directive is ignored in a `<meta>`
+  CSP and browsers log a console error for it on every page load. Framing
+  protection comes from the edge, where GitHub Pages sends
   `x-frame-options: SAMEORIGIN`. `script-src` and `style-src` are `'self'` plus per-page
   `sha256-…` hashes of inline blocks computed at build time — there is no
   `'unsafe-inline'` and no `'unsafe-eval'`.
