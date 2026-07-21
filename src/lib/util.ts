@@ -46,9 +46,21 @@ export function hexToBigIntDecimal(hex: string): string {
   }
 }
 
+/**
+ * Whole days from `b` to `a`, rounded toward zero-or-below.
+ *
+ * `Math.round` produced `-0` for anything that elapsed less than twelve hours
+ * ago, and `-0 < 0` is `false` in JavaScript — so a certificate that expired
+ * at 06:00 still read as not-expired at noon (#64). It also rounded *up*:
+ * twenty hours of remaining life was reported as "1 day left".
+ *
+ * Math.floor gives both: a negative interval never lands on -0, and a partial
+ * day is never counted as a whole one. Callers wanting "expired" should still
+ * compare timestamps rather than this value — see cert-decoder.
+ */
 export function diffDays(a: Date, b: Date): number {
   const ms = a.getTime() - b.getTime();
-  return Math.round(ms / 86_400_000);
+  return Math.floor(ms / 86_400_000);
 }
 
 export function formatDate(iso: string | Date): string {
