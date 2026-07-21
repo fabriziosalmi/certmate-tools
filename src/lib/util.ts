@@ -46,9 +46,21 @@ export function hexToBigIntDecimal(hex: string): string {
   }
 }
 
+/**
+ * Whole days from `b` to `a`, rounded toward zero-or-below.
+ *
+ * `Math.round` produced `-0` for anything that elapsed less than twelve hours
+ * ago, and `-0 < 0` is `false` in JavaScript — so a certificate that expired
+ * at 06:00 still read as not-expired at noon (#64). It also rounded *up*:
+ * twenty hours of remaining life was reported as "1 day left".
+ *
+ * Math.floor gives both: a negative interval never lands on -0, and a partial
+ * day is never counted as a whole one. Callers wanting "expired" should still
+ * compare timestamps rather than this value — see cert-decoder.
+ */
 export function diffDays(a: Date, b: Date): number {
   const ms = a.getTime() - b.getTime();
-  return Math.round(ms / 86_400_000);
+  return Math.floor(ms / 86_400_000);
 }
 
 export function formatDate(iso: string | Date): string {
@@ -113,15 +125,23 @@ export function parseDN(dn: string): Record<string, string[]> {
 
 /**
  * Read PEM blocks of the given label from input. Returns an empty array if no
- * block is found. Limits the number of blocks to MAX_PEM_BLOCKS.
+ * block is found.
+ *
+ * Returns EVERY block (#67). It used to `.slice(0, MAX_PEM_BLOCKS)`, which was
+ * worse than an error: pasting a 20-certificate bundle silently dropped four
+ * and the Chain Builder then reported "missing intermediate" with an AIA hint
+ * — a confident diagnosis of a problem the user did not have. It also made
+ * the `blocks.length > MAX_PEM_BLOCKS` guard in cert-decoder unreachable.
+ *
+ * Callers enforce MAX_PEM_BLOCKS and say so. Total input is already bounded
+ * by MAX_INPUT_BYTES.
  */
 export function extractPemBlocks(input: string, label: string): string[] {
   const re = new RegExp(
     `-----BEGIN ${label}-----[\\s\\S]*?-----END ${label}-----`,
     "g"
   );
-  const matches = input.match(re) ?? [];
-  return matches.slice(0, MAX_PEM_BLOCKS);
+  return input.match(re) ?? [];
 }
 
 export function wrapAsPem(label: string, base64: string): string {

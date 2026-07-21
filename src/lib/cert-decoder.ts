@@ -271,7 +271,10 @@ async function decodeOne(pemBlock: string): Promise<DecodedCertificate> {
     notAfter: notAfter.toISOString(),
     validityDays,
     daysUntilExpiry,
-    expired: daysUntilExpiry < 0,
+    // From the timestamps, not from daysUntilExpiry (#64): a day count is a
+    // display value, and deriving a boolean from it made "expired" depend on
+    // rounding. A certificate is expired the moment notAfter passes.
+    expired: notAfter.getTime() <= now.getTime(),
     notYetValid: notBefore.getTime() > now.getTime(),
     signatureAlgorithm,
     publicKey,

@@ -4,8 +4,11 @@
  * thumbprints — both the cert's SPKI and the SPKI derived from the private
  * key. If the bytes match, the key produced the public key in the cert.
  *
- * Supports: RSA (PKCS#8 and traditional RSA private key PEM via wrapping),
- * ECDSA P-256 / P-384 / P-521 (PKCS#8), Ed25519 (PKCS#8).
+ * Supports PKCS#8 only — RSA, ECDSA P-256 / P-384 / P-521, Ed25519 — because
+ * that is what Web Crypto imports. PKCS#1 ("BEGIN RSA PRIVATE KEY", still
+ * what `openssl genrsa` emits by default) and SEC1 ("BEGIN EC PRIVATE KEY")
+ * are rejected with the openssl command that converts them. The docstring
+ * used to claim PKCS#1 was wrapped and supported; it never was (#67).
  */
 
 import { X509Certificate } from "@peculiar/x509";
