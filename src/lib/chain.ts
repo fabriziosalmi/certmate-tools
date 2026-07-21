@@ -16,6 +16,7 @@
 import {
   AuthorityInfoAccessExtension,
   AuthorityKeyIdentifierExtension,
+  BasicConstraintsExtension,
   SubjectKeyIdentifierExtension,
   X509Certificate,
 } from "@peculiar/x509";
@@ -89,7 +90,10 @@ function makeNode(idx: number, cert: X509Certificate, fp: string, pem: string): 
     commonName: subDN["CN"]?.[0],
     issuerCommonName: isuDN["CN"]?.[0],
     selfSigned: cert.subject === cert.issuer,
-    isCA: cert.getExtension("2.5.29.19") != null,
+    // The `ca` boolean, not the extension's presence (#67): every Let's
+    // Encrypt leaf carries basicConstraints with CA:FALSE (critical), so
+    // testing for presence labelled every leaf a CA.
+    isCA: cert.getExtension(BasicConstraintsExtension)?.ca === true,
     notBefore: cert.notBefore.toISOString(),
     notAfter: cert.notAfter.toISOString(),
     expired: cert.notAfter.getTime() < now,
@@ -166,7 +170,13 @@ export async function buildChain(pemInput: string): Promise<ChainOutcome> {
 
     // Verify each link.
     const links: ChainLink[] = [];
-    let allValid = true;
+    // Seed from the certificates' own validity windows, not `true` (#63). A
+    // single self-signed certificate produces ZERO links and is its own root,
+    // so with a `true` seed nothing could ever clear the flag: an expired
+    // appliance certificate was reported as a valid chain.
+    let allValid = ordered.every(
+      (idx) => !nodes[idx]!.expired && !nodes[idx]!.notYetValid,
+    );
     for (let i = 0; i < ordered.length - 1; i++) {
       const childIdx = ordered[i]!;
       const parentIdx = ordered[i + 1]!;
