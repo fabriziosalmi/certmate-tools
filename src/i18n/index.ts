@@ -55,6 +55,7 @@ export interface Messages {
   footerNoTracking: string;
   footerNoUpload: string;
   footerOpenSource: string;
+  footerPrivacyLegal: string;
   footerCopyright: string;
   privacyBadgeInline: string;
   privacyBadgeTitleBlock: string;
@@ -250,6 +251,7 @@ const en: Messages = {
   footerNoTracking: "No tracking, no analytics scripts.",
   footerNoUpload: "No file ever leaves your browser.",
   footerOpenSource: "Open source — auditable end to end.",
+  footerPrivacyLegal: "Privacy & legal notice",
   footerCopyright: "MIT licensed.",
   privacyBadgeInline: "Runs in your browser. Nothing uploaded.",
   privacyBadgeTitleBlock: "100% client-side",
@@ -455,6 +457,7 @@ const it: Messages = {
   footerNoTracking: "Niente tracking, niente analytics.",
   footerNoUpload: "Nessun file lascia il tuo browser.",
   footerOpenSource: "Open source — verificabile da cima a fondo.",
+  footerPrivacyLegal: "Informativa privacy e note legali",
   footerCopyright: "Licenza MIT.",
   privacyBadgeInline: "Tutto in locale. Niente upload.",
   privacyBadgeTitleBlock: "100% client-side",
