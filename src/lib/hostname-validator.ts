@@ -33,6 +33,17 @@ export type HostnameValidationResult =
   | { ok: true; results: HostnameMatchResult[] }
   | { ok: false; error: string };
 
+/**
+ * Is this an IP literal rather than a hostname?
+ *
+ * Deliberately broad — anything that is only hex digits, dots and colons —
+ * because the cost of a false positive is refusing to match a dNSName that
+ * could not be a real hostname anyway, while a false negative reopens #65.
+ */
+function looksLikeIpLiteral(h: string): boolean {
+  return /^[\d.]+$/.test(h) || /^[0-9a-fA-F:]+$/.test(h);
+}
+
 function loadCertificate(input: string): X509Certificate {
   const trimmed = input.trim();
   if (!trimmed) throw new Error("Certificate is empty.");
@@ -171,11 +182,23 @@ export async function validateHostname(
       let matchedEntry: { type: string; value: string } | undefined;
       let reason = "no SAN entry covers this hostname";
 
-      // IP exact match (no wildcards)
-      if (/^[\d.:a-fA-F]+$/.test(h) && ipSans.includes(h)) {
-        matched = true;
-        matchedEntry = { type: "IP", value: h };
-        reason = `IP SAN exact match (${h})`;
+      // An IP literal is matched ONLY against iPAddress SANs (#65). RFC 6125
+      // and every browser require that: a dNSName entry holding "192.0.2.1"
+      // does not cover the address, and falling through to the DNS loop made
+      // the tool answer "covered" for a certificate Chrome rejects with
+      // ERR_CERT_COMMON_NAME_INVALID. The CN fallback below is skipped for
+      // the same reason.
+      const isIpLiteral = looksLikeIpLiteral(h);
+      if (isIpLiteral) {
+        if (ipSans.includes(h)) {
+          matched = true;
+          matchedEntry = { type: "IP", value: h };
+          reason = `IP SAN exact match (${h})`;
+        } else {
+          reason = dnsSans.includes(h)
+            ? `no iPAddress SAN covers this address — it appears as a dNSName entry, which TLS clients reject for an IP literal`
+            : "no iPAddress SAN covers this address";
+        }
       } else {
         for (const san of dnsSans) {
           const r = matchesPattern(san, h);
@@ -188,7 +211,7 @@ export async function validateHostname(
         }
       }
 
-      if (!matched && dnsSans.length === 0 && cn) {
+      if (!matched && !isIpLiteral && dnsSans.length === 0 && cn) {
         // Legacy CN fallback — browsers reject this since ~2017 but cert may be old.
         const r = matchesPattern(cn, h);
         if (r.ok) {
@@ -212,6 +235,33 @@ export async function validateHostname(
         ok: matched,
         detail: reason,
       });
+
+      // Coverage is not validity (#67). "Does this certificate cover
+      // x.example.com?" answered with an unqualified yes, for a certificate
+      // that expired in 2020, is the kind of true-but-useless answer that
+      // sends someone looking in the wrong place.
+      const now = Date.now();
+      const notAfter = cert.notAfter.getTime();
+      const notBefore = cert.notBefore.getTime();
+      if (notAfter <= now) {
+        rules.push({
+          rule: "Certificate is within its validity period",
+          ok: false,
+          detail: `expired on ${cert.notAfter.toUTCString()}`,
+        });
+        notes.push(
+          "This certificate has expired — coverage says nothing about whether a client will accept it."
+        );
+      } else if (notBefore > now) {
+        rules.push({
+          rule: "Certificate is within its validity period",
+          ok: false,
+          detail: `not valid until ${cert.notBefore.toUTCString()}`,
+        });
+        notes.push(
+          "This certificate is not valid yet — coverage says nothing about whether a client will accept it."
+        );
+      }
 
       return { hostname: h, matched, matchedEntry, reason, notes, rules };
     });
