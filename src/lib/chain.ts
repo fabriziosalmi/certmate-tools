@@ -24,6 +24,7 @@ import {
   bufToHexColon,
   extractPemBlocks,
   MAX_INPUT_BYTES,
+  MAX_PEM_BLOCKS,
   parseDN,
   safeHttpUrl,
   sha,
@@ -124,6 +125,12 @@ export async function buildChain(pemInput: string): Promise<ChainOutcome> {
     const blocks = extractPemBlocks(t, "CERTIFICATE");
     if (blocks.length === 0)
       return { ok: false, error: "No -----BEGIN CERTIFICATE----- block found." };
+    // Say so rather than quietly analysing a subset (#67).
+    if (blocks.length > MAX_PEM_BLOCKS)
+      return {
+        ok: false,
+        error: `Too many certificate blocks (${blocks.length}, limit ${MAX_PEM_BLOCKS}).`,
+      };
 
     const certs: X509Certificate[] = [];
     const nodes: ChainNode[] = [];

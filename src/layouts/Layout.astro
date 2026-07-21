@@ -111,6 +111,11 @@ const ogImageUrl = new URL(
       and substitutes them for the __CSP_SCRIPT_HASHES__ / __CSP_STYLE_HASHES__
       tokens. connect-src 'none' enforces the no-upload promise at the browser
       level: any regression that adds fetch/XHR/WebSocket will be blocked.
+
+      Note: `frame-ancestors` is IGNORED when a CSP is delivered via
+      <meta http-equiv> (it requires a real header), so it is kept here only
+      for completeness — framing protection comes from the edge, where GitHub
+      Pages sends `x-frame-options: SAMEORIGIN` (#67).
     */}
     <meta
       http-equiv="Content-Security-Policy"

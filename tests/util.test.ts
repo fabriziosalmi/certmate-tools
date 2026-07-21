@@ -124,9 +124,13 @@ MIIBkTCB+wIJAJxzZxxxxxxx
     expect(extractPemBlocks(oneBlock, "CERTIFICATE REQUEST")).toEqual([]);
   });
 
-  it("caps the number of returned blocks at MAX_PEM_BLOCKS", () => {
+  it("returns every block — callers enforce the limit, loudly (#67)", () => {
+    // This test used to assert the opposite. Silently returning the first 16
+    // meant a 20-certificate bundle was analysed as a 16-certificate one, and
+    // the Chain Builder reported a missing intermediate that was in fact
+    // pasted. Truncation with no signal is a worse answer than an error.
     const many = Array.from({ length: 200 }, () => oneBlock).join("\n");
-    expect(extractPemBlocks(many, "CERTIFICATE").length).toBeLessThanOrEqual(16);
+    expect(extractPemBlocks(many, "CERTIFICATE")).toHaveLength(200);
   });
 
   it("wraps raw base64 into a PEM block of the chosen label", () => {

@@ -145,3 +145,21 @@ describe("buildChain — isCA", () => {
     expect(chain.nodes[0]!.isCA).toBe(false);
   });
 });
+
+describe("buildChain — input limits (#67)", () => {
+  it("refuses an oversized bundle instead of silently analysing a subset", async () => {
+    // 20 certificates, above MAX_PEM_BLOCKS (16). Truncating used to drop the
+    // last four and then report "missing intermediate" — a confident
+    // diagnosis of a problem the user did not have.
+    const certs = await Promise.all(
+      Array.from({ length: 20 }, (_, i) => makeCert({ cn: `c${i}.example.com` })),
+    );
+
+    const result = await buildChain(certs.map((c) => c.pem).join("\n"));
+
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error).toMatch(/too many/i);
+    expect(result.error).toContain("20");
+  });
+});

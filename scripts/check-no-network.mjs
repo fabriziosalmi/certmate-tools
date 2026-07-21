@@ -28,6 +28,17 @@ const PATTERNS = [
   { name: "import(http(s):)",  re: /\bimport\s*\(\s*["'`]https?:/ },
   { name: "RTCPeerConnection", re: /\bRTCPeerConnection\b/ },
   { name: "navigator.connection", re: /\bnavigator\.connection\b/ },
+  // Navigation-based exfiltration (#67). CSP has no `navigate-to` directive,
+  // so `connect-src 'none'` does NOT stop a regression that puts data in a
+  // URL and navigates: location.assign, an <img> src, or a form GET all leave
+  // the browser carrying whatever was pasted into the tool. Neither this
+  // check nor the CSP covered them, which made the gate narrower than the
+  // promise it protects.
+  { name: "location assignment", re: /\blocation\s*(?:\.href\s*)?=\s*(?!["'`]#)/ },
+  { name: "location.assign/replace", re: /\blocation\.(?:assign|replace)\s*\(/ },
+  { name: "new Image().src", re: /\bnew\s+Image\s*\([^)]*\)\s*\.\s*src\s*=/ },
+  { name: "window.open", re: /\bwindow\.open\s*\(/ },
+  { name: "form submit()", re: /\.submit\s*\(\s*\)/ },
 ];
 
 const SCAN_EXTS = new Set([".html", ".js", ".mjs", ".css"]);

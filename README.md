@@ -33,7 +33,7 @@ Open [http://localhost:4321](http://localhost:4321).
 
 ## Stack
 
-- Astro 5 (SSG, file-based routing, one URL per tool)
+- Astro 6 (SSG, file-based routing, one URL per tool)
 - Tailwind v4 (CSS-first, Oxide engine)
 - TypeScript strict
 - `@peculiar/x509` + Web Crypto API for client-side X.509 parsing

@@ -11,6 +11,7 @@ import {
   bufToHexColon,
   extractPemBlocks,
   MAX_INPUT_BYTES,
+  MAX_PEM_BLOCKS,
   parseDN,
   sha,
   wrapAsPem,
@@ -247,6 +248,12 @@ export async function decodeCSRInput(
         ok: false,
         error:
           "No CSR block found. Paste content starting with -----BEGIN CERTIFICATE REQUEST-----.",
+      };
+    }
+    if (blocks.length > MAX_PEM_BLOCKS) {
+      return {
+        ok: false,
+        error: `Too many CSR blocks (${blocks.length}, limit ${MAX_PEM_BLOCKS}).`,
       };
     }
 

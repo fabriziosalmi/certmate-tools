@@ -125,15 +125,23 @@ export function parseDN(dn: string): Record<string, string[]> {
 
 /**
  * Read PEM blocks of the given label from input. Returns an empty array if no
- * block is found. Limits the number of blocks to MAX_PEM_BLOCKS.
+ * block is found.
+ *
+ * Returns EVERY block (#67). It used to `.slice(0, MAX_PEM_BLOCKS)`, which was
+ * worse than an error: pasting a 20-certificate bundle silently dropped four
+ * and the Chain Builder then reported "missing intermediate" with an AIA hint
+ * — a confident diagnosis of a problem the user did not have. It also made
+ * the `blocks.length > MAX_PEM_BLOCKS` guard in cert-decoder unreachable.
+ *
+ * Callers enforce MAX_PEM_BLOCKS and say so. Total input is already bounded
+ * by MAX_INPUT_BYTES.
  */
 export function extractPemBlocks(input: string, label: string): string[] {
   const re = new RegExp(
     `-----BEGIN ${label}-----[\\s\\S]*?-----END ${label}-----`,
     "g"
   );
-  const matches = input.match(re) ?? [];
-  return matches.slice(0, MAX_PEM_BLOCKS);
+  return input.match(re) ?? [];
 }
 
 export function wrapAsPem(label: string, base64: string): string {
