@@ -27,6 +27,6 @@
     "@astrojs/check": "^0.9.10",
     "@types/node": "^22.10.5",
     "happy-dom": "^20.14.5",
-    "vitest": "^4.1.6"
+    "vitest": "^4.1.11"
   }
 }
