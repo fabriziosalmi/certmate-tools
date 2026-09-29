@@ -1,0 +1,126 @@
+---
+import Layout from "~/layouts/Layout.astro";
+import PrivacyBadge from "~/components/PrivacyBadge.astro";
+import ToolNav from "~/components/ToolNav.astro";
+import { getMessages, type Locale } from "~/i18n";
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const m = getMessages(locale);
+const desc =
+  locale === "it"
+    ? "Da una data di scadenza: renew-by e readiness SC-081v3 (200g → 100g → 47g). Tutto in locale."
+    : "From an expiry date: renew-by date plus SC-081v3 readiness (200d → 100d → 47d). Fully local.";
+---
+
+<Layout
+  title={m.renewalCalculatorTitle}
+  description={desc}
+  keywords={["certificate renewal calculator", "47-day readiness", "sc-081v3", "rinnovo certificati"]}
+  compact
+>
+  <div class="flex-1 flex flex-col items-stretch justify-start md:justify-center px-4 py-6 md:py-10">
+    <div class="w-full max-w-3xl mx-auto">
+      <ToolNav locale={locale} currentSlug="renewal-calculator" />
+      <header class="mb-5">
+        <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+          {m.renewalCalculatorTitle}
+        </h1>
+        <p class="mt-1.5 text-zinc-600 dark:text-zinc-400 leading-relaxed">
+          {m.renewalCalculatorTagline}
+        </p>
+        <div class="mt-3"><PrivacyBadge locale={locale} variant="inline" /></div>
+      </header>
+
+      <div class:list={["rounded-2xl border shadow-sm p-4 sm:p-5", "bg-white border-zinc-200", "dark:bg-zinc-900 dark:border-zinc-800"]}>
+        <div class="grid sm:grid-cols-2 gap-4">
+          <label class="block">
+            <span class="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1.5">Not After (expiry)</span>
+            <input id="rc-date" type="date" class="w-full border rounded-md px-3 py-2.5 text-sm border-zinc-200 bg-white text-zinc-900 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100" />
+          </label>
+          <label class="block">
+            <span class="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1.5">Renew ahead (days)</span>
+            <input id="rc-ahead" type="number" min="1" max="90" value="30" class="w-full border rounded-md px-3 py-2.5 text-sm border-zinc-200 bg-white text-zinc-900 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100" />
+          </label>
+        </div>
+        <div class="mt-4 flex items-center gap-3 flex-wrap">
+          <button type="button" data-action="calc" class:list={["inline-flex w-full sm:w-auto justify-center items-center gap-2 rounded-md px-5 py-3 text-sm font-semibold transition-colors", "bg-zinc-900 text-white hover:bg-zinc-800", "dark:bg-brand-500 dark:text-zinc-50 dark:hover:bg-brand-400"]}>{m.decodeButton}</button>
+          <p id="status" role="status" aria-live="polite" class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400"></p>
+        </div>
+      </div>
+
+      <div id="error" role="alert" class:list={["mt-5 hidden rounded-lg border px-4 py-3 text-sm", "bg-red-50 border-red-200 text-red-900", "dark:bg-red-950/40 dark:border-red-900/60 dark:text-red-200"]}></div>
+      <div id="result" class="mt-5 space-y-3"></div>
+
+      <div class="mt-6 rounded-lg border border-zinc-200 dark:border-zinc-800 p-4 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">
+        SC-081v3 schedule: max 398 d until 2026-03-15 → 200 d → 2027-03-15 → 100 d → 2029-03-15 → 47 d.
+        <a href="https://cabforum.org/2025/04/11/ballot-sc081v3-introduce-schedule-of-reducing-validity-and-data-reuse-periods/" target="_blank" rel="noopener" class="underline ml-1">source ↗</a>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { planRenewal, maxValidityOn } from "~/lib/renewal";
+  import { el, mount } from "~/lib/dom";
+  import { detectLocale, getMessages } from "~/i18n";
+
+  const locale = detectLocale(location.pathname);
+  const m = getMessages(locale);
+
+  const $date = document.getElementById("rc-date") as HTMLInputElement;
+  const $ahead = document.getElementById("rc-ahead") as HTMLInputElement;
+  const $status = document.getElementById("status") as HTMLElement;
+  const $error = document.getElementById("error") as HTMLElement;
+  const $result = document.getElementById("result") as HTMLElement;
+
+  function showError(msg: string): void {
+    $error.textContent = msg;
+    $error.classList.remove("hidden");
+  }
+
+  function row(k: string, v: string, strong = false): HTMLElement {
+    return el(
+      "div",
+      { class: "flex items-baseline justify-between gap-4 py-1.5 border-b border-zinc-100 dark:border-zinc-800 last:border-0" },
+      el("dt", { class: "text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400" }, k),
+      el("dd", { class: `text-sm mono text-right ${strong ? "font-bold" : ""}` }, v)
+    );
+  }
+
+  function run(): void {
+    $error.classList.add("hidden");
+    if (!$date.value) {
+      $status.textContent = m.inputEmpty;
+      return;
+    }
+    const ahead = Math.min(90, Math.max(1, Number($ahead.value) || 30));
+    const r = planRenewal($date.value, { renewBeforeDays: ahead });
+    if (!r.ok) {
+      showError(r.error);
+      return;
+    }
+    const p = r.plan;
+    $status.textContent = "";
+    mount(
+      $result,
+      el(
+        "div",
+        { class: "rounded-lg border border-zinc-200 bg-white p-5 dark:bg-zinc-900/40 dark:border-zinc-800" },
+        el(
+          "dl",
+          null,
+          row("Days left", String(p.daysLeft), true),
+          row("Status", p.expired ? "EXPIRED" : p.daysLeft <= ahead ? "renew now" : "healthy"),
+          row("Renew by", p.notAfter ? p.renewBy.toUTCString() : "—"),
+          row("Max validity today", `${p.maxValidityNow} days (asked ${maxValidityOn(new Date())} d)`),
+        ),
+        el("p", { class: "mt-3 text-xs leading-relaxed text-zinc-600 dark:text-zinc-400" }, p.note47Day)
+      )
+    );
+  }
+
+  document.querySelector('[data-action="calc"]')?.addEventListener("click", run);
+</script>

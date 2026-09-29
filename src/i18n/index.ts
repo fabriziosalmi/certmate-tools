@@ -135,6 +135,22 @@ export interface Messages {
   acmeDns01Tagline: string;
   nis2ReadinessTitle: string;
   nis2ReadinessTagline: string;
+  fingerprintCalculatorTitle: string;
+  fingerprintCalculatorTagline: string;
+  pemValidatorTitle: string;
+  pemValidatorTagline: string;
+  formatConverterTitle: string;
+  formatConverterTagline: string;
+  renewalCalculatorTitle: string;
+  renewalCalculatorTagline: string;
+  certificateDiffTitle: string;
+  certificateDiffTagline: string;
+  inventoryValidatorTitle: string;
+  inventoryValidatorTagline: string;
+  keyInspectorTitle: string;
+  keyInspectorTagline: string;
+  csrGeneratorTitle: string;
+  csrGeneratorTagline: string;
 
   // chain builder + key matcher chrome
   chainBuilderHint: string;
@@ -264,7 +280,7 @@ const en: Messages = {
 
   catDecodeLabel: "Decode & inspect",
   catDecodeBlurb:
-    "Parse certificates, CSRs and keys in your browser — never uploaded.",
+    "Parse — and create — certificates, CSRs and keys in your browser. Never uploaded.",
   catValidateLabel: "Validate",
   catValidateBlurb:
     "Chains, hostnames, key/cert pairs — formal checks against RFC 5280 / 6125.",
@@ -348,6 +364,30 @@ const en: Messages = {
   nis2ReadinessTitle: "NIS2 TLS Readiness Check",
   nis2ReadinessTagline:
     "An interactive checklist that maps your TLS / cert posture to NIS2 Art. 21(2)(h) and Italian D.Lgs. 138/2024.",
+  fingerprintCalculatorTitle: "Fingerprint Calculator",
+  fingerprintCalculatorTagline:
+    "Hash any certificate (DER bytes) or text with SHA-1 / SHA-256 / SHA-512. Fully local via Web Crypto.",
+  pemValidatorTitle: "PEM Validator",
+  pemValidatorTagline:
+    "Check PEM envelopes — BEGIN/END pairing, base64 strictness, block inventory. No parsing surprises later.",
+  formatConverterTitle: "PEM ↔ DER Converter",
+  formatConverterTagline:
+    "Convert certificates between PEM and DER entirely in your browser. Download the result, upload nothing.",
+  renewalCalculatorTitle: "Renewal & 47-Day Readiness Calculator",
+  renewalCalculatorTagline:
+    "Given an expiry date, get your renew-by date and SC-081v3 readiness (200 d → 100 d → 47 d caps).",
+  certificateDiffTitle: "Certificate Diff",
+  certificateDiffTagline:
+    "Paste two certificates and compare every field — SAN, validity, key, fingerprints — side by side.",
+  inventoryValidatorTitle: "Inventory CSV Validator",
+  inventoryValidatorTagline:
+    "Validate a certificate inventory CSV (hostname, expiry) — flags bad hostnames, bad dates, expirations.",
+  keyInspectorTitle: "RSA & EC Key Inspector",
+  keyInspectorTagline:
+    "Paste a private key, public key or certificate and see algorithm, size, curve and SPKI thumbprint. Local only.",
+  csrGeneratorTitle: "CSR Generator",
+  csrGeneratorTagline:
+    "Generate a private key plus a PKCS#10 CSR with SANs, entirely in your browser. The key never leaves your device.",
 
   chainBuilderHint: "Paste leaf, intermediates and (optionally) root — any order",
   chainBuilderRunButton: "Build & validate chain",
@@ -470,7 +510,7 @@ const it: Messages = {
 
   catDecodeLabel: "Decodifica & ispeziona",
   catDecodeBlurb:
-    "Parser per certificati, CSR e chiavi nel tuo browser — niente upload.",
+    "Parser — e generatori — per certificati, CSR e chiavi nel tuo browser. Niente upload.",
   catValidateLabel: "Valida",
   catValidateBlurb:
     "Catene, hostname, accoppiate chiave/cert — verifiche formali su RFC 5280 / 6125.",
@@ -556,6 +596,30 @@ const it: Messages = {
   nis2ReadinessTitle: "NIS2 TLS Readiness",
   nis2ReadinessTagline:
     "Checklist interattiva che mappa la tua postura TLS / cert all'art. 21(2)(h) NIS2 e al D.Lgs. 138/2024.",
+  fingerprintCalculatorTitle: "Calcolatore Fingerprint",
+  fingerprintCalculatorTagline:
+    "Calcola SHA-1 / SHA-256 / SHA-512 di un certificato (byte DER) o di un testo. Tutto in locale via Web Crypto.",
+  pemValidatorTitle: "Validatore PEM",
+  pemValidatorTagline:
+    "Verifica gli envelope PEM — accoppiamento BEGIN/END, base64 strict, inventario blocchi.",
+  formatConverterTitle: "Convertitore PEM ↔ DER",
+  formatConverterTagline:
+    "Converti certificati tra PEM e DER nel browser. Scarica il risultato, senza upload.",
+  renewalCalculatorTitle: "Calcolatore Rinnovo & 47-Day Readiness",
+  renewalCalculatorTagline:
+    "Da una data di scadenza, ottieni il renew-by e la readiness SC-081v3 (cap 200 g → 100 g → 47 g).",
+  certificateDiffTitle: "Diff Certificati",
+  certificateDiffTagline:
+    "Incolla due certificati e confronta ogni campo — SAN, validità, chiave, fingerprint — fianco a fianco.",
+  inventoryValidatorTitle: "Validatore CSV Inventario",
+  inventoryValidatorTagline:
+    "Valida un CSV di inventario certificati (hostname, scadenza) — segnala hostname/date non validi e scadenze.",
+  keyInspectorTitle: "Inspector Chiavi RSA & EC",
+  keyInspectorTagline:
+    "Incolla chiave privata, pubblica o certificato e vedi algoritmo, dimensione, curva e thumbprint SPKI. Solo in locale.",
+  csrGeneratorTitle: "Generatore CSR",
+  csrGeneratorTagline:
+    "Genera chiave privata + CSR PKCS#10 con SAN, interamente nel browser. La chiave non lascia mai il tuo device.",
 
   chainBuilderHint: "Incolla leaf, intermediate ed (opzionale) root — in qualsiasi ordine",
   chainBuilderRunButton: "Costruisci e valida la catena",

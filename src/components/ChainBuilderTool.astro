@@ -208,6 +208,113 @@ const desc =
     );
   }
 
+  /**
+   * Visual chain strip: one compact node per ordered certificate, joined by
+   * a vertical edge colored by that link's verification outcome (emerald =
+   * signature + validity OK, red = broken, zinc = single cert / unknown). A
+   * dashed terminator marks a missing parent. Purely presentational — the
+   * per-link verdicts below remain the source of truth.
+   */
+  function chainStrip(res: ChainResult, roles: string[]): HTMLElement {
+    const items: Array<HTMLElement> = [];
+    res.ordered.forEach((idx, i) => {
+      const n = res.nodes[idx]!;
+      if (i > 0) {
+        const prev = res.ordered[i - 1]!;
+        const link = res.links.find(
+          (l) => l.childIndex === prev && l.parentIndex === idx
+        );
+        const ok = link ? link.signatureValid && link.validityOk : null;
+        const edge =
+          ok === false
+            ? "bg-red-400"
+            : ok === true
+              ? "bg-emerald-400"
+              : "bg-zinc-300 dark:bg-zinc-700";
+        items.push(
+          el(
+            "div",
+            { class: "flex justify-center", "aria-hidden": "true" },
+            el("div", { class: `w-0.5 h-4 ${edge}` })
+          )
+        );
+      }
+      const ring = n.expired
+        ? "border-red-300 dark:border-red-800"
+        : "border-zinc-200 dark:border-zinc-800";
+      const dot = n.expired
+        ? "bg-red-500"
+        : i === 0
+          ? "bg-brand-500"
+          : n.selfSigned
+            ? "bg-zinc-800 dark:bg-zinc-100"
+            : "bg-emerald-500";
+      items.push(
+        el(
+          "div",
+          {
+            class: `flex items-center gap-2.5 rounded-lg border bg-white px-3 py-2 dark:bg-zinc-900/40 ${ring}`,
+          },
+          el("span", { class: `h-2.5 w-2.5 shrink-0 rounded-full ${dot}` }),
+          el(
+            "div",
+            { class: "min-w-0 flex-1" },
+            el(
+              "div",
+              {
+                class:
+                  "text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400",
+              },
+              roles[i] ?? ""
+            ),
+            el(
+              "div",
+              { class: "mono text-sm font-medium truncate text-zinc-900 dark:text-zinc-100" },
+              n.commonName ?? n.subject
+            )
+          ),
+          n.isCA
+            ? el(
+                "span",
+                {
+                  class:
+                    "shrink-0 rounded-md bg-zinc-100 text-zinc-600 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider dark:bg-zinc-800 dark:text-zinc-300",
+                },
+                "CA"
+              )
+            : null
+        )
+      );
+    });
+    if (res.missingIssuer) {
+      items.push(
+        el(
+          "div",
+          { class: "flex justify-center", "aria-hidden": "true" },
+          el("div", { class: "w-0.5 h-4 bg-zinc-300 dark:bg-zinc-700" })
+        ),
+        el(
+          "div",
+          {
+            class:
+              "rounded-lg border border-dashed border-amber-300 dark:border-amber-800 px-3 py-2 text-xs text-amber-800 dark:text-amber-200",
+          },
+          `? ${m.chainMissingParentPrefix} — ${res.missingIssuer.issuerCN ?? "unknown issuer"}`
+        )
+      );
+    }
+    return el(
+      "div",
+      {
+        class:
+          "rounded-lg border border-zinc-200 bg-zinc-50/60 p-3 dark:bg-zinc-900/60 dark:border-zinc-800",
+        role: "img",
+        "aria-label": m.chainOrder,
+      },
+      ...items
+    );
+  }
+
   async function run() {
     if (busy) return;
     $error.classList.add("hidden");
@@ -367,6 +474,7 @@ const desc =
             )
           ),
           missingNode,
+          chainStrip(res, roles),
           el("div", { class: "grid gap-3" }, orderedNodes),
           el(
             "div",

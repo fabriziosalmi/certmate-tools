@@ -7,6 +7,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-09-29
+
+### Added
+
+- **8 new client-side tools (all live, EN+IT, no upload, no network)** —
+  15 live tools total:
+  - `/fingerprint-calculator/` — SHA-1/256/512 over certificate DER bytes
+    or arbitrary UTF-8 text via Web Crypto.
+  - `/pem-validator/` — PEM envelope checks (BEGIN/END pairing, strict
+    base64, block inventory).
+  - `/format-converter/` — PEM ↔ DER conversion with Blob-download for DER
+    output.
+  - `/renewal-calculator/` — renew-by dates plus SC-081v3 readiness
+    (200 d → 100 d → 47 d caps).
+  - `/certificate-diff/` — field-by-field diff of two certificates.
+  - `/inventory-validator/` — certificate inventory CSV validation
+    (hostnames, dates, expirations; 5000-row cap).
+  - `/key-inspector/` — RSA & EC key inspector (PKCS#8, SPKI, embedded
+    cert keys, bare DER) with SPKI thumbprints matching the decoder.
+  - `/csr-generator/` — private key (RSA/ECDSA) plus PKCS#10 CSR with
+    SANs, built with `@peculiar/x509` and dogfooded through the decoder
+    (`signatureValid === true`).
+- Chain visualizer in `/chain-builder/`: compact leaf → root strip with
+  per-link outcome coloring and a dashed terminator for missing parents.
+
+### Changed
+
+- `key-match` reuses `spkiFromPrivateKey()` from `key-inspector` — one
+  owner for the SPKI-derivation logic, no behavior change.
+- Decode-category blurb now reads "Parse — and create — …" since the
+  category hosts the CSR generator.
+
+### Deferred (not shippable without breaking the no-upload promise or the crypto bar)
+
+- CAA / TLSA / OCSP / CRL / CT-log / TLS-version / cipher / HSTS live
+  checkers — all require network egress, blocked by `connect-src 'none'`
+  and `check-no-network`. Covered by curated external links + guides.
+- PKCS#12 inspector/builder and JKS inspector — no PFX support in
+  `@peculiar/x509`, no 3DES in Web Crypto (classic P12 PBE), and
+  hand-rolled PBE crypto needs a dedicated phase with test vectors.
+
 ### Added
 
 - LICENSE (MIT) at the project root.

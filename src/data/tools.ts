@@ -26,7 +26,7 @@ export interface ExternalTool {
 export const categories: Record<Category, { label: string; blurb: string }> = {
   decode: {
     label: "Decode & inspect",
-    blurb: "Parse certificates, CSRs and keys in your browser — never uploaded.",
+    blurb: "Parse — and create — certificates, CSRs and keys in your browser. Never uploaded.",
   },
   validate: {
     label: "Validate",
@@ -94,6 +94,78 @@ export const internalTools: InternalTool[] = [
       "Test which hostnames a certificate covers under RFC 6125 — IDN, wildcards, CN fallback.",
     category: "validate",
     keywords: ["hostname validator", "san matcher", "wildcard certificate test"],
+    status: "live",
+  },
+  {
+    slug: "fingerprint-calculator",
+    title: "Fingerprint Calculator",
+    tagline:
+      "Hash a certificate's DER bytes or any text with SHA-1 / SHA-256 / SHA-512. Web Crypto only.",
+    category: "decode",
+    keywords: ["fingerprint calculator", "sha256 fingerprint", "cert thumbprint"],
+    status: "live",
+  },
+  {
+    slug: "pem-validator",
+    title: "PEM Validator",
+    tagline:
+      "Check PEM envelopes — BEGIN/END pairing, strict base64, block inventory.",
+    category: "decode",
+    keywords: ["pem validator", "pem check", "validate pem"],
+    status: "live",
+  },
+  {
+    slug: "format-converter",
+    title: "PEM ↔ DER Converter",
+    tagline:
+      "Convert certificates between PEM and DER in your browser. Download the result.",
+    category: "decode",
+    keywords: ["pem to der", "der to pem", "certificate format converter"],
+    status: "live",
+  },
+  {
+    slug: "renewal-calculator",
+    title: "Renewal & 47-Day Readiness Calculator",
+    tagline:
+      "Renew-by dates plus SC-081v3 readiness (200 d → 100 d → 47 d caps).",
+    category: "monitor",
+    keywords: ["certificate renewal calculator", "47-day readiness", "sc-081v3"],
+    status: "live",
+  },
+  {
+    slug: "certificate-diff",
+    title: "Certificate Diff",
+    tagline:
+      "Compare two certificates field-by-field — SAN, validity, key, fingerprints.",
+    category: "validate",
+    keywords: ["certificate diff", "compare certificates", "cert diff"],
+    status: "live",
+  },
+  {
+    slug: "inventory-validator",
+    title: "Inventory CSV Validator",
+    tagline:
+      "Validate a certificate inventory CSV — bad hostnames, bad dates, expirations.",
+    category: "monitor",
+    keywords: ["certificate inventory", "csv validator", "expiry inventory"],
+    status: "live",
+  },
+  {
+    slug: "key-inspector",
+    title: "RSA & EC Key Inspector",
+    tagline:
+      "Inspect private keys, public keys and embedded cert keys — algorithm, size, curve, SPKI thumbprint.",
+    category: "decode",
+    keywords: ["rsa key inspector", "ec key inspector", "inspect private key", "spki thumbprint"],
+    status: "live",
+  },
+  {
+    slug: "csr-generator",
+    title: "CSR Generator",
+    tagline:
+      "Generate a private key plus a PKCS#10 CSR with SANs, fully in your browser.",
+    category: "decode",
+    keywords: ["csr generator", "generate csr", "pkcs10 generator", "generare csr"],
     status: "live",
   },
   {
