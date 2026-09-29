@@ -127,17 +127,18 @@ const homeHref = localizedPath(locale, "/");
 
   <div class="border-t border-zinc-200 dark:border-zinc-800">
     <div
-      class="mx-auto max-w-6xl px-5 py-4 text-xs text-zinc-500 flex flex-wrap justify-between gap-2 dark:text-zinc-500"
+      class="mx-auto max-w-6xl px-5 py-4 text-xs text-zinc-500 flex flex-wrap items-center justify-between gap-x-5 gap-y-2 dark:text-zinc-500"
     >
-      <span>
-        © {year} CertMate — {m.footerCopyright} ·
+      <span class="inline-flex flex-wrap items-center gap-x-2">
+        <span>© {year} CertMate — {m.footerCopyright}</span>
+        <span aria-hidden="true" class="text-zinc-300 dark:text-zinc-700">·</span>
         <a
           href="https://www.certmate.org"
           target="_blank"
           rel="noopener"
           class="hover:text-zinc-900 dark:hover:text-zinc-100">certmate.org</a
         >
-         ·
+        <span aria-hidden="true" class="text-zinc-300 dark:text-zinc-700">·</span>
         <a
           href="https://github.com/fabriziosalmi/certmate"
           target="_blank"

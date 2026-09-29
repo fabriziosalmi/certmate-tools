@@ -1,8 +1,14 @@
 ---
 import Layout from "~/layouts/Layout.astro";
 import ToolCard from "~/components/ToolCard.astro";
-import { internalTools, externalTools, type Category } from "~/data/tools";
-import { getMessages, localizedPath, type Locale } from "~/i18n";
+import {
+  internalTools,
+  externalTools,
+  type Category,
+  type InternalTool,
+  type ExternalTool,
+} from "~/data/tools";
+import { getMessages, localizedPath, toolLabels, type Locale } from "~/i18n";
 
 interface Props {
   locale: Locale;
@@ -23,6 +29,7 @@ const liveCount = internalTools.filter((t) => t.status === "live").length;
 const internalCategoryOrder: Category[] = [
   "decode",
   "validate",
+  "monitor",
   "inspect",
   "acme",
   "compliance",
@@ -54,6 +61,69 @@ const seoDescription =
   locale === "it"
     ? "Strumenti online gratuiti e privacy-first per certificati TLS, CSR, ACME, DNS e compliance EU. Tutto nel tuo browser — niente upload, niente tracking."
     : "Free, privacy-first online tools for TLS certificates, CSRs, ACME, DNS and EU compliance. Everything runs in your browser — no uploads, no tracking.";
+
+const siteBase = "https://tools.certmate.org";
+const liveInternal = internalTools.filter((t) => t.status === "live");
+
+function cardSearchInternal(t: InternalTool): string {
+  const labels = toolLabels(m, t.slug, { title: t.title, tagline: t.tagline });
+  return `${labels.title} ${labels.tagline} ${t.keywords.join(" ")}`.toLowerCase();
+}
+
+function cardSearchExternal(t: ExternalTool): string {
+  return `${t.name} ${t.why}`.toLowerCase();
+}
+
+// "&" is rewritten for the JSON-LD block only: if Astro HTML-escapes the
+// interpolated string, "&amp;" would corrupt the structured data while
+// JSON.parse still succeeds — silently wrong SEO. "and" keeps it valid.
+// "<" is unicode-escaped so no string can ever form a "</script>" breakout.
+function plain(s: string): string {
+  return s.replace(/&/g, "and");
+}
+
+const jsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      name: "CertMate Tools",
+      url: siteBase + localizedPath(locale, "/"),
+      description: plain(seoDescription),
+      inLanguage: locale,
+    },
+    {
+      "@type": "ItemList",
+      itemListElement: liveInternal.map((t, i) => {
+        const labels = toolLabels(m, t.slug, {
+          title: t.title,
+          tagline: t.tagline,
+        });
+        return {
+          "@type": "ListItem",
+          position: i + 1,
+          item: {
+            "@type": "SoftwareApplication",
+            name: plain(labels.title),
+            url: siteBase + localizedPath(locale, `/${t.slug}/`),
+            description: plain(labels.tagline),
+            applicationCategory: "SecurityApplication",
+            operatingSystem: "Any (Web)",
+            offers: { "@type": "Offer", price: "0" },
+          },
+        };
+      }),
+    },
+    {
+      "@type": "FAQPage",
+      mainEntity: m.homeFaq.map((f) => ({
+        "@type": "Question",
+        name: plain(f.q),
+        acceptedAnswer: { "@type": "Answer", text: plain(f.a) },
+      })),
+    },
+  ],
+}).replace(/</g, "\\u003c");
 ---
 
 <Layout
@@ -63,14 +133,23 @@ const seoDescription =
     "ssl tools",
     "certificate decoder",
     "csr decoder",
+    "csr generator",
+    "fingerprint calculator",
+    "pem to der",
+    "certificate renewal calculator",
+    "certificate diff",
+    "rsa key inspector",
     "ssl checker",
     "tls tools",
     "acme tools",
     "nis2 tls",
     "decoder certificati",
+    "generatore csr",
+    "calcolatore fingerprint",
     "tools certificati ssl",
   ]}
 >
+  <script type="application/ld+json" set:html={jsonLd} /> {/* innerhtml-ok: static build-time JSON-LD (own strings only, "<" unicode-escaped, no user input) */}
   <section
     class:list={[
       "border-b",
@@ -95,7 +174,7 @@ const seoDescription =
         >
           {m.homeHeadlineL1}
           <br class="hidden md:block" />
-          {m.homeHeadlineL2a}
+          {m.homeHeadlineL2a}{" "}
           <span class="text-brand-700 dark:text-brand-400">{m.homeHeadlineL2b}</span>.
         </h1>
         <p class="mt-5 text-base sm:text-lg leading-relaxed max-w-2xl text-zinc-600 dark:text-zinc-300">
@@ -128,6 +207,80 @@ const seoDescription =
     </div>
   </section>
 
+  <section
+    aria-label={m.trustStripTitle}
+    class:list={[
+      "border-b",
+      "border-zinc-100 bg-white",
+      "dark:border-zinc-800 dark:bg-zinc-950",
+    ]}
+  >
+    <div class="mx-auto max-w-6xl px-4 sm:px-5 py-6">
+      <p
+        class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400"
+      >
+        {m.trustStripTitle}
+      </p>
+      <ul class="mt-3 grid gap-3 sm:grid-cols-3">
+        <li>
+          <a
+            href={localizedPath(locale, "/privacy/")}
+            class:list={[
+              "block rounded-xl border p-4 transition-colors",
+              "border-zinc-200 hover:border-brand-400",
+              "dark:border-zinc-800 dark:hover:border-brand-600",
+            ]}
+          >
+            <span class="block text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+              {m.trustPrivacyLabel} →
+            </span>
+            <span class="mt-1 block text-sm text-zinc-600 dark:text-zinc-400">
+              {m.trustPrivacyBlurb}
+            </span>
+          </a>
+        </li>
+        <li>
+          <a
+            href="https://github.com/fabriziosalmi/certmate-tools/blob/main/scripts/check-no-network.mjs"
+            target="_blank"
+            rel="noopener"
+            class:list={[
+              "block rounded-xl border p-4 transition-colors",
+              "border-zinc-200 hover:border-brand-400",
+              "dark:border-zinc-800 dark:hover:border-brand-600",
+            ]}
+          >
+            <span class="block text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+              {m.trustGateLabel} →
+            </span>
+            <span class="mt-1 block text-sm text-zinc-600 dark:text-zinc-400">
+              {m.trustGateBlurb}
+            </span>
+          </a>
+        </li>
+        <li>
+          <a
+            href="https://github.com/fabriziosalmi/certmate-tools"
+            target="_blank"
+            rel="noopener"
+            class:list={[
+              "block rounded-xl border p-4 transition-colors",
+              "border-zinc-200 hover:border-brand-400",
+              "dark:border-zinc-800 dark:hover:border-brand-600",
+            ]}
+          >
+            <span class="block text-sm font-semibold text-zinc-900 dark:text-zinc-50">
+              {m.trustSourceLabel} →
+            </span>
+            <span class="mt-1 block text-sm text-zinc-600 dark:text-zinc-400">
+              {m.trustSourceBlurb}
+            </span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </section>
+
   <section id="tools" class="mx-auto max-w-6xl px-4 sm:px-5 py-14 sm:py-16">
     <div class="flex items-baseline justify-between flex-wrap gap-3 mb-2">
       <h2 class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
@@ -137,14 +290,53 @@ const seoDescription =
         {m.homeOurToolsClaim}
       </p>
     </div>
-    <p class="text-zinc-600 max-w-2xl mb-10 dark:text-zinc-400">
+    <p class="text-zinc-600 max-w-2xl mb-6 dark:text-zinc-400">
       {m.homeOurToolsLead}
     </p>
+
+    <nav aria-label={m.homeOurTools} class="mb-6 flex flex-wrap gap-2">
+      {
+        groupedInternal.map(({ cat }) => (
+          <a
+            href={`#tools-${cat}`}
+            class:list={[
+              "rounded-full px-3 py-1.5 text-xs font-medium ring-1 transition-colors",
+              "bg-white text-zinc-600 ring-zinc-200 hover:ring-brand-400 hover:text-zinc-900",
+              "dark:bg-zinc-900 dark:text-zinc-400 dark:ring-zinc-800 dark:hover:ring-brand-600 dark:hover:text-zinc-100",
+            ]}
+          >
+            {catLabels[cat].label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <div class="mb-8 flex flex-col sm:flex-row sm:items-center gap-3">
+      <input
+        id="tool-filter"
+        type="search"
+        autocomplete="off"
+        placeholder={m.homeFilterPlaceholder}
+        aria-label={m.homeFilterPlaceholder}
+        class:list={[
+          "w-full sm:max-w-sm rounded-md border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-400/40",
+          "border-zinc-200 bg-white text-zinc-900 placeholder:text-zinc-400",
+          "dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder:text-zinc-600",
+        ]}
+      />
+      <p
+        id="tool-filter-status"
+        role="status"
+        aria-live="polite"
+        class="text-sm text-zinc-500 dark:text-zinc-400"
+      >
+      </p>
+    </div>
 
     <div class="space-y-12">
       {
         groupedInternal.map(({ cat, tools }) => (
-          <div>
+          <div id={`tools-${cat}`} data-category-section>
             <div class="mb-4 flex flex-col sm:flex-row sm:items-baseline gap-1.5 sm:gap-3">
               <h3 class="text-sm font-semibold uppercase tracking-wider text-brand-700 dark:text-brand-400">
                 {catLabels[cat].label}
@@ -155,9 +347,14 @@ const seoDescription =
             </div>
             <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {tools.map((t) => (
-                <ToolCard tool={t} locale={locale} />
+                <div data-tool-card data-search={cardSearchInternal(t)}>
+                  <ToolCard tool={t} locale={locale} />
+                </div>
               ))}
             </div>
+            <p data-filter-empty hidden class="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
+              {m.homeFilterEmpty}
+            </p>
           </div>
         ))
       }
@@ -184,10 +381,10 @@ const seoDescription =
         {m.homeExternalLead}
       </p>
 
-      <div class="space-y-12">
+    <div class="space-y-12">
         {
           groupedExternal.map(({ cat, tools }) => (
-            <div>
+            <div data-category-section>
               <div class="mb-4">
                 <h3 class="text-sm font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-300">
                   {catLabels[cat].label}
@@ -195,13 +392,47 @@ const seoDescription =
               </div>
               <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {tools.map((t) => (
-                  <ToolCard tool={t} locale={locale} />
+                  <div data-tool-card data-search={cardSearchExternal(t)}>
+                    <ToolCard tool={t} locale={locale} />
+                  </div>
                 ))}
               </div>
+              <p data-filter-empty hidden class="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
+                {m.homeFilterEmpty}
+              </p>
             </div>
           ))
         }
-      </div>
+    </div>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 sm:px-5 py-16 sm:py-20">
+    <h2 class="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+      {m.homeFaqTitle}
+    </h2>
+    <p class="mt-2 text-zinc-600 max-w-2xl dark:text-zinc-400">
+      {m.homeFaqLead}
+    </p>
+    <div class="mt-8 grid gap-4 md:grid-cols-2">
+      {
+        m.homeFaq.map((f) => (
+          <div
+            class:list={[
+              "rounded-xl border p-5",
+              "border-zinc-200 bg-white",
+              "dark:border-zinc-800 dark:bg-zinc-900/40",
+            ]}
+          >
+            <h3 class="font-semibold text-zinc-900 dark:text-zinc-50">
+              {f.q}
+            </h3>
+            <p class="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+              {f.a}
+            </p>
+          </div>
+        ))
+      }
     </div>
   </section>
 
@@ -240,3 +471,44 @@ const seoDescription =
     </div>
   </section>
 </Layout>
+
+<script>
+  import { detectLocale, getMessages } from "~/i18n";
+
+  // Client-side tool filter. Pure DOM hide/show over the pre-rendered cards:
+  // no fetch, no network, nothing to leak.
+  const locale = detectLocale(location.pathname);
+  const m = getMessages(locale);
+
+  const $q = document.getElementById("tool-filter") as HTMLInputElement | null;
+  const $status = document.getElementById("tool-filter-status");
+
+  function applyFilter(): void {
+    if (!$q || !$status) return;
+    const q = $q.value.trim().toLowerCase();
+    let shown = 0;
+    let total = 0;
+    document.querySelectorAll("[data-category-section]").forEach((sec) => {
+      let secShown = 0;
+      let secTotal = 0;
+      sec.querySelectorAll("[data-tool-card]").forEach((card) => {
+        secTotal += 1;
+        total += 1;
+        const hit =
+          q === "" || (card.getAttribute("data-search") ?? "").includes(q);
+        card.classList.toggle("hidden", !hit);
+        if (hit) {
+          secShown += 1;
+          shown += 1;
+        }
+      });
+      sec.classList.toggle("hidden", secTotal > 0 && secShown === 0);
+      sec
+        .querySelectorAll("[data-filter-empty]")
+        .forEach((p) => p.classList.toggle("hidden", secShown !== 0));
+    });
+    $status.textContent = q === "" ? "" : m.homeFilterStatus(shown, total);
+  }
+
+  $q?.addEventListener("input", applyFilter);
+</script>

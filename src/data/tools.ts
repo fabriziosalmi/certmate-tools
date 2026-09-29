@@ -13,6 +13,8 @@ export interface InternalTool {
   category: Category;
   keywords: string[];
   status: "live" | "soon";
+  /** Marks recently added tools on the homepage. Remove after one release. */
+  highlight?: "new";
 }
 
 export interface ExternalTool {
@@ -104,6 +106,7 @@ export const internalTools: InternalTool[] = [
     category: "decode",
     keywords: ["fingerprint calculator", "sha256 fingerprint", "cert thumbprint"],
     status: "live",
+    highlight: "new",
   },
   {
     slug: "pem-validator",
@@ -113,6 +116,7 @@ export const internalTools: InternalTool[] = [
     category: "decode",
     keywords: ["pem validator", "pem check", "validate pem"],
     status: "live",
+    highlight: "new",
   },
   {
     slug: "format-converter",
@@ -122,6 +126,7 @@ export const internalTools: InternalTool[] = [
     category: "decode",
     keywords: ["pem to der", "der to pem", "certificate format converter"],
     status: "live",
+    highlight: "new",
   },
   {
     slug: "renewal-calculator",
@@ -131,6 +136,7 @@ export const internalTools: InternalTool[] = [
     category: "monitor",
     keywords: ["certificate renewal calculator", "47-day readiness", "sc-081v3"],
     status: "live",
+    highlight: "new",
   },
   {
     slug: "certificate-diff",
@@ -140,6 +146,7 @@ export const internalTools: InternalTool[] = [
     category: "validate",
     keywords: ["certificate diff", "compare certificates", "cert diff"],
     status: "live",
+    highlight: "new",
   },
   {
     slug: "inventory-validator",
@@ -149,6 +156,7 @@ export const internalTools: InternalTool[] = [
     category: "monitor",
     keywords: ["certificate inventory", "csv validator", "expiry inventory"],
     status: "live",
+    highlight: "new",
   },
   {
     slug: "key-inspector",
@@ -158,6 +166,7 @@ export const internalTools: InternalTool[] = [
     category: "decode",
     keywords: ["rsa key inspector", "ec key inspector", "inspect private key", "spki thumbprint"],
     status: "live",
+    highlight: "new",
   },
   {
     slug: "csr-generator",
@@ -167,6 +176,7 @@ export const internalTools: InternalTool[] = [
     category: "decode",
     keywords: ["csr generator", "generate csr", "pkcs10 generator", "generare csr"],
     status: "live",
+    highlight: "new",
   },
   {
     slug: "acme-dns-01",

@@ -61,7 +61,10 @@ export interface Messages {
   privacyBadgeTitleBlock: string;
   privacyBadgeBodyBlock: string;
   externalBadge: string;
+  externalBadgeHint: string;
   soonBadge: string;
+  newBadge: string;
+  navGuides: string;
   openSourceBadge: string;
   reportBug: string;
 
@@ -96,6 +99,19 @@ export interface Messages {
   homeBottomTitle: string;
   homeBottomBody: string;
   homeBottomCta: string;
+  homeFilterPlaceholder: string;
+  homeFilterStatus: (shown: number, total: number) => string;
+  homeFilterEmpty: string;
+  homeFaqTitle: string;
+  homeFaqLead: string;
+  homeFaq: Array<{ q: string; a: string }>;
+  trustStripTitle: string;
+  trustPrivacyLabel: string;
+  trustPrivacyBlurb: string;
+  trustGateLabel: string;
+  trustGateBlurb: string;
+  trustSourceLabel: string;
+  trustSourceBlurb: string;
 
   // common tool UI
   toolPrivacyHint: string;
@@ -274,7 +290,9 @@ const en: Messages = {
   privacyBadgeBodyBlock:
     "Parsing happens in your browser with Web Crypto and @peculiar/x509. We never see your data.",
   externalBadge: "external",
+  externalBadgeHint: "External tool — curated, opens in a new tab",
   soonBadge: "soon",
+  newBadge: "new",
   openSourceBadge: "open source",
   reportBug: "Report a bug",
 
@@ -318,6 +336,43 @@ const en: Messages = {
   homeBottomBody:
     "Public TLS certificate lifetimes are on a published path down — the CA/Browser Forum ballot SC-081v3 caps maximum validity at 200 days from March 2026, 100 days from 2027, and 47 days by 2029. CertMate is the open-source manager built for that automation reality.",
   homeBottomCta: "Get CertMate on GitHub →",
+  navGuides: "Guides",
+
+  homeFilterPlaceholder: "Filter tools…",
+  homeFilterStatus: (shown, total) => `${shown} of ${total} tools`,
+  homeFilterEmpty: "No tools match. Clear the filter.",
+  homeFaqTitle: "Questions, answered",
+  homeFaqLead:
+    "The objections worth having — and how this site answers them.",
+  homeFaq: [
+    {
+      q: "Is it safe to paste a private key here?",
+      a: "Yes. Inspection tools run entirely in your browser using Web Crypto. There is no upload step, no account, and no server that could receive your data. The page security policy even blocks every network connection.",
+    },
+    {
+      q: "Do you store or track anything?",
+      a: "No. No analytics, no cookies, no logs of what you paste. Read the privacy notice for the full statement.",
+    },
+    {
+      q: "What is the 47-day readiness calculator about?",
+      a: "Public TLS certificate lifetimes are shrinking on a published schedule: 200 days from March 2026, 100 days from 2027, 47 days from 2029. The calculator tells you when to renew and whether your planning fits the caps.",
+    },
+    {
+      q: "Why is there one page per tool?",
+      a: "Each tool does one job, loads fast, and has its own address you can bookmark and share. No upsell, no maze.",
+    },
+    {
+      q: "Can I verify the no-upload claim?",
+      a: "Yes. The site is open source, every page ships a Content-Security-Policy with connect-src none, and a build-time check fails the deploy if any network call slips in.",
+    },
+  ],
+  trustStripTitle: "Do not trust us. Verify.",
+  trustPrivacyLabel: "Privacy notice",
+  trustPrivacyBlurb: "What we collect: nothing.",
+  trustGateLabel: "No-network gate",
+  trustGateBlurb: "The build fails if any upload slips in.",
+  trustSourceLabel: "Open source",
+  trustSourceBlurb: "Read every line on GitHub.",
 
   toolPrivacyHint: "Nothing uploaded — runs locally.",
   toolBackToTools: "← All tools",
@@ -504,7 +559,9 @@ const it: Messages = {
   privacyBadgeBodyBlock:
     "Il parsing avviene nel tuo browser con Web Crypto e @peculiar/x509. I tuoi dati non li vediamo mai.",
   externalBadge: "esterno",
+  externalBadgeHint: "Strumento esterno — selezionato, si apre in una nuova scheda",
   soonBadge: "in arrivo",
+  newBadge: "nuovo",
   openSourceBadge: "open source",
   reportBug: "Segnala un bug",
 
@@ -548,6 +605,43 @@ const it: Messages = {
   homeBottomBody:
     "La validità dei certificati TLS pubblici è in calo programmato — il CA/Browser Forum ha approvato il ballot SC-081v3 che fissa il massimo a 200 giorni da marzo 2026, 100 giorni dal 2027 e 47 giorni dal 2029. CertMate è il manager open-source pensato per questa realtà di automazione.",
   homeBottomCta: "Vai a CertMate su GitHub →",
+  navGuides: "Guide",
+
+  homeFilterPlaceholder: "Filtra gli strumenti…",
+  homeFilterStatus: (shown, total) => `${shown} di ${total} strumenti`,
+  homeFilterEmpty: "Nessuno strumento corrisponde. Svuota il filtro.",
+  homeFaqTitle: "Domande e risposte",
+  homeFaqLead:
+    "Le obiezioni sensate — e come questo sito risponde.",
+  homeFaq: [
+    {
+      q: "È sicuro incollare qui una chiave privata?",
+      a: "Sì. Gli strumenti girano interamente nel tuo browser con Web Crypto. Non c'è upload, non ci sono account e non esiste un server che possa ricevere i tuoi dati. La security policy della pagina blocca ogni connessione di rete.",
+    },
+    {
+      q: "Salvate o tracciate qualcosa?",
+      a: "No. Niente analytics, niente cookie, niente log di ciò che incolli. Leggi l'informativa privacy per il testo completo.",
+    },
+    {
+      q: "Cosa significa readiness a 47 giorni?",
+      a: "La validità dei certificati TLS pubblici si riduce secondo un calendario pubblico: 200 giorni da marzo 2026, 100 giorni dal 2027, 47 giorni dal 2029. Il calcolatore dice quando rinnovare e se i tuoi piani rientrano nei limiti.",
+    },
+    {
+      q: "Perché una pagina per ogni strumento?",
+      a: "Ogni strumento fa una sola cosa, carica in fretta e ha un indirizzo da salvare e condividere. Niente upsell, niente labirinti.",
+    },
+    {
+      q: "Posso verificare che non caricate nulla?",
+      a: "Sì. Il sito è open source, ogni pagina ha una Content-Security-Policy con connect-src none e un controllo in build blocca il deploy se compare una chiamata di rete.",
+    },
+  ],
+  trustStripTitle: "Non fidarti. Verifica.",
+  trustPrivacyLabel: "Informativa privacy",
+  trustPrivacyBlurb: "Cosa raccogliamo: niente.",
+  trustGateLabel: "Gate anti-rete",
+  trustGateBlurb: "La build fallisce se compare un upload.",
+  trustSourceLabel: "Open source",
+  trustSourceBlurb: "Leggi ogni riga su GitHub.",
 
   toolPrivacyHint: "Tutto in locale.",
   toolBackToTools: "← Tutti gli strumenti",
@@ -726,18 +820,47 @@ export function getMessages(locale: Locale | undefined): Messages {
 }
 
 /**
- * Slug → localized title/tagline lookup for internal tools, by reading the
- * Messages object key conventions: `<camelSlug>Title` and `<camelSlug>Tagline`.
+ * Slug → localized title/tagline lookup for internal tools.
+ *
+ * Resolution order: explicit alias (for the few slugs whose Messages key
+ * does not follow the camelCase convention) → `<camelSlug>Title` /
+ * `<camelSlug>Tagline` → registry title/tagline from tools.ts. The final
+ * fallback used to be the raw slug, which shipped slug-titled cards to the
+ * homepage twice (certificate-decoder, nis2-tls-readiness) plus every slug
+ * containing a digit (acme-dns-01: the old dash-letter regex dropped "-01").
+ * A slug must never render as UI copy again.
  */
+const TOOL_LABEL_ALIASES: Record<string, { title: string; tagline: string }> = {
+  "certificate-decoder": {
+    title: "certDecoderTitle",
+    tagline: "certDecoderTagline",
+  },
+  "nis2-tls-readiness": {
+    title: "nis2ReadinessTitle",
+    tagline: "nis2ReadinessTagline",
+  },
+};
+
 export function toolLabels(
   m: Messages,
-  slug: string
+  slug: string,
+  fallback?: { title: string; tagline: string }
 ): { title: string; tagline: string } {
-  const camel = slug.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
-  const title = (m as unknown as Record<string, string>)[`${camel}Title`];
-  const tagline = (m as unknown as Record<string, string>)[`${camel}Tagline`];
+  const dict = m as unknown as Record<string, string>;
+  const alias = TOOL_LABEL_ALIASES[slug];
+  if (alias) {
+    const title = dict[alias.title];
+    const tagline = dict[alias.tagline];
+    if (title) return { title, tagline: tagline ?? fallback?.tagline ?? "" };
+  }
+  const camel = slug.replace(/-([a-z0-9])/g, (_, c: string) =>
+    String(c).toUpperCase()
+  );
+  const title = dict[`${camel}Title`];
+  const tagline = dict[`${camel}Tagline`];
+  if (title) return { title, tagline: tagline ?? fallback?.tagline ?? "" };
   return {
-    title: title ?? slug,
-    tagline: tagline ?? "",
+    title: fallback?.title ?? slug,
+    tagline: fallback?.tagline ?? "",
   };
 }
