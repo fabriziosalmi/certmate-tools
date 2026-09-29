@@ -9,6 +9,10 @@ on:
     # Weekly drift catch — Monday 06:17 UTC (off-hour to avoid the top-of-hour spike).
     - cron: "17 6 * * 1"
 
+# Least privilege: the GITHUB_TOKEN defaults to nothing here; each job
+# declares exactly what it needs (scorecard Token-Permissions).
+permissions: {}
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true

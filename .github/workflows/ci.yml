@@ -7,6 +7,10 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Least privilege: the GITHUB_TOKEN defaults to nothing here; each job
+# declares exactly what it needs (scorecard Token-Permissions).
+permissions: {}
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
