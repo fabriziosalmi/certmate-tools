@@ -1,13 +1,13 @@
 /**
- * CSR generator — 100% client-side.
+ * CSR generator: 100% client-side.
  *
  * Generates the keypair with Web Crypto and builds the PKCS#10 request with
- * @peculiar/x509's `Pkcs10CertificateRequestGenerator` — the same library the
+ * @peculiar/x509's `Pkcs10CertificateRequestGenerator`: the same library the
  * CSR decoder uses, so a generated request is guaranteed to parse (dogfooded
  * in tests via `decodeCSRInput` + `signatureValid`).
  *
  * The private key is exported as PKCS#8 PEM for the user to save. It is shown
- * once and never transmitted — there is nowhere to transmit it to
+ * once and never transmitted: there is nowhere to transmit it to
  * (`connect-src 'none'`).
  */
 

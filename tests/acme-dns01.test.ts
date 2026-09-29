@@ -15,7 +15,7 @@ import { describe, expect, it } from "vitest";
 
 import { computeDns01, jwkThumbprint } from "~/lib/acme-dns01";
 
-// RFC 7638 §3.1 — the canonical example key and its documented thumbprint.
+// RFC 7638 §3.1: the canonical example key and its documented thumbprint.
 const RFC7638_JWK = {
   kty: "RSA",
   n:
@@ -31,7 +31,7 @@ describe("jwkThumbprint", () => {
     expect(await jwkThumbprint(RFC7638_JWK)).toBe(RFC7638_THUMBPRINT);
   });
 
-  it("ignores member order — canonicalisation is by name, not by input", async () => {
+  it("ignores member order: canonicalisation is by name, not by input", async () => {
     const reordered = { e: RFC7638_JWK.e, n: RFC7638_JWK.n, kty: RFC7638_JWK.kty };
     expect(await jwkThumbprint(reordered)).toBe(RFC7638_THUMBPRINT);
   });

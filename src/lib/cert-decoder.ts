@@ -128,7 +128,7 @@ async function inspectPublicKey(
   let namedCurve = alg.namedCurve;
 
   // If runtime didn't populate modulusLength / namedCurve, fall back to a probe
-  // via SubtleCrypto.importKey on the SPKI bytes — gives us proper algorithm
+  // via SubtleCrypto.importKey on the SPKI bytes, which gives us proper algorithm
   // metadata for the few algorithms the browser exposes.
   if (!keySize && !namedCurve) {
     const spki = cert.publicKey.rawData;
@@ -349,7 +349,7 @@ export async function decodeCertificateInput(
     return { ok: true, certs };
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    // Avoid leaking internal stack traces — keep messages crisp and short.
+    // Avoid leaking internal stack traces: keep messages crisp and short.
     const short = msg.split("\n")[0]!.slice(0, 240);
     return { ok: false, error: `Could not parse certificate: ${short}` };
   }

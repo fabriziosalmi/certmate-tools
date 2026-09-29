@@ -63,7 +63,6 @@ export interface Messages {
   externalBadge: string;
   externalBadgeHint: string;
   soonBadge: string;
-  newBadge: string;
   navGuides: string;
   openSourceBadge: string;
   reportBug: string;
@@ -282,7 +281,7 @@ const en: Messages = {
   footerBuiltWithPrivacy: "Built with privacy",
   footerNoTracking: "No tracking, no analytics scripts.",
   footerNoUpload: "No file ever leaves your browser.",
-  footerOpenSource: "Open source — auditable end to end.",
+  footerOpenSource: "Open source, auditable end to end.",
   footerPrivacyLegal: "Privacy & legal notice",
   footerCopyright: "MIT licensed.",
   privacyBadgeInline: "Runs in your browser. Nothing uploaded.",
@@ -290,18 +289,17 @@ const en: Messages = {
   privacyBadgeBodyBlock:
     "Parsing happens in your browser with Web Crypto and @peculiar/x509. We never see your data.",
   externalBadge: "external",
-  externalBadgeHint: "External tool — curated, opens in a new tab",
+  externalBadgeHint: "External tool: curated, opens in a new tab",
   soonBadge: "soon",
-  newBadge: "new",
   openSourceBadge: "open source",
   reportBug: "Report a bug",
 
   catDecodeLabel: "Decode & inspect",
   catDecodeBlurb:
-    "Parse — and create — certificates, CSRs and keys in your browser. Never uploaded.",
+    "Parse and create certificates, CSRs and keys in your browser. Never uploaded.",
   catValidateLabel: "Validate",
   catValidateBlurb:
-    "Chains, hostnames, key/cert pairs — formal checks against RFC 5280 / 6125.",
+    "Chains, hostnames, key/cert pairs: formal checks against RFC 5280 / 6125.",
   catInspectLabel: "Probe & scan",
   catInspectBlurb:
     "Live TLS handshakes, security headers, OCSP / CRL revocation status.",
@@ -313,7 +311,7 @@ const en: Messages = {
     "External account binding, DNS-01 challenge math, provider quick-refs.",
   catComplianceLabel: "Compliance EU",
   catComplianceBlurb:
-    "NIS2, DORA, eIDAS 2.0 — TLS posture mapped to the articles.",
+    "NIS2, DORA, eIDAS 2.0: TLS posture mapped to the articles.",
 
   homeBadge: (live) => `${live} tools · 100% client-side · MIT`,
   homeHeadlineL1: "The certificate toolbox",
@@ -327,14 +325,14 @@ const en: Messages = {
   homeOurToolsClaim:
     "100% client-side. Built with Web Crypto + @peculiar/x509.",
   homeOurToolsLead:
-    "Single-purpose tools, one URL each, no upsell. Open source — read the code.",
+    "Single-purpose tools, one URL each, no upsell. Open source: read the code.",
   homeExternal: "Trusted external tools",
   homeExternalCurated: "Curated, opens in a new tab.",
   homeExternalLead:
-    "Some jobs need infrastructure we cannot replicate in a static site — live TLS handshakes, transparency log indexing, OCSP queries. These are the ones we trust.",
+    "Some jobs need infrastructure we cannot replicate in a static site: live TLS handshakes, transparency log indexing, OCSP queries. These are the ones we trust.",
   homeBottomTitle: "Managing dozens of certificates?",
   homeBottomBody:
-    "Public TLS certificate lifetimes are on a published path down — the CA/Browser Forum ballot SC-081v3 caps maximum validity at 200 days from March 2026, 100 days from 2027, and 47 days by 2029. CertMate is the open-source manager built for that automation reality.",
+    "Public TLS certificate lifetimes are on a published path down: the CA/Browser Forum ballot SC-081v3 caps maximum validity at 200 days from March 2026, 100 days from 2027, and 47 days by 2029. CertMate is the open-source manager built for that automation reality.",
   homeBottomCta: "Get CertMate on GitHub →",
   navGuides: "Guides",
 
@@ -343,7 +341,7 @@ const en: Messages = {
   homeFilterEmpty: "No tools match. Clear the filter.",
   homeFaqTitle: "Questions, answered",
   homeFaqLead:
-    "The objections worth having — and how this site answers them.",
+    "The objections worth having, and how this site answers them.",
   homeFaq: [
     {
       q: "Is it safe to paste a private key here?",
@@ -374,7 +372,7 @@ const en: Messages = {
   trustSourceLabel: "Open source",
   trustSourceBlurb: "Read every line on GitHub.",
 
-  toolPrivacyHint: "Nothing uploaded — runs locally.",
+  toolPrivacyHint: "Nothing uploaded. Runs locally.",
   toolBackToTools: "← All tools",
   toolOtherTools: "Other tools:",
   decodeButton: "Decode",
@@ -396,7 +394,7 @@ const en: Messages = {
 
   certDecoderTitle: "Certificate Decoder",
   certDecoderTagline:
-    "Paste a PEM or DER certificate and see every X.509 field — Subject, SAN, validity, key, signature, fingerprints.",
+    "Paste a PEM or DER certificate and see every X.509 field: Subject, SAN, validity, key, signature, fingerprints.",
   certDecoderPlaceholder:
     "-----BEGIN CERTIFICATE-----\nMIIFazCCA1OgAwIBAgIRAIIQz7DSQONZRGPgu2OCiwAw...\n-----END CERTIFICATE-----",
   csrDecoderTitle: "CSR Decoder",
@@ -409,10 +407,10 @@ const en: Messages = {
     "Paste a bundle of PEM blocks. Reorder them into a valid leaf → root chain, spot what's missing and export a clean fullchain.pem.",
   keyMatcherTitle: "Key ↔ Cert Matcher",
   keyMatcherTagline:
-    "Confirm a private key and certificate match. Both stay in your browser — Web Crypto only.",
+    "Confirm a private key and certificate match. Both stay in your browser. Web Crypto only.",
   hostnameValidatorTitle: "Hostname / SAN Validator",
   hostnameValidatorTagline:
-    "Test which hostnames a certificate covers under RFC 6125 — wildcards, IDN, CN fallback.",
+    "Test which hostnames a certificate covers under RFC 6125: wildcards, IDN, CN fallback.",
   acmeDns01Title: "ACME DNS-01 Helper",
   acmeDns01Tagline:
     "Compute the TXT record value an ACME server expects from your account key (JWK) and the challenge token.",
@@ -424,7 +422,7 @@ const en: Messages = {
     "Hash any certificate (DER bytes) or text with SHA-1 / SHA-256 / SHA-512. Fully local via Web Crypto.",
   pemValidatorTitle: "PEM Validator",
   pemValidatorTagline:
-    "Check PEM envelopes — BEGIN/END pairing, base64 strictness, block inventory. No parsing surprises later.",
+    "Check PEM envelopes: BEGIN/END pairing, base64 strictness, block inventory. No parsing surprises later.",
   formatConverterTitle: "PEM ↔ DER Converter",
   formatConverterTagline:
     "Convert certificates between PEM and DER entirely in your browser. Download the result, upload nothing.",
@@ -433,10 +431,10 @@ const en: Messages = {
     "Given an expiry date, get your renew-by date and SC-081v3 readiness (200 d → 100 d → 47 d caps).",
   certificateDiffTitle: "Certificate Diff",
   certificateDiffTagline:
-    "Paste two certificates and compare every field — SAN, validity, key, fingerprints — side by side.",
+    "Paste two certificates and compare every field (SAN, validity, key, fingerprints) side by side.",
   inventoryValidatorTitle: "Inventory CSV Validator",
   inventoryValidatorTagline:
-    "Validate a certificate inventory CSV (hostname, expiry) — flags bad hostnames, bad dates, expirations.",
+    "Validate a certificate inventory CSV (hostname, expiry). It flags bad hostnames, bad dates and expirations.",
   keyInspectorTitle: "RSA & EC Key Inspector",
   keyInspectorTagline:
     "Paste a private key, public key or certificate and see algorithm, size, curve and SPKI thumbprint. Local only.",
@@ -444,7 +442,7 @@ const en: Messages = {
   csrGeneratorTagline:
     "Generate a private key plus a PKCS#10 CSR with SANs, entirely in your browser. The key never leaves your device.",
 
-  chainBuilderHint: "Paste leaf, intermediates and (optionally) root — any order",
+  chainBuilderHint: "Paste leaf, intermediates and (optionally) root, in any order",
   chainBuilderRunButton: "Build & validate chain",
   chainBuilderStatusEmpty: "Paste one or more PEM blocks.",
   chainBuilderDownloadBundle: "Download fullchain.pem",
@@ -543,7 +541,7 @@ const en: Messages = {
 };
 
 const it: Messages = {
-  brandTagline: "Strumenti gratuiti per SSL e certificati — privacy-first",
+  brandTagline: "Strumenti gratuiti per SSL e certificati, privacy-first",
   navAllTools: "Tutti gli strumenti",
   navSite: "certmate.org",
   navGithub: "GitHub",
@@ -551,7 +549,7 @@ const it: Messages = {
   footerBuiltWithPrivacy: "Costruito con la privacy",
   footerNoTracking: "Niente tracking, niente analytics.",
   footerNoUpload: "Nessun file lascia il tuo browser.",
-  footerOpenSource: "Open source — verificabile da cima a fondo.",
+  footerOpenSource: "Open source, verificabile da cima a fondo.",
   footerPrivacyLegal: "Informativa privacy e note legali",
   footerCopyright: "Licenza MIT.",
   privacyBadgeInline: "Tutto in locale. Niente upload.",
@@ -559,18 +557,17 @@ const it: Messages = {
   privacyBadgeBodyBlock:
     "Il parsing avviene nel tuo browser con Web Crypto e @peculiar/x509. I tuoi dati non li vediamo mai.",
   externalBadge: "esterno",
-  externalBadgeHint: "Strumento esterno — selezionato, si apre in una nuova scheda",
+  externalBadgeHint: "Strumento esterno: selezionato, si apre in una nuova scheda",
   soonBadge: "in arrivo",
-  newBadge: "nuovo",
   openSourceBadge: "open source",
   reportBug: "Segnala un bug",
 
   catDecodeLabel: "Decodifica & ispeziona",
   catDecodeBlurb:
-    "Parser — e generatori — per certificati, CSR e chiavi nel tuo browser. Niente upload.",
+    "Parser e generatori per certificati, CSR e chiavi nel tuo browser. Niente upload.",
   catValidateLabel: "Valida",
   catValidateBlurb:
-    "Catene, hostname, accoppiate chiave/cert — verifiche formali su RFC 5280 / 6125.",
+    "Catene, hostname, accoppiate chiave/cert: verifiche formali su RFC 5280 / 6125.",
   catInspectLabel: "Sonda & scansiona",
   catInspectBlurb:
     "Handshake TLS live, security header, stato di revoca OCSP / CRL.",
@@ -582,7 +579,7 @@ const it: Messages = {
     "External account binding, math della challenge DNS-01, quick-ref per provider.",
   catComplianceLabel: "Compliance EU",
   catComplianceBlurb:
-    "NIS2, DORA, eIDAS 2.0 — posture TLS mappata articolo per articolo.",
+    "NIS2, DORA, eIDAS 2.0: posture TLS mappata articolo per articolo.",
 
   homeBadge: (live) => `${live} tool · 100% client-side · MIT`,
   homeHeadlineL1: "La cassetta degli attrezzi",
@@ -596,14 +593,14 @@ const it: Messages = {
   homeOurToolsClaim:
     "100% client-side. Costruiti con Web Crypto + @peculiar/x509.",
   homeOurToolsLead:
-    "Strumenti a singolo scopo, una URL ciascuno, nessun upsell. Open source — leggi il codice.",
+    "Strumenti a singolo scopo, una URL ciascuno, nessun upsell. Open source: leggi il codice.",
   homeExternal: "Strumenti esterni di fiducia",
   homeExternalCurated: "Selezionati, si aprono in una nuova scheda.",
   homeExternalLead:
-    "Alcune cose richiedono infrastruttura che un sito statico non può replicare — handshake TLS live, indicizzazione CT, query OCSP. Questi sono quelli di cui ci fidiamo.",
+    "Alcune cose richiedono infrastruttura che un sito statico non può replicare: handshake TLS live, indicizzazione CT, query OCSP. Questi sono quelli di cui ci fidiamo.",
   homeBottomTitle: "Gestisci decine di certificati?",
   homeBottomBody:
-    "La validità dei certificati TLS pubblici è in calo programmato — il CA/Browser Forum ha approvato il ballot SC-081v3 che fissa il massimo a 200 giorni da marzo 2026, 100 giorni dal 2027 e 47 giorni dal 2029. CertMate è il manager open-source pensato per questa realtà di automazione.",
+    "La validità dei certificati TLS pubblici è in calo programmato: il CA/Browser Forum ha approvato il ballot SC-081v3 che fissa il massimo a 200 giorni da marzo 2026, 100 giorni dal 2027 e 47 giorni dal 2029. CertMate è il manager open-source pensato per questa realtà di automazione.",
   homeBottomCta: "Vai a CertMate su GitHub →",
   navGuides: "Guide",
 
@@ -612,7 +609,7 @@ const it: Messages = {
   homeFilterEmpty: "Nessuno strumento corrisponde. Svuota il filtro.",
   homeFaqTitle: "Domande e risposte",
   homeFaqLead:
-    "Le obiezioni sensate — e come questo sito risponde.",
+    "Le obiezioni sensate, e come questo sito risponde.",
   homeFaq: [
     {
       q: "È sicuro incollare qui una chiave privata?",
@@ -667,7 +664,7 @@ const it: Messages = {
 
   certDecoderTitle: "Decoder Certificati",
   certDecoderTagline:
-    "Incolla un certificato PEM o DER e leggi ogni campo X.509 — Subject, SAN, validità, chiave, firma, fingerprint.",
+    "Incolla un certificato PEM o DER e leggi ogni campo X.509: Subject, SAN, validità, chiave, firma, fingerprint.",
   certDecoderPlaceholder:
     "-----BEGIN CERTIFICATE-----\nMIIFazCCA1OgAwIBAgIRAIIQz7DSQONZRGPgu2OCiwAw...\n-----END CERTIFICATE-----",
   csrDecoderTitle: "Decoder CSR",
@@ -680,10 +677,10 @@ const it: Messages = {
     "Incolla un bundle PEM. Riordina in catena valida leaf → root, individua cosa manca ed esporta un fullchain.pem pulito.",
   keyMatcherTitle: "Match Chiave ↔ Certificato",
   keyMatcherTagline:
-    "Verifica che chiave privata e certificato corrispondano. Tutto resta nel browser — solo Web Crypto.",
+    "Verifica che chiave privata e certificato corrispondano. Tutto resta nel browser. Solo Web Crypto.",
   hostnameValidatorTitle: "Validatore Hostname / SAN",
   hostnameValidatorTagline:
-    "Verifica quali hostname un certificato copre secondo RFC 6125 — wildcard, IDN, fallback CN.",
+    "Verifica quali hostname un certificato copre secondo RFC 6125: wildcard, IDN, fallback CN.",
   acmeDns01Title: "ACME DNS-01 Helper",
   acmeDns01Tagline:
     "Calcola il valore TXT atteso dal server ACME a partire dalla tua account key (JWK) e dal token della challenge.",
@@ -695,7 +692,7 @@ const it: Messages = {
     "Calcola SHA-1 / SHA-256 / SHA-512 di un certificato (byte DER) o di un testo. Tutto in locale via Web Crypto.",
   pemValidatorTitle: "Validatore PEM",
   pemValidatorTagline:
-    "Verifica gli envelope PEM — accoppiamento BEGIN/END, base64 strict, inventario blocchi.",
+    "Verifica gli envelope PEM: accoppiamento BEGIN/END, base64 strict, inventario blocchi.",
   formatConverterTitle: "Convertitore PEM ↔ DER",
   formatConverterTagline:
     "Converti certificati tra PEM e DER nel browser. Scarica il risultato, senza upload.",
@@ -704,10 +701,10 @@ const it: Messages = {
     "Da una data di scadenza, ottieni il renew-by e la readiness SC-081v3 (cap 200 g → 100 g → 47 g).",
   certificateDiffTitle: "Diff Certificati",
   certificateDiffTagline:
-    "Incolla due certificati e confronta ogni campo — SAN, validità, chiave, fingerprint — fianco a fianco.",
+    "Incolla due certificati e confronta ogni campo (SAN, validità, chiave, fingerprint) fianco a fianco.",
   inventoryValidatorTitle: "Validatore CSV Inventario",
   inventoryValidatorTagline:
-    "Valida un CSV di inventario certificati (hostname, scadenza) — segnala hostname/date non validi e scadenze.",
+    "Valida un CSV di inventario certificati (hostname, scadenza). Segnala hostname/date non validi e scadenze.",
   keyInspectorTitle: "Inspector Chiavi RSA & EC",
   keyInspectorTagline:
     "Incolla chiave privata, pubblica o certificato e vedi algoritmo, dimensione, curva e thumbprint SPKI. Solo in locale.",
@@ -715,7 +712,7 @@ const it: Messages = {
   csrGeneratorTagline:
     "Genera chiave privata + CSR PKCS#10 con SAN, interamente nel browser. La chiave non lascia mai il tuo device.",
 
-  chainBuilderHint: "Incolla leaf, intermediate ed (opzionale) root — in qualsiasi ordine",
+  chainBuilderHint: "Incolla leaf, intermediate ed (opzionale) root, in qualsiasi ordine",
   chainBuilderRunButton: "Costruisci e valida la catena",
   chainBuilderStatusEmpty: "Incolla uno o più blocchi PEM.",
   chainBuilderDownloadBundle: "Scarica fullchain.pem",

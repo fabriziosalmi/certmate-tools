@@ -1,10 +1,10 @@
 /**
- * Tiny DOM-builder helpers — eliminates innerHTML and template-string HTML
+ * Tiny DOM-builder helpers: eliminates innerHTML and template-string HTML
  * concatenation from tool render code. Every string interpolation reaches the
  * DOM via createTextNode/setAttribute, so the XSS class is structurally
  * impossible regardless of caller discipline.
  *
- * Keep this module DOM-only (no Astro / no SSR-only APIs) — it ships to the
+ * Keep this module DOM-only (no Astro / no SSR-only APIs); it ships to the
  * browser as part of each tool script bundle.
  */
 
@@ -65,7 +65,7 @@ export function frag(...children: ChildValue[]): DocumentFragment {
   return f;
 }
 
-/** Plain text node — explicit wrap for clarity in render functions. */
+/** Plain text node: explicit wrap for clarity in render functions. */
 export function text(s: unknown): Text {
   return document.createTextNode(s == null ? "" : String(s));
 }

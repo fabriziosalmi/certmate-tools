@@ -13,8 +13,6 @@ export interface InternalTool {
   category: Category;
   keywords: string[];
   status: "live" | "soon";
-  /** Marks recently added tools on the homepage. Remove after one release. */
-  highlight?: "new";
 }
 
 export interface ExternalTool {
@@ -28,11 +26,11 @@ export interface ExternalTool {
 export const categories: Record<Category, { label: string; blurb: string }> = {
   decode: {
     label: "Decode & inspect",
-    blurb: "Parse — and create — certificates, CSRs and keys in your browser. Never uploaded.",
+    blurb: "Parse and create certificates, CSRs and keys in your browser. Never uploaded.",
   },
   validate: {
     label: "Validate",
-    blurb: "Chains, hostnames, key/cert pairs — formal checks against RFC 5280 / 6125.",
+    blurb: "Chains, hostnames, key/cert pairs: formal checks against RFC 5280 / 6125.",
   },
   inspect: {
     label: "Probe & scan",
@@ -48,7 +46,7 @@ export const categories: Record<Category, { label: string; blurb: string }> = {
   },
   compliance: {
     label: "Compliance EU",
-    blurb: "NIS2, DORA, eIDAS 2.0 — TLS posture mapped to the articles.",
+    blurb: "NIS2, DORA, eIDAS 2.0: TLS posture mapped to the articles.",
   },
 };
 
@@ -57,7 +55,7 @@ export const internalTools: InternalTool[] = [
     slug: "certificate-decoder",
     title: "Certificate Decoder",
     tagline:
-      "Paste a PEM or DER certificate and inspect every field — Subject, SAN, validity, key, signature, fingerprints.",
+      "Paste a PEM or DER certificate and inspect every field: Subject, SAN, validity, key, signature, fingerprints.",
     category: "decode",
     keywords: ["certificate decoder", "pem decoder", "x509 parser"],
     status: "live",
@@ -93,7 +91,7 @@ export const internalTools: InternalTool[] = [
     slug: "hostname-validator",
     title: "Hostname / SAN Validator",
     tagline:
-      "Test which hostnames a certificate covers under RFC 6125 — IDN, wildcards, CN fallback.",
+      "Test which hostnames a certificate covers under RFC 6125: IDN, wildcards, CN fallback.",
     category: "validate",
     keywords: ["hostname validator", "san matcher", "wildcard certificate test"],
     status: "live",
@@ -106,17 +104,15 @@ export const internalTools: InternalTool[] = [
     category: "decode",
     keywords: ["fingerprint calculator", "sha256 fingerprint", "cert thumbprint"],
     status: "live",
-    highlight: "new",
   },
   {
     slug: "pem-validator",
     title: "PEM Validator",
     tagline:
-      "Check PEM envelopes — BEGIN/END pairing, strict base64, block inventory.",
+      "Check PEM envelopes: BEGIN/END pairing, strict base64, block inventory.",
     category: "decode",
     keywords: ["pem validator", "pem check", "validate pem"],
     status: "live",
-    highlight: "new",
   },
   {
     slug: "format-converter",
@@ -126,7 +122,6 @@ export const internalTools: InternalTool[] = [
     category: "decode",
     keywords: ["pem to der", "der to pem", "certificate format converter"],
     status: "live",
-    highlight: "new",
   },
   {
     slug: "renewal-calculator",
@@ -136,37 +131,33 @@ export const internalTools: InternalTool[] = [
     category: "monitor",
     keywords: ["certificate renewal calculator", "47-day readiness", "sc-081v3"],
     status: "live",
-    highlight: "new",
   },
   {
     slug: "certificate-diff",
     title: "Certificate Diff",
     tagline:
-      "Compare two certificates field-by-field — SAN, validity, key, fingerprints.",
+      "Compare two certificates field by field: SAN, validity, key, fingerprints.",
     category: "validate",
     keywords: ["certificate diff", "compare certificates", "cert diff"],
     status: "live",
-    highlight: "new",
   },
   {
     slug: "inventory-validator",
     title: "Inventory CSV Validator",
     tagline:
-      "Validate a certificate inventory CSV — bad hostnames, bad dates, expirations.",
+      "Validate a certificate inventory CSV: bad hostnames, bad dates, expirations.",
     category: "monitor",
     keywords: ["certificate inventory", "csv validator", "expiry inventory"],
     status: "live",
-    highlight: "new",
   },
   {
     slug: "key-inspector",
     title: "RSA & EC Key Inspector",
     tagline:
-      "Inspect private keys, public keys and embedded cert keys — algorithm, size, curve, SPKI thumbprint.",
+      "Inspect private keys, public keys and embedded cert keys: algorithm, size, curve, SPKI thumbprint.",
     category: "decode",
     keywords: ["rsa key inspector", "ec key inspector", "inspect private key", "spki thumbprint"],
     status: "live",
-    highlight: "new",
   },
   {
     slug: "csr-generator",
@@ -176,7 +167,6 @@ export const internalTools: InternalTool[] = [
     category: "decode",
     keywords: ["csr generator", "generate csr", "pkcs10 generator", "generare csr"],
     status: "live",
-    highlight: "new",
   },
   {
     slug: "acme-dns-01",
@@ -266,7 +256,7 @@ export const externalTools: ExternalTool[] = [
   {
     name: "nis2-public",
     url: "https://github.com/fabriziosalmi/nis2-public",
-    why: "Open-source platform for NIS2 continuous posture management — governance, technical validation and incident response in one self-hosted stack.",
+    why: "Open-source platform for NIS2 continuous posture management: governance, technical validation and incident response in one self-hosted stack.",
     category: "compliance",
     openSource: "https://github.com/fabriziosalmi/nis2-public",
   },

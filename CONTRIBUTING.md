@@ -2,7 +2,7 @@
 
 Thanks for stopping by. This repository is a collection of static, fully
 client-side TLS / certificate / ACME tools that act as the SEO front door for
-[CertMate](https://www.certmate.org). Contributions are very welcome —
+[CertMate](https://www.certmate.org). Contributions are very welcome:
 bug-fixes, new tools, translations, copy polish, accessibility tweaks.
 
 ## TL;DR
@@ -77,7 +77,7 @@ target language for the project.
 
 - Bugs: a minimal repro link to the deployed site is gold.
 - Feature requests: explain the user problem first, the proposed UI second.
-- Security: read [SECURITY.md](SECURITY.md) first — please do not open a
+- Security: read [SECURITY.md](SECURITY.md) first; please do not open a
   public issue for security bugs.
 
 ## Pull requests

@@ -141,7 +141,7 @@ const desc =
       // Show base64 preview; the real artifact is the Download button.
       let s = "";
       for (const b of r.bytes) s += String.fromCharCode(b);
-      $output.value = btoa(s).slice(0, 4000) + (r.bytes.length > 3000 ? "\n… (truncated preview — use Download for full DER)" : "");
+      $output.value = btoa(s).slice(0, 4000) + (r.bytes.length > 3000 ? "\n… (truncated preview: use Download for full DER)" : "");
       $status.textContent = `${r.label}: ${r.bytes.length} DER bytes ready.`;
       $download.disabled = false;
     } else {
@@ -158,7 +158,7 @@ const desc =
   $convert.addEventListener("click", run);
   $download.addEventListener("click", () => {
     if (!lastBytes) return;
-    // Blob-URL download — no network, no navigation with data in URL.
+    // Blob-URL download: no network, no navigation with data in URL.
     const blob = new Blob([lastBytes as unknown as BlobPart], { type: "application/pkix-cert" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");

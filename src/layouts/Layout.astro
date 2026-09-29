@@ -34,8 +34,8 @@ const canonicalUrl = new URL(
 
 const fullTitle =
   title === "CertMate Tools"
-    ? `CertMate Tools — ${m.brandTagline}`
-    : `${title} — CertMate Tools`;
+    ? `CertMate Tools · ${m.brandTagline}`
+    : `${title} · CertMate Tools`;
 
 const cleanPath = stripLocale(Astro.url.pathname);
 const alternates = LOCALES.map((l) => ({
@@ -114,7 +114,7 @@ const ogImageUrl = new URL(
 
       `frame-ancestors` is deliberately ABSENT: it is ignored when a CSP is
       delivered via <meta http-equiv> (it needs a real header) and every
-      browser logs a console error for it on every page load — noise on a site
+      browser logs a console error for it on every page load: noise on a site
       whose whole argument is that its guarantees are checkable. Framing
       protection comes from the edge, where GitHub Pages sends
       `x-frame-options: SAMEORIGIN` (#67).

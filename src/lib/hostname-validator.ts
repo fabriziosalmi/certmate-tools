@@ -36,7 +36,7 @@ export type HostnameValidationResult =
 /**
  * Is this an IP literal rather than a hostname?
  *
- * Deliberately broad — anything that is only hex digits, dots and colons —
+ * Deliberately broad (anything that is only hex digits, dots and colons),
  * because the cost of a false positive is refusing to match a dNSName that
  * could not be a real hostname anyway, while a false negative reopens #65.
  */
@@ -65,7 +65,7 @@ function normalizeHostname(hostname: string): string {
 }
 
 function matchesWildcardLabel(pattern: string, label: string): boolean {
-  // RFC 6125 §6.4.3 — wildcard must be the left-most label.
+  // RFC 6125 §6.4.3: wildcard must be the left-most label.
   // The asterisk MUST NOT match domain labels that themselves contain a dot.
   // We don't enforce ≥2 labels right of the wildcard here; the caller does.
   if (!pattern.includes("*")) return pattern === label;
@@ -123,7 +123,7 @@ function checkIDN(hostname: string): HostnameRuleResult {
     ok: ascii,
     detail: ascii
       ? "hostname is ASCII / Punycode"
-      : "hostname contains non-ASCII Unicode — convert to xn-- form before matching",
+      : "hostname contains non-ASCII Unicode: convert to xn-- form before matching",
   };
 }
 
@@ -196,7 +196,7 @@ export async function validateHostname(
           reason = `IP SAN exact match (${h})`;
         } else {
           reason = dnsSans.includes(h)
-            ? `no iPAddress SAN covers this address — it appears as a dNSName entry, which TLS clients reject for an IP literal`
+            ? `no iPAddress SAN covers this address: it appears as a dNSName entry, which TLS clients reject for an IP literal`
             : "no iPAddress SAN covers this address";
         }
       } else {
@@ -212,7 +212,7 @@ export async function validateHostname(
       }
 
       if (!matched && !isIpLiteral && dnsSans.length === 0 && cn) {
-        // Legacy CN fallback — browsers reject this since ~2017 but cert may be old.
+        // Legacy CN fallback: browsers reject this since ~2017 but cert may be old.
         const r = matchesPattern(cn, h);
         if (r.ok) {
           matched = true;
@@ -226,7 +226,7 @@ export async function validateHostname(
 
       if (dnsSans.length === 0 && ipSans.length === 0) {
         notes.push(
-          "Certificate has no SAN extension — modern TLS clients will reject it regardless of CN."
+          "Certificate has no SAN extension, so modern TLS clients will reject it regardless of CN."
         );
       }
 
@@ -250,7 +250,7 @@ export async function validateHostname(
           detail: `expired on ${cert.notAfter.toUTCString()}`,
         });
         notes.push(
-          "This certificate has expired — coverage says nothing about whether a client will accept it."
+          "This certificate has expired; coverage says nothing about whether a client will accept it."
         );
       } else if (notBefore > now) {
         rules.push({
@@ -259,7 +259,7 @@ export async function validateHostname(
           detail: `not valid until ${cert.notBefore.toUTCString()}`,
         });
         notes.push(
-          "This certificate is not valid yet — coverage says nothing about whether a client will accept it."
+          "This certificate is not valid yet; coverage says nothing about whether a client will accept it."
         );
       }
 

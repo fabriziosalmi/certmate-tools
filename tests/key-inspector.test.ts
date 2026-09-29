@@ -10,7 +10,7 @@ function toPem(label: string, buf: ArrayBuffer): string {
   return `-----BEGIN ${label}-----\n${lines.join("\n")}\n-----END ${label}-----\n`;
 }
 
-describe("inspectKey — RSA", () => {
+describe("inspectKey: RSA", () => {
   it("describes a PKCS#8 private key and its SPKI public key consistently", async () => {
     const keys = (await webcrypto.subtle.generateKey(
       {
@@ -46,7 +46,7 @@ describe("inspectKey — RSA", () => {
   });
 });
 
-describe("inspectKey — EC", () => {
+describe("inspectKey: EC", () => {
   it("reports curve and bit size for a P-256 private key", async () => {
     const keys = (await webcrypto.subtle.generateKey(
       { name: "ECDSA", namedCurve: "P-256" },
@@ -66,7 +66,7 @@ describe("inspectKey — EC", () => {
   });
 });
 
-describe("inspectKey — certificates and rejections", () => {
+describe("inspectKey: certificates and rejections", () => {
   it("inspects the public key embedded in a certificate", async () => {
     const { pem } = await makeCert({ cn: "key.example.com" });
     const out = await inspectKey(pem);

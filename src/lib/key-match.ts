@@ -1,11 +1,10 @@
 /**
  * Match a private key against a certificate, fully client-side, using Web
  * Crypto and @peculiar/x509. We compare SubjectPublicKeyInfo SHA-256
- * thumbprints — both the cert's SPKI and the SPKI derived from the private
+ * thumbprints: both the cert's SPKI and the SPKI derived from the private
  * key. If the bytes match, the key produced the public key in the cert.
  *
- * Supports PKCS#8 only — RSA, ECDSA P-256 / P-384 / P-521, Ed25519 — because
- * that is what Web Crypto imports. PKCS#1 ("BEGIN RSA PRIVATE KEY", still
+ * Supports PKCS#8 only (RSA, ECDSA P-256 / P-384 / P-521, Ed25519), because that is what Web Crypto imports. PKCS#1 ("BEGIN RSA PRIVATE KEY", still
  * what `openssl genrsa` emits by default) and SEC1 ("BEGIN EC PRIVATE KEY")
  * are rejected with the openssl command that converts them. The docstring
  * used to claim PKCS#1 was wrapped and supported; it never was (#67).
@@ -86,7 +85,7 @@ async function importPrivateKey(pemInput: string): Promise<{
   // WebCrypto natively; we reject with a hint.
   if (t.includes("-----BEGIN ENCRYPTED PRIVATE KEY-----")) {
     throw new Error(
-      "Encrypted private key — decrypt it first (openssl pkey -in ... -out unencrypted.pem)."
+      "Encrypted private key: decrypt it first (openssl pkey -in ... -out unencrypted.pem)."
     );
   }
   if (t.includes("-----BEGIN EC PRIVATE KEY-----")) {

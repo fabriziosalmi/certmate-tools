@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.3] - 2026-09-29
+
+### Added
+
+- 6 network-checker guides (EN+IT) with copy-paste OpenSSL/dig/curl
+  recipes: CAA + TLSA/DANE DNS records, OCSP/CRL revocation, Certificate
+  Transparency search, TLS versions/ciphers probing, HSTS + preload, live
+  server expiry checks. Each links to the closest CTA: a live internal
+  tool where one exists, a curated external checker otherwise, none for
+  dig-only guides. Guide CTAs now support external destinations
+  (`externalTool`) instead of assuming an internal tool.
+
 ## [0.2.2] - 2026-09-29
 
 ### Fixed
@@ -17,7 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   keys off-convention). Fixed with digit-aware matching, an explicit alias
   map, and a registry fallback so a slug can never render as UI copy again.
   Guarded by `tests/i18n-labels.test.ts`.
-- Homepage omitted the whole Monitor category — `renewal-calculator` and
+- Homepage omitted the whole Monitor category: `renewal-calculator` and
   `inventory-validator` were live but invisible on home. Added `monitor` to
   the homepage category order.
 - Hero headline rendered "you canactually trust" (collapsed JSX
@@ -38,22 +50,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **8 new client-side tools (all live, EN+IT, no upload, no network)** —
+- **8 new client-side tools (all live, EN+IT, no upload, no network):**
   15 live tools total:
-  - `/fingerprint-calculator/` — SHA-1/256/512 over certificate DER bytes
+  - `/fingerprint-calculator/`: SHA-1/256/512 over certificate DER bytes
     or arbitrary UTF-8 text via Web Crypto.
-  - `/pem-validator/` — PEM envelope checks (BEGIN/END pairing, strict
+  - `/pem-validator/`: PEM envelope checks (BEGIN/END pairing, strict
     base64, block inventory).
-  - `/format-converter/` — PEM ↔ DER conversion with Blob-download for DER
+  - `/format-converter/`: PEM ↔ DER conversion with Blob-download for DER
     output.
-  - `/renewal-calculator/` — renew-by dates plus SC-081v3 readiness
+  - `/renewal-calculator/`: renew-by dates plus SC-081v3 readiness
     (200 d → 100 d → 47 d caps).
-  - `/certificate-diff/` — field-by-field diff of two certificates.
-  - `/inventory-validator/` — certificate inventory CSV validation
+  - `/certificate-diff/`: field-by-field diff of two certificates.
+  - `/inventory-validator/`: certificate inventory CSV validation
     (hostnames, dates, expirations; 5000-row cap).
-  - `/key-inspector/` — RSA & EC key inspector (PKCS#8, SPKI, embedded
+  - `/key-inspector/`: RSA and EC key inspector (PKCS#8, SPKI, embedded
     cert keys, bare DER) with SPKI thumbprints matching the decoder.
-  - `/csr-generator/` — private key (RSA/ECDSA) plus PKCS#10 CSR with
+  - `/csr-generator/`: private key (RSA/ECDSA) plus PKCS#10 CSR with
     SANs, built with `@peculiar/x509` and dogfooded through the decoder
     (`signatureValid === true`).
 - Chain visualizer in `/chain-builder/`: compact leaf → root strip with
@@ -61,19 +73,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- `key-match` reuses `spkiFromPrivateKey()` from `key-inspector` — one
+- `key-match` reuses `spkiFromPrivateKey()` from `key-inspector`: one
   owner for the SPKI-derivation logic, no behavior change.
-- Decode-category blurb now reads "Parse — and create — …" since the
+- Decode-category blurb now reads "Parse and create …" since the
   category hosts the CSR generator.
 
 ### Deferred (not shippable without breaking the no-upload promise or the crypto bar)
 
 - CAA / TLSA / OCSP / CRL / CT-log / TLS-version / cipher / HSTS live
-  checkers — all require network egress, blocked by `connect-src 'none'`
+  checkers, all requiring network egress and blocked by `connect-src 'none'`
   and `check-no-network`. Covered by curated external links + guides.
-- PKCS#12 inspector/builder and JKS inspector — no PFX support in
-  `@peculiar/x509`, no 3DES in Web Crypto (classic P12 PBE), and
-  hand-rolled PBE crypto needs a dedicated phase with test vectors.
+- PKCS#12 inspector/builder and JKS inspector: not planned. No PFX support
+  in `@peculiar/x509`, no 3DES in Web Crypto (classic P12 PBE), and the
+  value does not justify hand-rolled PBE crypto. Use `openssl pkcs12`
+  and `keytool` locally instead.
 
 ### Added
 
@@ -91,27 +104,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Astro 5 + Tailwind v4 + TypeScript scaffolding.
 - Native Astro i18n for English (default, unprefixed), Italian, German and
-  French — with hreflang alternates emitted in `<head>` and a locale
+  French, with hreflang alternates emitted in `<head>` and a locale
   switcher in the header.
 - Automatic light/dark theme via `prefers-color-scheme`.
 - Compact toolbox UX pattern: no marketing hero on tool pages; results
   rendered in a native `<dialog>` modal; auto-decode on paste.
 - Shared `Modal.astro`, `PrivacyBadge.astro`, `ToolCard.astro` components.
 - **7 client-side tools (all live)**:
-  - `/certificate-decoder/` — X.509 PEM/DER inspector with fingerprints,
+  - `/certificate-decoder/`: X.509 PEM/DER inspector with fingerprints,
     SAN, issuer/subject, multi-cert bundles.
-  - `/csr-decoder/` — PKCS#10 inspector with requested SAN, key parameters,
+  - `/csr-decoder/`: PKCS#10 inspector with requested SAN, key parameters,
     challenge attributes and signature verification.
-  - `/chain-builder/` — re-orders an arbitrary PEM bundle into a leaf→root
+  - `/chain-builder/`: re-orders an arbitrary PEM bundle into a leaf→root
     chain, verifies each signature link, flags missing intermediates with
     the AIA URL when present.
-  - `/key-matcher/` — confirms a PKCS#8 private key matches a certificate
+  - `/key-matcher/`: confirms a PKCS#8 private key matches a certificate
     by comparing SPKI SHA-256 (Web Crypto only).
-  - `/hostname-validator/` — RFC 6125 / 6125-bis matching with wildcard
+  - `/hostname-validator/`: RFC 6125 / 6125-bis matching with wildcard
     rules, IDN checks and a CN-fallback diagnostic.
-  - `/acme-dns-01/` — RFC 8555 §8.4 + RFC 7638 JWK thumbprint TXT-record
+  - `/acme-dns-01/`: RFC 8555 §8.4 + RFC 7638 JWK thumbprint TXT-record
     helper with an in-browser sample RSA-2048 account key generator.
-  - `/nis2-tls-readiness/` — interactive checklist mapped to NIS2
+  - `/nis2-tls-readiness/`: interactive checklist mapped to NIS2
     Art. 21(2)(h), Italian D.Lgs. 138/2024 / ACN det. 379907/2025 and
     DORA, exports a Markdown evidence pack.
 - Directory home page with curated external tools (Qualys SSL Labs,

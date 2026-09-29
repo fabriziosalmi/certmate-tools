@@ -59,8 +59,8 @@ const groupedExternal = externalCategoryOrder
 
 const seoDescription =
   locale === "it"
-    ? "Strumenti online gratuiti e privacy-first per certificati TLS, CSR, ACME, DNS e compliance EU. Tutto nel tuo browser — niente upload, niente tracking."
-    : "Free, privacy-first online tools for TLS certificates, CSRs, ACME, DNS and EU compliance. Everything runs in your browser — no uploads, no tracking.";
+    ? "Strumenti online gratuiti e privacy-first per certificati TLS, CSR, ACME, DNS e compliance EU. Tutto nel tuo browser. Niente upload, niente tracking."
+    : "Free, privacy-first online tools for TLS certificates, CSRs, ACME, DNS and EU compliance. Everything runs in your browser. No uploads, no tracking.";
 
 const siteBase = "https://tools.certmate.org";
 const liveInternal = internalTools.filter((t) => t.status === "live");
@@ -76,7 +76,7 @@ function cardSearchExternal(t: ExternalTool): string {
 
 // "&" is rewritten for the JSON-LD block only: if Astro HTML-escapes the
 // interpolated string, "&amp;" would corrupt the structured data while
-// JSON.parse still succeeds — silently wrong SEO. "and" keeps it valid.
+// JSON.parse still succeeds, silently wrong SEO. "and" keeps it valid.
 // "<" is unicode-escaped so no string can ever form a "</script>" breakout.
 function plain(s: string): string {
   return s.replace(/&/g, "and");

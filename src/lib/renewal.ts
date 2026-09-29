@@ -1,9 +1,9 @@
 /**
- * Renewal + 47-day readiness calculator — pure date math, client-side.
+ * Renewal + 47-day readiness calculator: pure date math, client-side.
  *
  * Encodes the CA/Browser Forum SC-081v3 schedule (200 d from 2026-03-15,
  * 100 d from 2027-03-15, 47 d from 2029-03-15) so teams can plan automation
- * before the caps bite. No certificate parsing here — the decoder already
+ * before the caps bite. No certificate parsing here: the decoder already
  * does that; this module answers "when must I renew?".
  */
 
@@ -62,7 +62,7 @@ export function planRenewal(
 
   const note47Day =
     lifetimeIfIssuedToday > maxValidityNow
-      ? `A certificate valid until this date issued today would exceed the current ${maxValidityNow}-day cap — plan automation now.`
+      ? `A certificate valid until this date issued today would exceed the current ${maxValidityNow}-day cap: plan automation now.`
       : `Within the current ${maxValidityNow}-day cap (SC-081v3 schedule: 200 d → 2026-03-15, 100 d → 2027-03-15, 47 d → 2029-03-15).`;
 
   return {

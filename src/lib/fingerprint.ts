@@ -1,5 +1,5 @@
 /**
- * Fingerprint calculator — 100% client-side.
+ * Fingerprint calculator: 100% client-side.
  *
  * Hashes either the DER bytes of a pasted certificate (standard definition of
  * a certificate fingerprint: digest over the DER encoding) or, for arbitrary

@@ -79,7 +79,7 @@ export async function makeCert(opts: CertOptions): Promise<GeneratedCert> {
   return { cert, keys, pem: cert.toString("pem") };
 }
 
-/** An expired self-signed certificate — the shape that used to read "valid". */
+/** An expired self-signed certificate: the shape that used to read "valid". */
 export function expiredWindow(): { notBefore: Date; notAfter: Date } {
   const now = Date.now();
   return {

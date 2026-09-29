@@ -13,7 +13,7 @@ const m = getMessages(locale);
 const desc =
   locale === "it"
     ? "Verifica nel browser quali hostname un certificato copre, secondo RFC 6125: wildcard, IDN, fallback CN. Niente upload."
-    : "Check in your browser which hostnames a certificate covers, under RFC 6125 — wildcards, IDN, CN fallback. No upload.";
+    : "Check in your browser which hostnames a certificate covers, under RFC 6125: wildcards, IDN, CN fallback. No upload.";
 ---
 
 <Layout
@@ -202,7 +202,7 @@ const desc =
           "span",
           null,
           el("span", { class: "font-medium" }, rl.rule),
-          " — ",
+          ": ",
           el(
             "span",
             { class: "text-zinc-600 dark:text-zinc-400" },

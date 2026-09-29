@@ -1,5 +1,5 @@
 /**
- * Certificate format converter — PEM ↔ DER, 100% client-side.
+ * Certificate format converter: PEM ↔ DER, 100% client-side.
  *
  * Pure base64 transforms, no parsing, no network. DER output is offered as a
  * download via a Blob URL created in the component (no `fetch`, no upload).

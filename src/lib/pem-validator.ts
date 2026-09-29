@@ -1,9 +1,9 @@
 /**
- * PEM validator — 100% client-side, synchronous, no crypto.
+ * PEM validator: 100% client-side, synchronous, no crypto.
  *
  * Checks BEGIN/END pairing, label consistency, base64 charset and strict
  * decodability. Never flags the *meaning* of the DER (that is the decoder's
- * job) — only whether the PEM envelope is well-formed.
+ * job): only whether the PEM envelope is well-formed.
  */
 
 import { MAX_INPUT_BYTES } from "./util";

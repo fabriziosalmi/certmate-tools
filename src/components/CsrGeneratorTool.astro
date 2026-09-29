@@ -76,7 +76,7 @@ const desc =
 
       <div id="output" class="mt-5 space-y-3 hidden">
         <div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-relaxed text-amber-900 dark:bg-amber-950/30 dark:border-amber-900/40 dark:text-amber-200">
-          Save the private key now — it is shown once, stored nowhere, transmitted never.
+          Save the private key now: it is shown once, stored nowhere, transmitted never.
         </div>
         <div>
           <div class="flex items-center justify-between mb-1.5">
@@ -90,7 +90,7 @@ const desc =
         </div>
         <div>
           <div class="flex items-center justify-between mb-1.5">
-            <h3 class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Private key (PKCS#8 — keep secret)</h3>
+            <h3 class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Private key (PKCS#8, keep secret)</h3>
             <button type="button" data-dl="key" class="text-xs font-medium text-brand-700 hover:text-brand-800 dark:text-brand-400">Download .key</button>
           </div>
           <textarea id="cg-out-key" rows="6" readonly spellcheck="false" class="mono w-full rounded-lg border px-4 py-3 text-xs leading-relaxed border-zinc-200 bg-zinc-50 text-zinc-900 dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-100"></textarea>
@@ -209,7 +209,7 @@ const desc =
       await navigator.clipboard.writeText($outCsr.value);
       btn.textContent = m.copied;
       setTimeout(() => { btn.textContent = m.copy; }, 1500);
-    } catch { /* clipboard denied — silent */ }
+    } catch { /* clipboard denied, silent */ }
   });
   document.querySelector('[data-dl="csr"]')?.addEventListener("click", () => download("request.csr", $outCsr.value, "application/pkcs10"));
   document.querySelector('[data-dl="key"]')?.addEventListener("click", () => download("private.key", $outKey.value, "application/pkcs8"));
