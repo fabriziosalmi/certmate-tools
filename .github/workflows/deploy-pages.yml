@@ -5,6 +5,10 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# Least privilege: the GITHUB_TOKEN defaults to nothing here; each job
+# declares exactly what it needs (scorecard Token-Permissions).
+permissions: {}
+
 # Allow only one concurrent deployment, but don't cancel an in-progress one —
 # we don't want to interrupt a production publish.
 concurrency:

@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- 2 moderate OSV vulnerabilities: vitest to 4.1.11 (CVE-2026-84373,
+  dev-server file read) and astro to 7.3.5 with a `devalue` override to
+  ^5.9.2 (CVE-2026-81176). `npm audit` is clean.
+
+### Changed
+
+- Least-privilege `permissions: {}` at the top of CI, CodeQL and Pages
+  workflows (scorecard Token-Permissions).
+- New `release-assets` workflow: on release publish, the tagged tree is
+  rebuilt, zipped, checksummed, and the checksums are signed keyless with
+  Sigstore cosign, then attached to the release (scorecard
+  Signed-Releases). No long-lived keys.
+
 ## [0.2.3] - 2026-09-29
 
 ### Added

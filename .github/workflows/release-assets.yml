@@ -1,0 +1,83 @@
+name: Release assets
+
+# When a GitHub release is published, build the static site from the tagged
+# tree, attach it as a zip plus checksums, and sign the checksums keyless
+# with Sigstore (Fulcio/Rekor via the job's OIDC identity). No long-lived
+# keys, nothing to rotate or leak.
+#
+# This is what feeds scorecard Signed-Releases: the release carries
+# SHA256SUMS.txt plus SHA256SUMS.txt.sig / .pem, so anyone can verify that
+# the published site bytes came from this repo's CI and not from a
+# tampered upload.
+
+on:
+  release:
+    types: [published]
+
+# Least privilege: the GITHUB_TOKEN defaults to nothing here; the job
+# declares exactly what it needs (scorecard Token-Permissions).
+# `contents: write` is load-bearing: attaching files to the release
+# through `gh release upload` fails without it.
+permissions: {}
+
+jobs:
+  assets:
+    name: Build, sign, attach
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: Checkout the release tag
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Setup Node from .nvmrc
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install cosign
+        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
+        with:
+          cosign-release: v3.1.3
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Production build
+        run: npm run build
+
+      - name: Package and sign
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          set -euo pipefail
+          cd dist
+          zip -qr "../certmate-tools-${TAG}-site.zip" .
+          cd ..
+          sha256sum "certmate-tools-${TAG}-site.zip" > SHA256SUMS.txt
+          cosign sign-blob --yes \
+            --output-signature SHA256SUMS.txt.sig \
+            --output-certificate SHA256SUMS.txt.pem \
+            SHA256SUMS.txt
+          cosign verify-blob \
+            --certificate-identity-regexp '^https://github.com/fabriziosalmi/certmate-tools/' \
+            --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+            --cert SHA256SUMS.txt.pem \
+            --signature SHA256SUMS.txt.sig \
+            SHA256SUMS.txt
+
+      - name: Attach assets to the release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          gh release upload "$TAG" \
+            "certmate-tools-${TAG}-site.zip" SHA256SUMS.txt \
+            SHA256SUMS.txt.sig SHA256SUMS.txt.pem \
+            --clobber
