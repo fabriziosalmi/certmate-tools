@@ -21,6 +21,7 @@ import {
   sha,
   wrapAsPem,
 } from "./util";
+import { spkiFromPrivateKey } from "./key-inspector";
 
 export interface KeyMatchResult {
   match: boolean;
@@ -149,50 +150,6 @@ async function importPrivateKey(pemInput: string): Promise<{
   );
 }
 
-async function derivedSpki(cryptoKey: CryptoKey): Promise<ArrayBuffer> {
-  // Web Crypto only exports the *public* SPKI from a public key, not a
-  // private one. We derive the public key by re-importing a JWK exported
-  // from the private key with the "d" field removed (RSA / EC) or using
-  // crypto.subtle.exportKey("jwk") + re-import as public.
-  const jwk = await crypto.subtle.exportKey("jwk", cryptoKey);
-
-  // Strip private parts to derive the public JWK.
-  const pub: Record<string, unknown> = { ...jwk };
-  delete pub.d;
-  delete pub.p;
-  delete pub.q;
-  delete pub.dp;
-  delete pub.dq;
-  delete pub.qi;
-  delete pub.oth;
-  pub.key_ops = ["verify"];
-
-  const algo: RsaHashedImportParams | EcKeyImportParams | AlgorithmIdentifier =
-    cryptoKey.algorithm.name === "RSASSA-PKCS1-v1_5" ||
-    cryptoKey.algorithm.name === "RSA-PSS"
-      ? {
-          name: cryptoKey.algorithm.name,
-          hash:
-            (cryptoKey.algorithm as RsaHashedKeyAlgorithm).hash?.name ??
-            "SHA-256",
-        }
-      : cryptoKey.algorithm.name === "ECDSA"
-        ? {
-            name: "ECDSA",
-            namedCurve: (cryptoKey.algorithm as EcKeyAlgorithm).namedCurve,
-          }
-        : { name: cryptoKey.algorithm.name };
-
-  const pubKey = await crypto.subtle.importKey(
-    "jwk",
-    pub as JsonWebKey,
-    algo,
-    true,
-    ["verify"]
-  );
-  return crypto.subtle.exportKey("spki", pubKey);
-}
-
 export async function matchKeyAndCert(
   certPem: string,
   keyPem: string
@@ -202,7 +159,7 @@ export async function matchKeyAndCert(
     const { cryptoKey, algorithm } = await importPrivateKey(keyPem);
 
     const certSpki = cert.publicKey.rawData;
-    const derived = await derivedSpki(cryptoKey);
+    const derived = await spkiFromPrivateKey(cryptoKey);
 
     const [certHash, derHash] = await Promise.all([
       sha("SHA-256", certSpki),

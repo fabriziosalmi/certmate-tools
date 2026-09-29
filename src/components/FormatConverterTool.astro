@@ -1,0 +1,189 @@
+---
+import Layout from "~/layouts/Layout.astro";
+import PrivacyBadge from "~/components/PrivacyBadge.astro";
+import ToolNav from "~/components/ToolNav.astro";
+import { getMessages, type Locale } from "~/i18n";
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const m = getMessages(locale);
+const desc =
+  locale === "it"
+    ? "Converti certificati tra PEM e DER nel browser. Scarica il risultato, niente upload."
+    : "Convert certificates between PEM and DER in your browser. Download the result, no upload.";
+---
+
+<Layout
+  title={m.formatConverterTitle}
+  description={desc}
+  keywords={["pem to der", "der to pem", "certificate format converter", "convertitore pem der"]}
+  compact
+>
+  <div class="flex-1 flex flex-col items-stretch justify-start md:justify-center px-4 py-6 md:py-10">
+    <div class="w-full max-w-3xl mx-auto">
+      <ToolNav locale={locale} currentSlug="format-converter" />
+      <header class="mb-5">
+        <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+          {m.formatConverterTitle}
+        </h1>
+        <p class="mt-1.5 text-zinc-600 dark:text-zinc-400 leading-relaxed">
+          {m.formatConverterTagline}
+        </p>
+        <div class="mt-3"><PrivacyBadge locale={locale} variant="inline" /></div>
+      </header>
+
+      <div class:list={["rounded-2xl border shadow-sm overflow-hidden", "bg-white border-zinc-200", "dark:bg-zinc-900 dark:border-zinc-800"]}>
+        <div class:list={["flex flex-wrap items-center justify-between gap-2 border-b px-4 py-2.5", "bg-zinc-50/60 border-zinc-100", "dark:bg-zinc-900/80 dark:border-zinc-800"]}>
+          <div class="flex items-center gap-2 text-xs font-medium text-zinc-500 dark:text-zinc-400">
+            <label><input type="radio" name="fc-dir" value="pem2der" checked class="mr-1" />PEM → DER</label>
+            <label><input type="radio" name="fc-dir" value="der2pem" class="mr-1" />DER (base64) → PEM</label>
+          </div>
+          <button type="button" data-action="clear" class="text-xs font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100">{m.clear}</button>
+        </div>
+        <textarea
+          id="fc-input"
+          rows="8"
+          spellcheck="false"
+          autocomplete="off"
+          autocapitalize="off"
+          autocorrect="off"
+          maxlength="2097152"
+          placeholder="-----BEGIN CERTIFICATE-----..."
+          class:list={["mono w-full resize-y border-0 px-4 py-3 text-base sm:text-sm leading-relaxed min-h-40 focus:outline-none focus:ring-0", "bg-white text-zinc-900 placeholder:text-zinc-400", "dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder:text-zinc-600"]}
+        ></textarea>
+        <div class="border-t border-zinc-100 dark:border-zinc-800 px-4 py-3 flex flex-wrap items-center gap-2">
+          <label class="text-xs font-medium text-zinc-500 dark:text-zinc-400">PEM label
+            <input id="fc-label" type="text" value="CERTIFICATE" spellcheck="false" autocomplete="off" class="mono ml-2 w-44 border rounded-md px-2 py-1.5 text-xs border-zinc-200 bg-white text-zinc-900 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100" />
+          </label>
+          <label class="text-xs font-medium text-zinc-500 dark:text-zinc-400 cursor-pointer">… or DER file <input id="fc-file" type="file" accept=".der,.cer,.crt" class="hidden" /></label>
+        </div>
+      </div>
+
+      <div class="mt-4 flex items-center gap-3 flex-wrap">
+        <button
+          type="button"
+          data-action="convert"
+          class:list={["inline-flex w-full sm:w-auto justify-center items-center gap-2 rounded-md px-5 py-3 text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed", "bg-zinc-900 text-white hover:bg-zinc-800", "dark:bg-brand-500 dark:text-zinc-50 dark:hover:bg-brand-400"]}
+        >{m.decodeButton}</button>
+        <button type="button" data-action="download" disabled class="inline-flex w-full sm:w-auto justify-center items-center gap-2 rounded-md px-5 py-3 text-sm font-semibold border border-zinc-200 dark:border-zinc-800 disabled:opacity-50">Download</button>
+        <p id="status" role="status" aria-live="polite" class="w-full sm:w-auto text-xs sm:text-sm leading-relaxed text-zinc-500 dark:text-zinc-400"></p>
+      </div>
+
+      <div id="error" role="alert" class:list={["mt-5 hidden rounded-lg border px-4 py-3 text-sm", "bg-red-50 border-red-200 text-red-900", "dark:bg-red-950/40 dark:border-red-900/60 dark:text-red-200"]}></div>
+      <div class="mt-5">
+        <textarea id="fc-output" rows="6" readonly spellcheck="false" placeholder="Output…" class:list={["mono w-full rounded-lg border px-4 py-3 text-xs leading-relaxed", "border-zinc-200 bg-zinc-50 text-zinc-900", "dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-100"]}></textarea>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { pemToDer, derToPem } from "~/lib/format-converter";
+  import { MAX_INPUT_BYTES } from "~/lib/util";
+  import { detectLocale, getMessages } from "~/i18n";
+
+  const locale = detectLocale(location.pathname);
+  const m = getMessages(locale);
+
+  const $input = document.getElementById("fc-input") as HTMLTextAreaElement;
+  const $output = document.getElementById("fc-output") as HTMLTextAreaElement;
+  const $label = document.getElementById("fc-label") as HTMLInputElement;
+  const $file = document.getElementById("fc-file") as HTMLInputElement;
+  const $status = document.getElementById("status") as HTMLElement;
+  const $error = document.getElementById("error") as HTMLElement;
+  const $convert = document.querySelector('[data-action="convert"]') as HTMLButtonElement;
+  const $download = document.querySelector('[data-action="download"]') as HTMLButtonElement;
+
+  let lastBytes: Uint8Array | null = null;
+  let lastFilename = "certificate.der";
+
+  function showError(msg: string): void {
+    $error.textContent = msg;
+    $error.classList.remove("hidden");
+    $status.textContent = "";
+  }
+
+  function direction(): string {
+    const checked = document.querySelector('input[name="fc-dir"]:checked') as HTMLInputElement | null;
+    return checked?.value ?? "pem2der";
+  }
+
+  function base64ToBytes(b64: string): Uint8Array {
+    const clean = b64.replace(/\s+/g, "");
+    const bin = atob(clean);
+    const out = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+
+  function run(): void {
+    $error.classList.add("hidden");
+    lastBytes = null;
+    $download.disabled = true;
+    if (!$input.value.trim()) {
+      $status.textContent = m.inputEmpty;
+      return;
+    }
+    if ($input.value.length > MAX_INPUT_BYTES) {
+      showError(m.inputTooLarge);
+      return;
+    }
+    if (direction() === "pem2der") {
+      const r = pemToDer($input.value);
+      if (!r.ok) {
+        showError(r.error);
+        return;
+      }
+      lastBytes = r.bytes;
+      lastFilename = "certificate.der";
+      // Show base64 preview; the real artifact is the Download button.
+      let s = "";
+      for (const b of r.bytes) s += String.fromCharCode(b);
+      $output.value = btoa(s).slice(0, 4000) + (r.bytes.length > 3000 ? "\n… (truncated preview — use Download for full DER)" : "");
+      $status.textContent = `${r.label}: ${r.bytes.length} DER bytes ready.`;
+      $download.disabled = false;
+    } else {
+      try {
+        const bytes = base64ToBytes($input.value);
+        $output.value = derToPem(bytes, $label.value || "CERTIFICATE");
+        $status.textContent = m.decodedSuccess(1);
+      } catch {
+        showError("Input is not valid base64 DER.");
+      }
+    }
+  }
+
+  $convert.addEventListener("click", run);
+  $download.addEventListener("click", () => {
+    if (!lastBytes) return;
+    // Blob-URL download — no network, no navigation with data in URL.
+    const blob = new Blob([lastBytes as unknown as BlobPart], { type: "application/pkix-cert" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = lastFilename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  });
+  $file.addEventListener("change", () => {
+    const f = $file.files?.[0];
+    if (!f) return;
+    void f.arrayBuffer().then((buf) => {
+      $output.value = derToPem(buf, $label.value || "CERTIFICATE");
+      $status.textContent = m.decodedSuccess(1);
+    });
+  });
+  document.querySelector('[data-action="clear"]')?.addEventListener("click", () => {
+    $input.value = "";
+    $output.value = "";
+    $error.classList.add("hidden");
+    $status.textContent = "";
+    lastBytes = null;
+    $download.disabled = true;
+    $input.focus();
+  });
+</script>

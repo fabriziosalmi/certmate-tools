@@ -1,0 +1,216 @@
+---
+import Layout from "~/layouts/Layout.astro";
+import PrivacyBadge from "~/components/PrivacyBadge.astro";
+import ToolNav from "~/components/ToolNav.astro";
+import { getMessages, type Locale } from "~/i18n";
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const m = getMessages(locale);
+const desc =
+  locale === "it"
+    ? "Genera chiave privata + CSR PKCS#10 con SAN nel browser. La chiave non lascia mai il tuo device."
+    : "Generate a private key plus a PKCS#10 CSR with SANs in your browser. The key never leaves your device.";
+---
+
+<Layout
+  title={m.csrGeneratorTitle}
+  description={desc}
+  keywords={["csr generator", "generate csr", "pkcs10 generator", "generare csr", "openssl req alternative"]}
+  compact
+>
+  <div class="flex-1 flex flex-col items-stretch justify-start md:justify-center px-4 py-6 md:py-10">
+    <div class="w-full max-w-3xl mx-auto">
+      <ToolNav locale={locale} currentSlug="csr-generator" />
+      <header class="mb-5">
+        <h1 class="text-2xl md:text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
+          {m.csrGeneratorTitle}
+        </h1>
+        <p class="mt-1.5 text-zinc-600 dark:text-zinc-400 leading-relaxed">
+          {m.csrGeneratorTagline}
+        </p>
+        <div class="mt-3"><PrivacyBadge locale={locale} variant="block" /></div>
+      </header>
+
+      <div class:list={["rounded-2xl border shadow-sm p-4 sm:p-5 space-y-4", "bg-white border-zinc-200", "dark:bg-zinc-900 dark:border-zinc-800"]}>
+        <div class="grid sm:grid-cols-2 gap-4">
+          <label class="block sm:col-span-1">
+            <span class="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1.5">CN *</span>
+            <input id="cg-cn" type="text" placeholder="www.example.com" spellcheck="false" autocomplete="off" autocapitalize="off" class="mono w-full border rounded-md px-3 py-2.5 text-sm border-zinc-200 bg-white text-zinc-900 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100" />
+          </label>
+          <label class="block sm:col-span-1">
+            <span class="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1.5">SAN (DNS + IP, one per line or comma)</span>
+            <textarea id="cg-san" rows="2" placeholder="www.example.com&#10;example.com" spellcheck="false" autocomplete="off" autocapitalize="off" class="mono w-full border rounded-md px-3 py-2.5 text-sm border-zinc-200 bg-white text-zinc-900 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100"></textarea>
+          </label>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <label class="block"><span class="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1.5">O</span><input id="cg-o" type="text" spellcheck="false" autocomplete="off" class="mono w-full border rounded-md px-3 py-2.5 text-sm border-zinc-200 bg-white text-zinc-900 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100" /></label>
+          <label class="block"><span class="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1.5">OU</span><input id="cg-ou" type="text" spellcheck="false" autocomplete="off" class="mono w-full border rounded-md px-3 py-2.5 text-sm border-zinc-200 bg-white text-zinc-900 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100" /></label>
+          <label class="block"><span class="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1.5">L</span><input id="cg-l" type="text" spellcheck="false" autocomplete="off" class="mono w-full border rounded-md px-3 py-2.5 text-sm border-zinc-200 bg-white text-zinc-900 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100" /></label>
+          <label class="block"><span class="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1.5">ST</span><input id="cg-st" type="text" spellcheck="false" autocomplete="off" class="mono w-full border rounded-md px-3 py-2.5 text-sm border-zinc-200 bg-white text-zinc-900 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100" /></label>
+          <label class="block"><span class="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1.5">C</span><input id="cg-c" type="text" maxlength="2" placeholder="IT" spellcheck="false" autocomplete="off" autocapitalize="characters" class="mono w-full border rounded-md px-3 py-2.5 text-sm border-zinc-200 bg-white text-zinc-900 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100" /></label>
+          <label class="block col-span-1"><span class="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1.5">Email</span><input id="cg-email" type="text" spellcheck="false" autocomplete="off" class="mono w-full border rounded-md px-3 py-2.5 text-sm border-zinc-200 bg-white text-zinc-900 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100" /></label>
+          <label class="block"><span class="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1.5">Key</span>
+            <select id="cg-keytype" class="w-full border rounded-md px-3 py-2.5 text-sm border-zinc-200 bg-white text-zinc-900 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100">
+              <option value="rsa">RSA</option>
+              <option value="ecdsa">ECDSA</option>
+            </select>
+          </label>
+          <label class="block"><span class="block text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-1.5">Size / Curve</span>
+            <select id="cg-param" class="mono w-full border rounded-md px-3 py-2.5 text-sm border-zinc-200 bg-white text-zinc-900 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100">
+              <option value="2048">2048</option>
+              <option value="3072">3072</option>
+              <option value="4096">4096</option>
+            </select>
+          </label>
+        </div>
+        <div class="flex items-center gap-3 flex-wrap">
+          <button type="button" data-action="generate" class:list={["inline-flex w-full sm:w-auto justify-center items-center gap-2 rounded-md px-5 py-3 text-sm font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed", "bg-zinc-900 text-white hover:bg-zinc-800", "dark:bg-brand-500 dark:text-zinc-50 dark:hover:bg-brand-400"]}>{m.decodeButton}</button>
+          <p id="status" role="status" aria-live="polite" class="text-xs sm:text-sm text-zinc-500 dark:text-zinc-400"></p>
+        </div>
+      </div>
+
+      <div id="error" role="alert" class:list={["mt-5 hidden rounded-lg border px-4 py-3 text-sm", "bg-red-50 border-red-200 text-red-900", "dark:bg-red-950/40 dark:border-red-900/60 dark:text-red-200"]}></div>
+
+      <div id="output" class="mt-5 space-y-3 hidden">
+        <div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-relaxed text-amber-900 dark:bg-amber-950/30 dark:border-amber-900/40 dark:text-amber-200">
+          Save the private key now — it is shown once, stored nowhere, transmitted never.
+        </div>
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <h3 class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">CSR (send to your CA)</h3>
+            <div class="flex gap-2">
+              <button type="button" data-copy="csr" class="text-xs font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100">{m.copy}</button>
+              <button type="button" data-dl="csr" class="text-xs font-medium text-brand-700 hover:text-brand-800 dark:text-brand-400">Download .csr</button>
+            </div>
+          </div>
+          <textarea id="cg-out-csr" rows="8" readonly spellcheck="false" class="mono w-full rounded-lg border px-4 py-3 text-xs leading-relaxed border-zinc-200 bg-zinc-50 text-zinc-900 dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-100"></textarea>
+        </div>
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <h3 class="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Private key (PKCS#8 — keep secret)</h3>
+            <button type="button" data-dl="key" class="text-xs font-medium text-brand-700 hover:text-brand-800 dark:text-brand-400">Download .key</button>
+          </div>
+          <textarea id="cg-out-key" rows="6" readonly spellcheck="false" class="mono w-full rounded-lg border px-4 py-3 text-xs leading-relaxed border-zinc-200 bg-zinc-50 text-zinc-900 dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-100"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { generateCsr } from "~/lib/csr-generator";
+  import { detectLocale, getMessages } from "~/i18n";
+
+  const locale = detectLocale(location.pathname);
+  const m = getMessages(locale);
+
+  const $ = (id: string) => document.getElementById(id) as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+  const $cn = $("cg-cn") as HTMLInputElement;
+  const $san = $("cg-san") as HTMLTextAreaElement;
+  const $o = $("cg-o") as HTMLInputElement;
+  const $ou = $("cg-ou") as HTMLInputElement;
+  const $l = $("cg-l") as HTMLInputElement;
+  const $st = $("cg-st") as HTMLInputElement;
+  const $c = $("cg-c") as HTMLInputElement;
+  const $email = $("cg-email") as HTMLInputElement;
+  const $keytype = $("cg-keytype") as HTMLSelectElement;
+  const $param = $("cg-param") as HTMLSelectElement;
+  const $status = document.getElementById("status") as HTMLElement;
+  const $error = document.getElementById("error") as HTMLElement;
+  const $output = document.getElementById("output") as HTMLElement;
+  const $outCsr = document.getElementById("cg-out-csr") as HTMLTextAreaElement;
+  const $outKey = document.getElementById("cg-out-key") as HTMLTextAreaElement;
+  const $btn = document.querySelector('[data-action="generate"]') as HTMLButtonElement;
+
+  let busy = false;
+
+  function showError(msg: string): void {
+    $error.textContent = msg;
+    $error.classList.remove("hidden");
+    $status.textContent = "";
+  }
+
+  // Key-type switch re-renders the size/curve options without innerHTML:
+  // options are rebuilt via DOM APIs only.
+  $keytype.addEventListener("change", () => {
+    const opts = $keytype.value === "rsa" ? ["2048", "3072", "4096"] : ["P-256", "P-384", "P-521"];
+    $param.replaceChildren(...opts.map((v) => {
+      const o = document.createElement("option");
+      o.value = v;
+      o.textContent = v;
+      return o;
+    }));
+  });
+
+  function download(filename: string, text: string, mime: string): void {
+    const blob = new Blob([text], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+  }
+
+  async function run(): Promise<void> {
+    if (busy) return;
+    $error.classList.add("hidden");
+    if (!$cn.value.trim()) {
+      $status.textContent = m.inputEmpty;
+      return;
+    }
+    busy = true;
+    $btn.disabled = true;
+    $status.textContent = m.decodingButton;
+    try {
+      const sanTokens = $san.value.split(/[\s,;]+/).map((s) => s.trim()).filter(Boolean);
+      const sanIp = sanTokens.filter((t) => /^\d+\.\d+\.\d+\.\d+$/.test(t) || t.includes(":"));
+      const sanDns = sanTokens.filter((t) => !sanIp.includes(t));
+      const r = await generateCsr({
+        keyType: $keytype.value === "ecdsa" ? "ecdsa" : "rsa",
+        rsaBits: ($param.value === "3072" || $param.value === "4096" ? Number($param.value) : 2048) as 2048 | 3072 | 4096,
+        curve: ($param.value.startsWith("P-") ? $param.value : "P-256") as "P-256" | "P-384" | "P-521",
+        subject: {
+          CN: $cn.value.trim(),
+          O: $o.value.trim() || undefined,
+          OU: $ou.value.trim() || undefined,
+          L: $l.value.trim() || undefined,
+          ST: $st.value.trim() || undefined,
+          C: $c.value.trim() || undefined,
+          emailAddress: $email.value.trim() || undefined,
+        },
+        sanDns,
+        sanIp,
+      });
+      if (!r.ok) {
+        showError(r.error);
+        return;
+      }
+      $outCsr.value = r.csr.csrPem;
+      $outKey.value = r.csr.privateKeyPem;
+      $output.classList.remove("hidden");
+      $status.textContent = `${r.csr.algorithm}${r.csr.keySize ? ` ${r.csr.keySize}` : ""}${r.csr.namedCurve ? ` ${r.csr.namedCurve}` : ""} · SPKI ${r.csr.spkiSha256.slice(0, 23)}…`;
+      $output.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    } finally {
+      busy = false;
+      $btn.disabled = false;
+    }
+  }
+
+  $btn.addEventListener("click", () => void run());
+  document.querySelector('[data-copy="csr"]')?.addEventListener("click", async (e) => {
+    const btn = e.currentTarget as HTMLButtonElement;
+    try {
+      await navigator.clipboard.writeText($outCsr.value);
+      btn.textContent = m.copied;
+      setTimeout(() => { btn.textContent = m.copy; }, 1500);
+    } catch { /* clipboard denied — silent */ }
+  });
+  document.querySelector('[data-dl="csr"]')?.addEventListener("click", () => download("request.csr", $outCsr.value, "application/pkcs10"));
+  document.querySelector('[data-dl="key"]')?.addEventListener("click", () => download("private.key", $outKey.value, "application/pkcs8"));
+</script>
