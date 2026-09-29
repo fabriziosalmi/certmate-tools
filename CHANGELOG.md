@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.4] - 2026-09-29
+
 ### Fixed
 
 - 2 moderate OSV vulnerabilities: vitest to 4.1.11 (CVE-2026-84373,
