@@ -61,15 +61,15 @@ jobs:
           zip -qr "../certmate-tools-${TAG}-site.zip" .
           cd ..
           sha256sum "certmate-tools-${TAG}-site.zip" > SHA256SUMS.txt
+          # cosign v3 dropped the legacy --output-signature/--output-certificate
+          # pair: one sigstore bundle carries signature + certificate together.
           cosign sign-blob --yes \
-            --output-signature SHA256SUMS.txt.sig \
-            --output-certificate SHA256SUMS.txt.pem \
+            --bundle SHA256SUMS.txt.bundle \
             SHA256SUMS.txt
           cosign verify-blob \
             --certificate-identity-regexp '^https://github.com/fabriziosalmi/certmate-tools/' \
             --certificate-oidc-issuer https://token.actions.githubusercontent.com \
-            --cert SHA256SUMS.txt.pem \
-            --signature SHA256SUMS.txt.sig \
+            --bundle SHA256SUMS.txt.bundle \
             SHA256SUMS.txt
 
       - name: Attach assets to the release
@@ -79,5 +79,5 @@ jobs:
         run: |
           gh release upload "$TAG" \
             "certmate-tools-${TAG}-site.zip" SHA256SUMS.txt \
-            SHA256SUMS.txt.sig SHA256SUMS.txt.pem \
+            SHA256SUMS.txt.bundle \
             --clobber
