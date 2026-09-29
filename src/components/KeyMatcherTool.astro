@@ -12,8 +12,8 @@ const { locale } = Astro.props;
 const m = getMessages(locale);
 const desc =
   locale === "it"
-    ? "Verifica nel browser che una chiave privata corrisponda a un certificato. Niente upload — Web Crypto + confronto SPKI."
-    : "Confirm a private key matches a certificate, fully in your browser. Web Crypto only — SPKI fingerprint comparison.";
+    ? "Verifica nel browser che una chiave privata corrisponda a un certificato. Niente upload. Web Crypto + confronto SPKI."
+    : "Confirm a private key matches a certificate, fully in your browser. Web Crypto only. SPKI fingerprint comparison.";
 ---
 
 <Layout
@@ -221,7 +221,7 @@ const desc =
 
       const fields: Array<[string, string]> = [
         [m.commonSubject, res.certSubject],
-        [m.commonCommonName, res.certCommonName ?? "—"],
+        [m.commonCommonName, res.certCommonName ?? "n/a"],
         [m.commonKeyAlgorithm, res.keyAlgorithm],
       ];
       if (res.keyKeySize) fields.push([m.commonKeySize, `${res.keyKeySize} bits`]);

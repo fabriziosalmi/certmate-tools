@@ -12,8 +12,8 @@ const { locale } = Astro.props;
 const m = getMessages(locale);
 const desc =
   locale === "it"
-    ? "Decodifica online qualsiasi CSR PKCS#10 nel browser. Vedi CN, SAN, parametri chiave, attributi richiesti — niente upload."
-    : "Decode any PKCS#10 Certificate Signing Request in your browser. See CN, SAN, key parameters and challenge attributes — no upload.";
+    ? "Decodifica online qualsiasi CSR PKCS#10 nel browser. Vedi CN, SAN, parametri chiave, attributi richiesti. Niente upload."
+    : "Decode any PKCS#10 Certificate Signing Request in your browser. See CN, SAN, key parameters and challenge attributes. No upload.";
 ---
 
 <Layout
@@ -279,7 +279,7 @@ const desc =
       );
     }
     const detail = csr.signatureCheckError
-      ? ` — ${csr.signatureCheckError}`
+      ? `: ${csr.signatureCheckError}`
       : "";
     return el(
       "span",

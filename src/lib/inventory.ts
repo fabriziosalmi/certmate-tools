@@ -1,5 +1,5 @@
 /**
- * Certificate inventory CSV validator — pure string parsing, client-side.
+ * Certificate inventory CSV validator: pure string parsing, client-side.
  *
  * Expected columns (header required, case-insensitive): at least `hostname`
  * (aliases: host, domain, cn, dns) and optionally `not_after` / `expiry` /

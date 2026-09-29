@@ -4,7 +4,7 @@
  * Regression tests for #63: `allValid` started at `true` and was only
  * falsified inside the per-link loop or by a missing issuer. A single
  * self-signed certificate has zero links and is its own root, so nothing ever
- * cleared the flag — an expired self-signed certificate from an internal
+ * cleared the flag: an expired self-signed certificate from an internal
  * appliance was reported as a valid chain.
  */
 
@@ -13,7 +13,7 @@ import { describe, expect, it } from "vitest";
 import { buildChain } from "~/lib/chain";
 import { DAY, expiredWindow, makeCert } from "./helpers/certs";
 
-describe("buildChain — single self-signed certificate", () => {
+describe("buildChain: single self-signed certificate", () => {
   it("reports an expired self-signed certificate as NOT valid", async () => {
     const { pem } = await makeCert({ cn: "appliance.internal", ...expiredWindow() });
 
@@ -55,7 +55,7 @@ describe("buildChain — single self-signed certificate", () => {
   });
 });
 
-describe("buildChain — leaf + issuer", () => {
+describe("buildChain: leaf + issuer", () => {
   it("validates a well-formed two-cert chain", async () => {
     const root = await makeCert({ cn: "Test Root CA", ca: true });
     const leaf = await makeCert({
@@ -109,7 +109,7 @@ describe("buildChain — leaf + issuer", () => {
   });
 });
 
-describe("buildChain — isCA", () => {
+describe("buildChain: isCA", () => {
   it("does not call a leaf a CA (#67)", async () => {
     // Let's Encrypt leaves carry basicConstraints with CA:FALSE, critical.
     // Testing the extension's *presence* made every one of them a CA.
@@ -146,10 +146,10 @@ describe("buildChain — isCA", () => {
   });
 });
 
-describe("buildChain — input limits (#67)", () => {
+describe("buildChain: input limits (#67)", () => {
   it("refuses an oversized bundle instead of silently analysing a subset", async () => {
     // 20 certificates, above MAX_PEM_BLOCKS (16). Truncating used to drop the
-    // last four and then report "missing intermediate" — a confident
+    // last four and then report "missing intermediate": a confident
     // diagnosis of a problem the user did not have.
     const certs = await Promise.all(
       Array.from({ length: 20 }, (_, i) => makeCert({ cn: `c${i}.example.com` })),

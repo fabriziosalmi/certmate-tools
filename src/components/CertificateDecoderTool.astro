@@ -13,8 +13,8 @@ const m = getMessages(locale);
 
 const seoDescription =
   locale === "it"
-    ? "Decodifica online qualsiasi certificato SSL/TLS X.509 nel browser. Incolla PEM o DER e vedi Subject, SAN, validità, chiave, firma, fingerprint — niente upload, niente tracking."
-    : "Decode any SSL/TLS X.509 certificate in your browser. Paste a PEM or DER and see Subject, SAN, validity, key, signature, fingerprints — no upload, no tracking.";
+    ? "Decodifica online qualsiasi certificato SSL/TLS X.509 nel browser. Incolla PEM o DER e vedi Subject, SAN, validità, chiave, firma, fingerprint. Niente upload, niente tracking."
+    : "Decode any SSL/TLS X.509 certificate in your browser. Paste a PEM or DER and see Subject, SAN, validity, key, signature, fingerprints. No upload, no tracking.";
 ---
 
 <Layout
@@ -368,7 +368,7 @@ const seoDescription =
           btn.textContent = prev;
         }, 1500);
       } catch {
-        /* clipboard denied — silent */
+        /* clipboard denied, silent */
       }
     });
     return el("div", { class: "flex items-start gap-2" }, code, btn);
@@ -474,7 +474,7 @@ const seoDescription =
                 "mt-4 rounded-md bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-900 leading-relaxed dark:bg-amber-950/30 dark:border-amber-900/40 dark:text-amber-200",
             },
             el("strong", null, "SC-081v3"),
-            ` — public TLS validity drops to 200 d (15 Mar 2026), 100 d (2027), 47 d (2029). This certificate's ${cert.validityDays}-day lifetime`,
+            `: public TLS validity drops to 200 d (15 Mar 2026), 100 d (2027), 47 d (2029). This certificate's ${cert.validityDays}-day lifetime`,
             cert.validityDays > 200
               ? " already exceeds the March 2026 cap."
               : " will exceed the March 2027 cap.",

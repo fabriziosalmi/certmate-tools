@@ -33,7 +33,7 @@ const sections: ChecklistSection[] =
   locale === "it"
     ? [
         {
-          ref: "Art. 21(2)(h) NIS2 — Crittografia",
+          ref: "Art. 21(2)(h) NIS2: Crittografia",
           items: [
             {
               q: "Tutti i servizi pubblici espongono solo TLS 1.2+ con TLS 1.3 abilitato preferito.",
@@ -74,7 +74,7 @@ const sections: ChecklistSection[] =
           ],
         },
         {
-          ref: "Det. ACN 379907/2025 — Inventario e ciclo di vita",
+          ref: "Det. ACN 379907/2025: Inventario e ciclo di vita",
           items: [
             {
               q: "Inventario centralizzato dei certificati pubblici con scadenze monitorate.",
@@ -101,7 +101,7 @@ const sections: ChecklistSection[] =
           ],
         },
         {
-          ref: "Art. 23 NIS2 — Notifica incidenti",
+          ref: "Art. 23 NIS2: Notifica incidenti",
           items: [
             {
               q: "Runbook di notifica ACN per incidente PKI (24h early warning, 72h notifica, 1 mese report finale).",
@@ -121,7 +121,7 @@ const sections: ChecklistSection[] =
           ],
         },
         {
-          ref: "DORA / eIDAS — Resilienza e qualified",
+          ref: "DORA / eIDAS: Resilienza e qualified",
           items: [
             {
               q: "Policy di cifratura documentata (data at rest / in transit / in use), allineata a RTS 2024/1774 art. 6.",
@@ -150,7 +150,7 @@ const sections: ChecklistSection[] =
       ]
     : [
         {
-          ref: "NIS2 Art. 21(2)(h) — Cryptography",
+          ref: "NIS2 Art. 21(2)(h): Cryptography",
           items: [
             {
               q: "All public-facing services accept TLS 1.2+ only, with TLS 1.3 enabled and preferred.",
@@ -176,7 +176,7 @@ const sections: ChecklistSection[] =
             {
               q: "Full certificate chain served (no client-side AIA chasing required).",
               severity: "p0",
-              how: "Run Chain Builder against your server's chain — it must report 'chain valid' with no 'missing intermediate'.",
+              how: "Run Chain Builder against your server's chain: it must report 'chain valid' with no 'missing intermediate'.",
               links: [
                 { href: chainBuilderPath, label: "Chain Builder", internal: true },
                 { href: "https://www.ssllabs.com/ssltest/", label: "SSL Labs (Certification Paths)" },
@@ -191,7 +191,7 @@ const sections: ChecklistSection[] =
           ],
         },
         {
-          ref: "Italian ACN det. 379907/2025 — Inventory & lifecycle",
+          ref: "Italian ACN det. 379907/2025: Inventory and lifecycle",
           items: [
             {
               q: "Centralized inventory of public certificates with expiry tracking.",
@@ -218,7 +218,7 @@ const sections: ChecklistSection[] =
           ],
         },
         {
-          ref: "NIS2 Art. 23 — Incident reporting",
+          ref: "NIS2 Art. 23: Incident reporting",
           items: [
             {
               q: "PKI incident runbook for ACN notification (24h early warning, 72h notification, 1-month final report).",
@@ -238,7 +238,7 @@ const sections: ChecklistSection[] =
           ],
         },
         {
-          ref: "DORA / eIDAS — Resilience & qualified",
+          ref: "DORA / eIDAS: Resilience and qualified",
           items: [
             {
               q: "Documented encryption policy (data at rest / in transit / in use) aligned to RTS 2024/1774 art. 6.",
@@ -303,7 +303,7 @@ const desc =
       >
         <div class="rounded-lg border border-zinc-200 bg-zinc-50/60 p-3 dark:border-zinc-800 dark:bg-zinc-900/40">
           <div class="text-[10px] font-semibold uppercase tracking-wider text-brand-700 dark:text-brand-400 mb-1">
-            {locale === "it" ? "1 — Rispondi" : "1 — Answer"}
+            {locale === "it" ? "1. Rispondi" : "1. Answer"}
           </div>
           <p class="text-xs text-zinc-600 dark:text-zinc-400 leading-snug">
             {locale === "it"
@@ -313,17 +313,17 @@ const desc =
         </div>
         <div class="rounded-lg border border-zinc-200 bg-zinc-50/60 p-3 dark:border-zinc-800 dark:bg-zinc-900/40">
           <div class="text-[10px] font-semibold uppercase tracking-wider text-brand-700 dark:text-brand-400 mb-1">
-            {locale === "it" ? "2 — Verifica" : "2 — Evidence"}
+            {locale === "it" ? "2. Verifica" : "2. Evidence"}
           </div>
           <p class="text-xs text-zinc-600 dark:text-zinc-400 leading-snug">
             {locale === "it"
-              ? "Per ogni item, apri \"come verificarlo\" — link a tool interni ed esterni."
-              : "Open “how to verify” on each item — links to internal and external tools."}
+              ? "Per ogni item, apri \"come verificarlo\": link a tool interni ed esterni."
+              : "Open “how to verify” on each item: links to internal and external tools."}
           </p>
         </div>
         <div class="rounded-lg border border-zinc-200 bg-zinc-50/60 p-3 dark:border-zinc-800 dark:bg-zinc-900/40">
           <div class="text-[10px] font-semibold uppercase tracking-wider text-brand-700 dark:text-brand-400 mb-1">
-            {locale === "it" ? "3 — Esporta" : "3 — Export"}
+            {locale === "it" ? "3. Esporta" : "3. Export"}
           </div>
           <p class="text-xs text-zinc-600 dark:text-zinc-400 leading-snug">
             {locale === "it"
@@ -521,11 +521,11 @@ const desc =
                         title={
                           item.severity === "p0"
                             ? locale === "it"
-                              ? "P0 — requisito tecnico critico"
-                              : "P0 — critical technical requirement"
+                              ? "P0: requisito tecnico critico"
+                              : "P0: critical technical requirement"
                             : locale === "it"
-                              ? "P1 — buona pratica raccomandata"
-                              : "P1 — recommended good practice"
+                              ? "P1: buona pratica raccomandata"
+                              : "P1: recommended good practice"
                         }
                       >
                         {item.severity}
@@ -621,7 +621,7 @@ const desc =
             href="https://eur-lex.europa.eu/eli/dir/2022/2555/oj/eng"
             target="_blank"
             rel="noopener"
-            class="text-brand-700 hover:underline dark:text-brand-400">Directive (EU) 2022/2555 — NIS2</a
+            class="text-brand-700 hover:underline dark:text-brand-400">Directive (EU) 2022/2555 (NIS2)</a
           >
         </li>
         <li>
@@ -629,7 +629,7 @@ const desc =
             href="https://www.acn.gov.it/portale/web/guest/normativa"
             target="_blank"
             rel="noopener"
-            class="text-brand-700 hover:underline dark:text-brand-400">ACN — D.Lgs. 138/2024 e Determinazione 379907/2025</a
+            class="text-brand-700 hover:underline dark:text-brand-400">ACN: D.Lgs. 138/2024 e Determinazione 379907/2025</a
           >
         </li>
         <li>
@@ -637,7 +637,7 @@ const desc =
             href="https://eur-lex.europa.eu/eli/reg/2022/2554/oj"
             target="_blank"
             rel="noopener"
-            class="text-brand-700 hover:underline dark:text-brand-400">Regulation (EU) 2022/2554 — DORA</a
+            class="text-brand-700 hover:underline dark:text-brand-400">Regulation (EU) 2022/2554 (DORA)</a
           >
         </li>
         <li>
@@ -745,7 +745,7 @@ const desc =
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     } catch {
-      /* quota exceeded or storage blocked — silent fallback */
+      /* quota exceeded or storage blocked, silent fallback */
     }
   }
 
@@ -837,7 +837,7 @@ const desc =
     barTrack.setAttribute("aria-valuenow", String(score));
     barTrack.setAttribute(
       "aria-valuetext",
-      `${score}% — ${yesAnswered} of ${totalAnswered} applicable items satisfied (weighted P0 ×2)`
+      `${score}%: ${yesAnswered} of ${totalAnswered} applicable items satisfied (weighted P0 ×2)`
     );
 
     // Any P0 = "no" forces amber regardless of weighted score: a single
@@ -975,7 +975,7 @@ const desc =
       const sections = collectSections();
       const s = currentScore();
       const lines: string[] = [];
-      lines.push("# NIS2 TLS Readiness — evidence pack");
+      lines.push("# NIS2 TLS Readiness evidence pack");
       lines.push("");
       lines.push(`- Generated: ${new Date().toISOString()}`);
       if (meta.org) lines.push(`- Organization: ${meta.org}`);
@@ -986,7 +986,7 @@ const desc =
         `- Score: ${s.score}% (${s.yesAnswered}/${s.totalAnswered} items, weighted P0 ×2)`
       );
       if (s.p0Failed > 0) {
-        lines.push(`- **P0 failures: ${s.p0Failed}** — review before sign-off.`);
+        lines.push(`- **P0 failures: ${s.p0Failed}**: review before sign-off.`);
       }
       lines.push("");
 
@@ -995,7 +995,7 @@ const desc =
         sec.items.forEach((it) => {
           const marker =
             it.answer === "yes" ? "[x]" : it.answer === "no" ? "[ ]" : "[?]";
-          const ans = it.answer ?? "—";
+          const ans = it.answer ?? "n/a";
           const sev = it.severity.toUpperCase();
           lines.push(`- ${marker} \`${sev}\` ${it.question} _(${ans})_`);
         });
@@ -1003,10 +1003,10 @@ const desc =
       });
 
       lines.push("## References");
-      lines.push("- Directive (EU) 2022/2555 — NIS2");
+      lines.push("- Directive (EU) 2022/2555 (NIS2)");
       lines.push("- D.Lgs. 138/2024 (IT) and ACN Determinazione 379907/2025");
-      lines.push("- Regulation (EU) 2022/2554 — DORA");
-      lines.push("- Commission Delegated Regulation (EU) 2024/1774 — RTS encryption");
+      lines.push("- Regulation (EU) 2022/2554 (DORA)");
+      lines.push("- Commission Delegated Regulation (EU) 2024/1774 (RTS encryption)");
       lines.push("");
       lines.push("---");
       lines.push("Built with https://tools.certmate.org");

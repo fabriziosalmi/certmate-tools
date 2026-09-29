@@ -124,7 +124,7 @@ MIIBkTCB+wIJAJxzZxxxxxxx
     expect(extractPemBlocks(oneBlock, "CERTIFICATE REQUEST")).toEqual([]);
   });
 
-  it("returns every block — callers enforce the limit, loudly (#67)", () => {
+  it("returns every block: callers enforce the limit, loudly (#67)", () => {
     // This test used to assert the opposite. Silently returning the first 16
     // meant a 20-certificate bundle was analysed as a 16-certificate one, and
     // the Chain Builder reported a missing intermediate that was in fact

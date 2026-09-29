@@ -33,7 +33,6 @@ if (isInternal) {
 const href = isInternal ? localizedPath(locale, `/${tool.slug}/`) : tool.url;
 const isExternal = !isInternal;
 const isSoon = isInternal && tool.status === "soon";
-const isNew = isInternal && tool.highlight === "new";
 ---
 
 {
@@ -80,18 +79,6 @@ const isNew = isInternal && tool.highlight === "new";
       {title}
     </h3>
     <span class="inline-flex items-center gap-1.5 shrink-0">
-      {
-        isNew && (
-          <span
-            class:list={[
-              "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider",
-              "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-200",
-            ]}
-          >
-            {m.newBadge}
-          </span>
-        )
-      }
       {
         isExternal && (
           <span

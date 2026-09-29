@@ -4,7 +4,7 @@
  * Regression tests for #64: `expired` was derived from
  * `diffDays(notAfter, now) < 0`, and `diffDays` used `Math.round`. For a
  * certificate that expired between one and twelve hours ago the quotient
- * rounds to `-0`, and `-0 < 0` is `false` in JavaScript — so at noon, a
+ * rounds to `-0`, and `-0 < 0` is `false` in JavaScript, so at noon, a
  * certificate that died at 06:00 showed the amber "Expires in 0 days" badge
  * instead of the red "Expired" one.
  *
@@ -39,7 +39,7 @@ describe("diffDays", () => {
 
   it("floors rather than rounds, so a partial day is not counted early", () => {
     const now = new Date("2026-07-21T00:00:00Z");
-    // 20 hours away is not "one day left" — it is zero full days.
+    // 20 hours away is not "one day left": it is zero full days.
     expect(diffDays(new Date("2026-07-21T20:00:00Z"), now)).toBe(0);
     expect(diffDays(new Date("2026-07-22T00:00:00Z"), now)).toBe(1);
   });
@@ -50,7 +50,7 @@ describe("diffDays", () => {
   });
 });
 
-describe("decodeCertificateInput — expiry", () => {
+describe("decodeCertificateInput: expiry", () => {
   it("reports a certificate that expired hours ago as expired", async () => {
     const now = Date.now();
     const { pem } = await makeCert({
@@ -104,7 +104,7 @@ describe("decodeCertificateInput — expiry", () => {
     // 29, not 30: the certificate has 30 days minus the milliseconds spent
     // generating it, and flooring never overstates remaining life. For an
     // expiry warning, under-reporting by less than a day is the safe
-    // direction — rounding up is what tells someone they have another day.
+    // direction: rounding up is what tells someone they have another day.
     expect(decoded.daysUntilExpiry).toBe(29);
   });
 
@@ -123,7 +123,7 @@ describe("decodeCertificateInput — expiry", () => {
   });
 });
 
-describe("decodeCertificateInput — basics", () => {
+describe("decodeCertificateInput: basics", () => {
   it("reads the subject CN and the SANs", async () => {
     const { pem } = await makeCert({
       cn: "app.example.com",

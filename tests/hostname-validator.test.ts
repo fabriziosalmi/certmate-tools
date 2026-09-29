@@ -96,7 +96,7 @@ describe("validity", () => {
 
     const res = await check(pem, "old.example.com");
 
-    // The SAN does cover it — but answering only that is misleading.
+    // The SAN does cover it, but answering only that is misleading.
     expect(res.matched).toBe(true);
     expect(
       res.notes.some((n) => n.toLowerCase().includes("expired")) ||

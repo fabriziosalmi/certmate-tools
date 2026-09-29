@@ -1,10 +1,10 @@
 /**
- * CSR generator — dogfooded through the CSR decoder.
+ * CSR generator, dogfooded through the CSR decoder.
  *
  * A generated request must parse with `decodeCSRInput` and carry
  * `signatureValid === true`: that single assertion covers DN encoding,
  * extensionRequest/SAN encoding, the signatureAlgorithm OID and the
- * signature itself — i.e. everything we could get wrong in PKCS#10.
+ * signature itself (i.e. everything we could get wrong in PKCS#10).
  */
 import "./helpers/certs"; // side effect: sets @peculiar/x509 crypto provider
 import { describe, expect, it } from "vitest";
@@ -12,7 +12,7 @@ import { describe, expect, it } from "vitest";
 import { generateCsr } from "~/lib/csr-generator";
 import { decodeCSRInput } from "~/lib/csr-decoder";
 
-describe("generateCsr — RSA", () => {
+describe("generateCsr: RSA", () => {
   it("produces a verifiable CSR with subject, DNS SANs and IP SAN", async () => {
     const gen = await generateCsr({
       keyType: "rsa",
@@ -43,7 +43,7 @@ describe("generateCsr — RSA", () => {
   }, 30000);
 });
 
-describe("generateCsr — ECDSA", () => {
+describe("generateCsr: ECDSA", () => {
   it("produces a verifiable P-256 CSR", async () => {
     const gen = await generateCsr({
       keyType: "ecdsa",
@@ -64,7 +64,7 @@ describe("generateCsr — ECDSA", () => {
   }, 30000);
 });
 
-describe("generateCsr — validation", () => {
+describe("generateCsr: validation", () => {
   it("rejects a missing CN", async () => {
     const out = await generateCsr({ keyType: "rsa", subject: { CN: "  " } });
     expect(out.ok).toBe(false);

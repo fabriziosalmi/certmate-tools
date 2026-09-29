@@ -1,9 +1,9 @@
 /**
  * Key ↔ certificate matching.
  *
- * Part of #66. The verdict here is binary and consequential — "this key does
+ * Part of #66. The verdict here is binary and consequential: "this key does
  * not belong to this certificate" is what stops someone deploying a mismatched
- * pair — and it had no tests.
+ * pair, and it had no tests.
  *
  * Also pins the PKCS#1 behaviour (#67): the module docstring claimed support
  * for "traditional RSA private key PEM via wrapping" while the code throws on

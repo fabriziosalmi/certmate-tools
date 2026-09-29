@@ -1,8 +1,8 @@
 # Security policy
 
 Thank you for taking the time to look at the security of **certmate-tools**.
-The project is a static, client-side toolbox — no server-side code processes
-user data — but we still take any finding seriously.
+The project is a static, client-side toolbox: no server-side code processes
+user data, but we still take any finding seriously.
 
 ## Reporting a vulnerability
 
@@ -19,7 +19,7 @@ following private channels:
 Please include, when possible:
 
 - A clear description of the issue and its impact.
-- Steps to reproduce — minimal page, URL, payload.
+- Steps to reproduce: minimal page, URL, payload.
 - Affected version / commit SHA.
 - Your contact handle so we can credit you in the advisory (optional).
 
@@ -34,9 +34,9 @@ Please include, when possible:
 
 ## Out of scope
 
-- Findings against third-party tools listed in the curated directory — please
+- Findings against third-party tools listed in the curated directory: please
   contact those projects directly.
-- Pure SEO / typo / copywriting issues — open a regular issue or PR.
+- Pure SEO / typo / copywriting issues: open a regular issue or PR.
 - Issues affecting unsupported browsers (we target the last two stable
   versions of Chrome, Firefox, Safari and Edge).
 
@@ -67,7 +67,7 @@ The "no upload" promise is enforced by the browser, not just by code review.
   CSP and browsers log a console error for it on every page load. Framing
   protection comes from the edge, where GitHub Pages sends
   `x-frame-options: SAMEORIGIN`. `script-src` and `style-src` are `'self'` plus per-page
-  `sha256-…` hashes of inline blocks computed at build time — there is no
+  `sha256-…` hashes of inline blocks computed at build time: there is no
   `'unsafe-inline'` and no `'unsafe-eval'`.
 - `connect-src 'none'` is the load-bearing rule: any future regression that
   introduces `fetch()`, `XMLHttpRequest`, `WebSocket`, `EventSource`,
@@ -81,7 +81,7 @@ The "no upload" promise is enforced by the browser, not just by code review.
 - **DOM-builder helpers** (`src/lib/dom.ts`: `el`, `frag`, `mount`, `text`)
   are the only sanctioned way to render dynamic content. They funnel every
   string through `createTextNode` / `setAttribute`, so escaping is enforced
-  by construction rather than by caller discipline — there is no `escapeHtml`
+  by construction rather than by caller discipline: there is no `escapeHtml`
   to remember to call.
 - **Permissions-Policy** disables every powerful browser API the tools do not
   need (camera, microphone, geolocation, payment, USB, etc.).

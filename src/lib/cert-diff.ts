@@ -1,5 +1,5 @@
 /**
- * Certificate diff — decode two certificates locally and compare
+ * Certificate diff: decode two certificates locally and compare
  * field-by-field. Reuses the decoder so semantics stay identical.
  */
 
@@ -17,7 +17,7 @@ export type CertDiffOutcome =
   | { ok: false; error: string };
 
 function fmtList(xs: string[]): string {
-  return xs.length ? xs.join(", ") : "—";
+  return xs.length ? xs.join(", ") : "none";
 }
 
 function rowsFor(a: DecodedCertificate, b: DecodedCertificate): DiffRow[] {
@@ -30,8 +30,8 @@ function rowsFor(a: DecodedCertificate, b: DecodedCertificate): DiffRow[] {
     ["Validity (days)", String(a.validityDays), String(b.validityDays)],
     [
       "SAN",
-      a.san.map((s) => `${s.type}:${s.value}`).join(" ") || "—",
-      b.san.map((s) => `${s.type}:${s.value}`).join(" ") || "—",
+      a.san.map((s) => `${s.type}:${s.value}`).join(" ") || "none",
+      b.san.map((s) => `${s.type}:${s.value}`).join(" ") || "none",
     ],
     [
       "Public key",

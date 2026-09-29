@@ -132,7 +132,7 @@ const desc =
                   "div",
                   { class: "px-3 py-2 text-xs border-t border-zinc-100 dark:border-zinc-800 first:border-0" },
                   el("span", { class: "mono font-semibold" }, `L${x.line} ${x.hostname || "(empty)"} `),
-                  el("span", { class: "text-amber-800 dark:text-amber-200" }, `— ${x.issues.join("; ")}`)
+                  el("span", { class: "text-amber-800 dark:text-amber-200" }, `: ${x.issues.join("; ")}`)
                 )
               )
             )

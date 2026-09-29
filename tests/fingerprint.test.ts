@@ -13,7 +13,7 @@ describe("fingerprintInput", () => {
     expect(dec.ok).toBe(true);
     if (!fp.ok || !dec.ok) return;
     expect(fp.result.kind).toBe("certificate-der");
-    // Same DER bytes in, same digest out — the definition of a fingerprint.
+    // Same DER bytes in, same digest out: the definition of a fingerprint.
     expect(fp.result.sha256).toBe(dec.certs[0]!.fingerprintSha256);
     expect(fp.result.sha1).toBe(dec.certs[0]!.fingerprintSha1);
   });

@@ -1,14 +1,14 @@
 /**
- * RSA & EC key inspector — 100% client-side via Web Crypto + @peculiar/x509.
+ * RSA & EC key inspector: 100% client-side via Web Crypto + @peculiar/x509.
  *
  * Accepts PKCS#8 private keys, SPKI public keys, X.509 certificates (inspects
  * the embedded public key) and bare base64/DER of either. Reports algorithm,
- * size/curve, RSA exponent and the SPKI SHA-256 thumbprint — the same value
+ * size/curve, RSA exponent and the SPKI SHA-256 thumbprint: the same value
  * the decoder and the key matcher show, so the three tools agree.
  *
  * Traditional formats Web Crypto cannot import (PKCS#1 "RSA PRIVATE KEY",
  * SEC1 "EC PRIVATE KEY", encrypted keys, OpenSSH) are rejected with the exact
- * `openssl` command that converts them — same policy as key-match.
+ * `openssl` command that converts them, same policy as key-match.
  */
 
 import { X509Certificate } from "@peculiar/x509";
@@ -222,7 +222,7 @@ async function describe(
 
 function traditionalFormatError(input: string): string | null {
   if (input.includes("-----BEGIN ENCRYPTED PRIVATE KEY-----")) {
-    return "Encrypted private key — decrypt first: openssl pkcs8 -in key.pem -out key.pkcs8.pem";
+    return "Encrypted private key: decrypt first: openssl pkcs8 -in key.pem -out key.pkcs8.pem";
   }
   if (input.includes("-----BEGIN RSA PRIVATE KEY-----")) {
     return "PKCS#1 (RSA PRIVATE KEY) is not importable by Web Crypto. Convert: openssl pkcs8 -topk8 -nocrypt -in key.pem -out key.pkcs8.pem";

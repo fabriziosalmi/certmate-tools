@@ -1,7 +1,7 @@
 /**
  * CSR decoder.
  *
- * Part of #66 — the last of the six verdict-producing modules that had no
+ * Part of #66: the last of the six verdict-producing modules that had no
  * tests. A CSR is what someone sends to a CA, so "which names am I actually
  * requesting?" is the question this answers, and getting it wrong means
  * discovering a missing SAN after issuance.

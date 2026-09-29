@@ -6,7 +6,7 @@
  *
  * The JWK thumbprint follows RFC 7638: a canonical JSON representation of
  * the public key's required members, hashed with SHA-256. We compute it
- * entirely client-side — the account key never leaves the browser.
+ * entirely client-side: the account key never leaves the browser.
  */
 
 import { bufToBase64Url, sha } from "./util";

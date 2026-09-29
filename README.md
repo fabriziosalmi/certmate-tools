@@ -4,19 +4,19 @@
 [![CodeQL](https://github.com/fabriziosalmi/certmate-tools/actions/workflows/codeql.yml/badge.svg)](https://github.com/fabriziosalmi/certmate-tools/actions/workflows/codeql.yml)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/fabriziosalmi/certmate-tools/badge)](https://scorecard.dev/viewer/?uri=github.com/fabriziosalmi/certmate-tools)
 
-Free online tools for TLS, SSL certificates, ACME, domain & DNS — privacy-first, client-side, zero upload.
+Free online tools for TLS, SSL certificates, ACME, domain and DNS. Privacy-first, client-side, zero upload.
 
-Companion to [CertMate](https://github.com/fabriziosalmi/certmate) — open-source SSL certificate management.
+Companion to [CertMate](https://github.com/fabriziosalmi/certmate), open-source SSL certificate management.
 
 ## Ecosystem
 
 Part of the [CertMate](https://github.com/fabriziosalmi/certmate) ecosystem:
 
-- **[CertMate](https://github.com/fabriziosalmi/certmate)** — open-source SSL certificate management (API + UI).
-- **[certmate-agent](https://github.com/fabriziosalmi/certmate-agent)** — conversational assistant: a local LLM mapped 1:1 to CertMate's REST API, with RAG over the docs.
-- **[nis2-public](https://github.com/fabriziosalmi/nis2-public)** — NIS2 continuous posture management & remediation.
+- **[CertMate](https://github.com/fabriziosalmi/certmate)**: open-source SSL certificate management (API + UI).
+- **[certmate-agent](https://github.com/fabriziosalmi/certmate-agent)**: conversational assistant, a local LLM mapped 1:1 to CertMate's REST API, with RAG over the docs.
+- **[nis2-public](https://github.com/fabriziosalmi/nis2-public)**: NIS2 continuous posture management and remediation.
 
-**Enterprise / high-scale** — multi-tenant, mTLS, white-label and NIS2-aligned deployments are available through *CertMate-ng* (source-available, BSL 1.1, EU-built). Contact **fabrizio.salmi@gmail.com**.
+**Enterprise / high-scale**: multi-tenant, mTLS, white-label and NIS2-aligned deployments are available through *CertMate-ng* (source-available, BSL 1.1, EU-built). Contact **fabrizio.salmi@gmail.com**.
 
 ## Security
 
@@ -54,4 +54,4 @@ src/
 
 1. Create `src/pages/<tool-slug>/index.astro`
 2. Register it in `src/data/tools.ts`
-3. Use `Layout.astro` and existing components — keep the "above-the-fold" + "no upload" pattern.
+3. Use `Layout.astro` and existing components: keep the "above-the-fold" + "no upload" pattern.

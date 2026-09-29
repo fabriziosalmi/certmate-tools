@@ -212,7 +212,7 @@ const desc =
    * Visual chain strip: one compact node per ordered certificate, joined by
    * a vertical edge colored by that link's verification outcome (emerald =
    * signature + validity OK, red = broken, zinc = single cert / unknown). A
-   * dashed terminator marks a missing parent. Purely presentational — the
+   * dashed terminator marks a missing parent. Purely presentational: the
    * per-link verdicts below remain the source of truth.
    */
   function chainStrip(res: ChainResult, roles: string[]): HTMLElement {
@@ -299,7 +299,7 @@ const desc =
             class:
               "rounded-lg border border-dashed border-amber-300 dark:border-amber-800 px-3 py-2 text-xs text-amber-800 dark:text-amber-200",
           },
-          `? ${m.chainMissingParentPrefix} — ${res.missingIssuer.issuerCN ?? "unknown issuer"}`
+          `? ${m.chainMissingParentPrefix}: ${res.missingIssuer.issuerCN ?? "unknown issuer"}`
         )
       );
     }
@@ -386,7 +386,7 @@ const desc =
               class:
                 "rounded-md border border-amber-200 bg-amber-50/60 px-3 py-2 text-xs text-amber-900 leading-relaxed dark:bg-amber-950/30 dark:border-amber-900/60 dark:text-amber-200",
             },
-            `${m.chainMissingParentPrefix} #${res.missingIssuer.forIndex + 1} — ${m.chainExpectedIssuer} `,
+            `${m.chainMissingParentPrefix} #${res.missingIssuer.forIndex + 1}: ${m.chainExpectedIssuer} `,
             el(
               "span",
               { class: "font-medium" },
