@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-09-29
+
+### Fixed
+
+- Homepage cards for `certificate-decoder`, `acme-dns-01` and
+  `nis2-tls-readiness` rendered the raw slug with an empty tagline. Root
+  cause: convention-based `toolLabels()` lookup (digit-blind regex plus two
+  keys off-convention). Fixed with digit-aware matching, an explicit alias
+  map, and a registry fallback so a slug can never render as UI copy again.
+  Guarded by `tests/i18n-labels.test.ts`.
+- Homepage omitted the whole Monitor category — `renewal-calculator` and
+  `inventory-validator` were live but invisible on home. Added `monitor` to
+  the homepage category order.
+- Hero headline rendered "you canactually trust" (collapsed JSX
+  whitespace). Explicit space added.
+- Footer bottom-bar links ran together on narrow screens. Spacing fixed.
+
+### Added
+
+- Homepage FAQ section (5 entries, EN+IT) with `FAQPage` structured data.
+- Homepage JSON-LD (`WebSite` + `ItemList` of live tools + `FAQPage`).
+- Client-side tool filter on the homepage (pure DOM, no network).
+- "Do not trust us. Verify." trust strip: privacy notice, no-network gate
+  source, open-source repo.
+- "New" badges on the 8 tools added in 0.2.1 (remove after one release).
+- Category anchor chips on the homepage tool index.
+
 ## [0.2.1] - 2026-09-29
 
 ### Added
