@@ -8,6 +8,13 @@ updates:
     labels:
       - "dependencies"
       - "security"
+    ignore:
+      # astro check (@astrojs/check) supports only TypeScript 5 and 6.
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+      # @peculiar/x509 2+ needs a Reflect polyfill in the client bundle.
+      - dependency-name: "@peculiar/x509"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -17,3 +24,8 @@ updates:
     labels:
       - "dependencies"
       - "security"
+    groups:
+      # init, analyze and upload-sarif must run the same CodeQL version.
+      codeql-action:
+        patterns:
+          - "github/codeql-action*"
